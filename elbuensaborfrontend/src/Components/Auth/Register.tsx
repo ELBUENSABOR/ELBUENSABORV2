@@ -79,6 +79,7 @@ const Register = () => {
         token: resp.data.token,
         username: resp.data.username,
         role: resp.data.role,
+        userId: resp.data.userId,
       });
 
       setTimeout(() => {
@@ -106,6 +107,7 @@ const Register = () => {
           placeholder="Nombre"
           value={form.nombre}
           onChange={handleChange}
+          className="form-control"
         />
 
         <input
@@ -114,6 +116,7 @@ const Register = () => {
           placeholder="Apellido"
           value={form.apellido}
           onChange={handleChange}
+          className="form-control"
         />
 
         <input
@@ -122,6 +125,7 @@ const Register = () => {
           placeholder="Nombre de usuario"
           value={form.username}
           onChange={handleChange}
+          className="form-control"
         />
 
         <input
@@ -130,6 +134,7 @@ const Register = () => {
           placeholder="Correo"
           value={form.email}
           onChange={handleChange}
+          className="form-control"
         />
 
         <input
@@ -138,6 +143,7 @@ const Register = () => {
           placeholder="Contraseña"
           value={form.password}
           onChange={handleChange}
+          className="form-control"
         />
 
         <input
@@ -146,6 +152,7 @@ const Register = () => {
           placeholder="Teléfono"
           value={form.telefono}
           onChange={handleChange}
+          className="form-control"
         />
 
         <input
@@ -154,6 +161,7 @@ const Register = () => {
           placeholder="Calle"
           value={form.calle}
           onChange={handleChange}
+          className="form-control"
         />
 
         <input
@@ -162,6 +170,7 @@ const Register = () => {
           placeholder="Numero"
           value={form.numero}
           onChange={handleChange}
+          className="form-control"
         />
 
         <input
@@ -170,6 +179,7 @@ const Register = () => {
           placeholder="Codigo postal"
           value={form.codigoPostal || ""}
           onChange={handleChange}
+          className="form-control"
         />
 
         <select name="localidad" value={form.localidad} onChange={handleChange}>

@@ -53,7 +53,7 @@ const Login = () => {
       });
       setTimeout(() => {
         navigate("/");
-      }, 1000);
+      }, 500);
     } catch (err: any) {
       setMsg((prev) => ({
         ...prev,
@@ -76,6 +76,7 @@ const Login = () => {
           placeholder="Nombre de usuario"
           value={form.username}
           onChange={handleChange}
+          className="form-control"
         />
         <input
           type="password"
@@ -83,6 +84,7 @@ const Login = () => {
           placeholder="Contraseña"
           value={form.password}
           onChange={handleChange}
+          className="form-control"
         />
         <button type="submit" disabled={loading}>
           {loading ? "Iniciando sesión..." : "Iniciar sesión"}

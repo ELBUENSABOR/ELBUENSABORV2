@@ -34,5 +34,8 @@ public interface PedidoVentaRepository extends JpaRepository<PedidoVenta, Long> 
 
     @Query("SELECT p FROM PedidoVenta p WHERE p.fechaPedido BETWEEN :fechaInicio AND :fechaFin")
     List<PedidoVenta> findByFechaPedidoBetween(@Param("fechaInicio") LocalDateTime fechaInicio, @Param("fechaFin") LocalDateTime fechaFin);
+
+    @Query("SELECT p FROM PedidoVenta p LEFT JOIN FETCH p.detalles d LEFT JOIN FETCH d.manufacturado LEFT JOIN FETCH d.insumo WHERE p.sucursal.id = :sucursalId")
+    List<PedidoVenta> findBySucursalIdWithDetalles(@Param("sucursalId") Long sucursalId);
 }
 

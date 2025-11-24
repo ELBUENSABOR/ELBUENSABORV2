@@ -4,10 +4,12 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Stream;
 
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.utn.elbuensabor.dtos.StockAlertaDTO;
 import com.utn.elbuensabor.entities.ArticuloInsumo;
 import com.utn.elbuensabor.entities.ArticuloManufacturado;
 import com.utn.elbuensabor.entities.ArticuloManufacturadoDetalle;
@@ -200,6 +202,26 @@ public class StockService {
                 .findBySucursalIdAndInsumoId(sucursalId, insumoId)
                 .map(SucursalInsumo::getStockActual)
                 .orElse(0.0);
+    }
+
+    public List<StockAlertaDTO> obtenerAlertas(Long sucursalId) {
+        List<SucursalInsumo> bajo = sucursalInsumoRepository.findStockBajoMinimo(sucursalId);
+        List<SucursalInsumo> cerca = sucursalInsumoRepository.findStockCercaMinimo(sucursalId);
+
+        return Stream.concat(
+                        bajo.stream().map(si -> toAlerta(si, "BAJO")),
+                        cerca.stream().map(si -> toAlerta(si, "PRECAUCION")))
+                .toList();
+    }
+
+    private StockAlertaDTO toAlerta(SucursalInsumo sucursalInsumo, String nivel) {
+        ArticuloInsumo insumo = sucursalInsumo.getInsumo();
+        return new StockAlertaDTO(
+                insumo.getId(),
+                insumo.getDenominacion(),
+                sucursalInsumo.getStockActual(),
+                sucursalInsumo.getStockMinimo(),
+                nivel);
     }
 }
 

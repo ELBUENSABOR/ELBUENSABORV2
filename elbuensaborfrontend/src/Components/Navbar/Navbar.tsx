@@ -24,7 +24,7 @@ export default function MyNavbar() {
               Productos
             </Nav.Link>
             {user?.role === "ADMIN" && (
-              <Nav.Link as={Link} to="/dashboard">
+              <Nav.Link as={Link} to="/dashboard/home">
                 Panel de administración
               </Nav.Link>
             )}
