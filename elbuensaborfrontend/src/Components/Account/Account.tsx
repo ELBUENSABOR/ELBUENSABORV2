@@ -16,7 +16,7 @@ const Account = () => {
     },
   ]);
 
-  const { user } = useUser();
+  const { user, logout } = useUser();
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     console.log("submit");
@@ -24,6 +24,9 @@ const Account = () => {
       if (!userData) return;
       const updatedUser = await updateUser(userData.id, userData);
       console.log("update user", updatedUser);
+      if (user?.username !== userData.username) {
+        logout();
+      }
     } catch (error) {
       alert("Error al actualizar el usuario");
       console.error("error", error);
@@ -105,30 +108,6 @@ const Account = () => {
       <div>
         <form onSubmit={handleSubmit}>
           <div className="row-account">
-            <label htmlFor="nombre" className="form-label">
-              Nombre
-            </label>
-            <input
-              type="text"
-              name="nombre"
-              placeholder="Nombre"
-              value={userData?.nombre}
-              className="form-control"
-              onChange={(e) => handleChange(e)}
-            />
-            <label htmlFor="apellido" className="form-label">
-              Apellido
-            </label>
-            <input
-              type="text"
-              name="apellido"
-              placeholder="Apellido"
-              value={userData?.apellido}
-              className="form-control"
-              onChange={(e) => handleChange(e)}
-            />
-          </div>
-          <div className="row-account">
             <label htmlFor="email" className="form-label">
               Email
             </label>
@@ -152,7 +131,30 @@ const Account = () => {
               onChange={(e) => handleChange(e)}
             />
           </div>
-
+          <div className="row-account">
+            <label htmlFor="nombre" className="form-label">
+              Nombre
+            </label>
+            <input
+              type="text"
+              name="nombre"
+              placeholder="Nombre"
+              value={userData?.nombre}
+              className="form-control"
+              onChange={(e) => handleChange(e)}
+            />
+            <label htmlFor="apellido" className="form-label">
+              Apellido
+            </label>
+            <input
+              type="text"
+              name="apellido"
+              placeholder="Apellido"
+              value={userData?.apellido}
+              className="form-control"
+              onChange={(e) => handleChange(e)}
+            />
+          </div>
           <div className="row-account">
             <label htmlFor="telefono" className="form-label">
               Teléfono

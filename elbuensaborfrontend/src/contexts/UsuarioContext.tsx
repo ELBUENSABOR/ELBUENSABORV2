@@ -1,5 +1,6 @@
 import { createContext, useContext, useState, type ReactNode } from "react";
 import type { User } from "../models/Usuario";
+import { useNavigate } from "react-router-dom";
 
 interface UserContextType {
   user: User | null;
@@ -15,7 +16,9 @@ export const UserProvider = ({ children }: { children: ReactNode }) => {
     const username = localStorage.getItem("username");
     const role = localStorage.getItem("role");
     const userId = localStorage.getItem("userId");
-    return token && username && role && userId ? { token, username, role, userId } : null;
+    return token && username && role && userId
+      ? { token, username, role, userId }
+      : null;
   });
 
   const setUser = (user: User) => {
