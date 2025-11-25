@@ -1,19 +1,19 @@
 package com.utn.elbuensabor.services.impl;
 
-import com.utn.elbuensabor.entities.Domicilio;
-import com.utn.elbuensabor.entities.Localidad;
-import com.utn.elbuensabor.entities.Usuario;
-import com.utn.elbuensabor.repositories.LocalidadRepository;
+import com.utn.elbuensabor.dtos.UserRequestDTO;
+import com.utn.elbuensabor.entities.*;
+import com.utn.elbuensabor.repositories.*;
 import com.utn.elbuensabor.services.UserService;
 import org.apache.catalina.User;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import com.utn.elbuensabor.dtos.LocalidadDTO;
 import com.utn.elbuensabor.dtos.UserDTO;
-import com.utn.elbuensabor.entities.Cliente;
-import com.utn.elbuensabor.repositories.UsuarioRepository;
 
 import lombok.RequiredArgsConstructor;
+
+import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -21,126 +21,214 @@ public class UserServiceImpl implements UserService {
 
     private final UsuarioRepository usuarioRepository;
     private final LocalidadRepository localidadRepository;
+    private final PasswordEncoder encoder;
+    private final ClienteRepository clienteRepository;
+    private final EmpleadoRepository empleadoRepository;
+    private final SucursalEmpresaRepository sucursalEmpresaRepository;
 
-    public UserDTO getUser(Long id) {
-        return usuarioRepository.findByIdWithCliente(id)
-                .map(u -> {
-                    Cliente cliente = u.getCliente();
-                    if (cliente == null) {
-                        throw new RuntimeException("El usuario no tiene un cliente asociado");
-                    }
+    public UserDTO createUser(UserRequestDTO dto) {
+        Usuario usuario = new Usuario();
+        usuario.setUsername(dto.username());
+        usuario.setPassword(encoder.encode(dto.password()));
+        usuario.setActivo(true);
+        usuario.setRolSistema(dto.rolSistema());
 
-                    var domicilio = cliente.getDomicilio();
-                    if (domicilio == null) {
-                        throw new RuntimeException("El cliente no tiene un domicilio asociado");
-                    }
+        SucursalEmpresa sucursal = sucursalEmpresaRepository.findById(dto.sucursalId())
+                .orElseThrow(() -> new RuntimeException("Sucursal no encontrada"));
 
-                    var localidad = domicilio.getLocalidad();
-                    if (localidad == null) {
-                        throw new RuntimeException("El domicilio no tiene una localidad asociada");
-                    }
+        usuario.setSucursal(sucursal);
 
-                    return new UserDTO(
-                            u.getId(),
-                            u.getUsername(),
-                            cliente.getEmail(),
-                            cliente.getNombre(),
-                            cliente.getApellido(),
-                            cliente.getTelefono(),
-                            new UserDTO.Domicilio(
-                                    domicilio.getCalle(),
-                                    domicilio.getCodigoPostal(),
-                                    domicilio.getNumero(),
-                                    new LocalidadDTO(localidad.getId(), localidad.getNombre())
-                            )
-                    );
-                })
-                .orElseThrow(() -> new RuntimeException("Usuario no encontrado"));
+        usuarioRepository.save(usuario);
+
+        if (dto.rolSistema() == RolSistema.CLIENTE || dto.rolSistema() == RolSistema.ADMIN) {
+
+            Cliente cliente = new Cliente();
+            cliente.setUsuario(usuario);
+            cliente.setNombre(dto.nombre());
+            cliente.setApellido(dto.apellido());
+            cliente.setEmail(dto.email());
+            cliente.setTelefono(dto.telefono());
+
+            if (dto.domicilio() == null) {
+                throw new RuntimeException("El cliente debe tener un domicilio");
+            }
+
+            var d = dto.domicilio();
+
+            Domicilio domicilio = new Domicilio();
+            domicilio.setCalle(d.calle());
+            domicilio.setNumero(d.numero());
+            domicilio.setCodigoPostal(d.codigoPostal());
+
+            Localidad localidad = localidadRepository.findById(d.localidadId())
+                    .orElseThrow(() -> new RuntimeException("Localidad no encontrada"));
+
+            domicilio.setLocalidad(localidad);
+
+            cliente.setDomicilio(domicilio);
+
+            clienteRepository.save(cliente);
+        }
+
+        else if (dto.rolSistema() == RolSistema.EMPLEADO) {
+
+            Empleado empleado = new Empleado();
+            empleado.setUsuario(usuario);
+
+            empleado.setNombre(dto.nombre());
+            empleado.setApellido(dto.apellido());
+            empleado.setEmail(dto.email());
+            empleado.setTelefono(dto.telefono());
+
+            // PerfilEmpleado podría venir por DTO o tener uno por defecto
+            empleado.setPerfilEmpleado(dto.perfilEmpleado() != null
+                    ? dto.perfilEmpleado()
+                    : PerfilEmpleado.CAJERO);
+
+            empleadoRepository.save(empleado);
+        }
+
+        Usuario creado = usuarioRepository
+                .findByIdWithClienteEmpleadoAndDomicilio(usuario.getId())
+                .orElseThrow(() -> new RuntimeException("Error al recuperar usuario"));
+
+        return mapToUserDTO(creado);
     }
 
-    public UserDTO updateUser(Long id, UserDTO userDTO) {
-
-        Usuario usuario = usuarioRepository.findByIdWithClienteAndDomicilio(id)
+    public UserDTO getUser(Long id) {
+        Usuario u = usuarioRepository.findByIdWithClienteEmpleadoAndDomicilio(id)
                 .orElseThrow(() -> new RuntimeException("Usuario no encontrado"));
 
-        // =============================
-        // ACTUALIZAR USUARIO
-        // =============================
+        return mapToUserDTO(u);
+    }
+
+    public List<UserDTO> getAllUsers() {
+        List<Usuario> usuarios = usuarioRepository.findAllWithClienteEmpleadoAndDomicilio();
+
+        return usuarios.stream()
+                .map(this::mapToUserDTO)
+                .toList();
+    }
+
+    public UserDTO updateUser(Long id, UserRequestDTO userDTO) {
+
+        Usuario usuario = usuarioRepository.findByIdWithClienteEmpleadoAndDomicilio(id)
+                .orElseThrow(() -> new RuntimeException("Usuario no encontrado"));
+
         usuario.setUsername(userDTO.username());
         usuario.setActivo(true);
 
-        // =============================
-        // ACTUALIZAR CLIENTE
-        // =============================
         Cliente cliente = usuario.getCliente();
+        Empleado empleado = usuario.getEmpleado();
+
         if (cliente != null) {
             cliente.setNombre(userDTO.nombre());
             cliente.setApellido(userDTO.apellido());
             cliente.setTelefono(userDTO.telefono());
             cliente.setEmail(userDTO.email());
-        }
 
-        // =============================
-        // ACTUALIZAR DOMICILIO
-        // =============================
-        if (cliente != null && userDTO.domicilio() != null) {
+            UserRequestDTO.DomicilioDTO dom = userDTO.domicilio();
+            if (dom != null) {
 
-            UserDTO.Domicilio dom = userDTO.domicilio();
+                if (cliente.getDomicilio() == null) {
+                    cliente.setDomicilio(new Domicilio());
+                }
 
-            // si no tiene domicilio, lo creo
-            if (cliente.getDomicilio() == null) {
-                cliente.setDomicilio(new Domicilio());
-            }
+                Domicilio domicilio = cliente.getDomicilio();
+                domicilio.setCalle(dom.calle());
+                domicilio.setCodigoPostal(dom.codigoPostal());
+                domicilio.setNumero(dom.numero());
 
-            Domicilio domicilio = cliente.getDomicilio();
+                if (dom.localidadId() != null) {
+                    Localidad localidad = localidadRepository.findById(dom.localidadId())
+                            .orElseThrow(() -> new RuntimeException("Localidad no encontrada"));
 
-            domicilio.setCalle(dom.calle());
-            domicilio.setNumero(dom.numero());
-            domicilio.setCodigoPostal(dom.codigoPostal());
-
-            // =============================
-            // LOCALIDAD SEGURA
-            // =============================
-            if (dom.localidad() != null) {
-                LocalidadDTO l = dom.localidad();
-
-                // buscar localidad real
-                Localidad localidad = localidadRepository.findById(l.id())
-                        .orElseThrow(() -> new RuntimeException("Localidad no encontrada"));
-
-                // asignarlas
-                domicilio.setLocalidad(localidad);
+                    domicilio.setLocalidad(localidad);
+                }
             }
         }
 
-        // =============================
-        // GUARDAR
-        // =============================
+        if (empleado != null) {
+            empleado.setNombre(userDTO.nombre());
+            empleado.setApellido(userDTO.apellido());
+            empleado.setTelefono(userDTO.telefono());
+            empleado.setEmail(userDTO.email());
+        }
+
+        if (userDTO.sucursalId() != null) {
+            SucursalEmpresa sucursal = sucursalEmpresaRepository.findById(userDTO.sucursalId())
+                    .orElseThrow(() -> new RuntimeException("Sucursal no encontrada"));
+
+            usuario.setSucursal(sucursal);
+        }
+
         usuarioRepository.save(usuario);
 
-        // =============================
-        // DEVOLVER DTO
-        // =============================
-        return new UserDTO(
-                usuario.getId(),
-                usuario.getUsername(),
-                cliente != null ? cliente.getEmail() : null,
-                cliente != null ? cliente.getNombre() : null,
-                cliente != null ? cliente.getApellido() : null,
-                cliente != null ? cliente.getTelefono() : null,
-                cliente != null && cliente.getDomicilio() != null
-                        ? new UserDTO.Domicilio(
-                        cliente.getDomicilio().getCalle(),
-                        cliente.getDomicilio().getCodigoPostal(),
-                        cliente.getDomicilio().getNumero(),
-                        cliente.getDomicilio().getLocalidad() != null
-                                ? new LocalidadDTO(
-                                cliente.getDomicilio().getLocalidad().getId(),
-                                cliente.getDomicilio().getLocalidad().getNombre()
-                        )
+        return mapToUserDTO(usuario);
+    }
+
+    public UserDTO deleteUser(Long id) {
+
+        Usuario usuario = usuarioRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Usuario no encontrado"));
+
+        usuario.setActivo(false);
+
+        usuarioRepository.save(usuario);
+
+        return mapToUserDTO(usuario);
+    }
+
+    private UserDTO mapToUserDTO(Usuario u) {
+
+        Cliente cliente = u.getCliente();
+        Empleado empleado = u.getEmpleado();
+
+        String nombre = null;
+        String apellido = null;
+        String email = null;
+        String telefono = null;
+        UserDTO.Domicilio domicilioDTO = null;
+
+        if (cliente != null) {
+            nombre = cliente.getNombre();
+            apellido = cliente.getApellido();
+            email = cliente.getEmail();
+            telefono = cliente.getTelefono();
+
+            var domicilio = cliente.getDomicilio();
+            if (domicilio != null) {
+                var localidad = domicilio.getLocalidad();
+
+                domicilioDTO = new UserDTO.Domicilio(
+                        domicilio.getCalle(),
+                        domicilio.getCodigoPostal(),
+                        domicilio.getNumero(),
+                        localidad != null
+                                ? new LocalidadDTO(localidad.getId(), localidad.getNombre())
                                 : null
-                )
-                        : null
+                );
+            }
+        }
+        
+        if (empleado != null) {
+            nombre = empleado.getNombre();
+            apellido = empleado.getApellido();
+            email = empleado.getEmail();
+            telefono = empleado.getTelefono();
+        }
+
+        return new UserDTO(
+                u.getId(),
+                u.getUsername(),
+                email,
+                nombre,
+                apellido,
+                telefono,
+                domicilioDTO,
+                u.getRolSistema(),
+                u.getActivo(),
+                u.getSucursal() != null ? u.getSucursal().getId() : null
         );
     }
 
