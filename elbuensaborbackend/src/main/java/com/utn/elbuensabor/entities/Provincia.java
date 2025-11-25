@@ -20,7 +20,7 @@ public class Provincia extends BaseEntity {
 
     private String nombre;
 
-    @ManyToOne(cascade = CascadeType.ALL)
+    @ManyToOne()
     @JoinColumn(name = "pais_id")
     private Pais pais;
 

@@ -1,0 +1,41 @@
+.users-container {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  height: fit-content;
+}
+
+.header-dashboard {
+  display: flex;
+  width: 100%;
+  padding: 20px 0px 20px 0px;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.header-dashboard > input {
+  flex: 4;
+  min-width: 280px;
+}
+
+.header-dashboard > select {
+  flex: 2;
+  min-width: 280px;
+}
+
+.header-dashboard > button {
+  flex: 1;
+}
+
+.table-container {
+  overflow-x: auto;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+}
+
+.deleted-row {
+  --bs-table-bg: rgba(255, 44, 44, 0.43);
+}

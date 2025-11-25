@@ -1,10 +1,13 @@
-import type { ChangeEvent } from "react";
+import { useState, type ChangeEvent } from "react";
 import { Outlet } from "react-router-dom";
 import Sidebar from "./Sidebar/Sidebar";
 import { useSucursal } from "../../contexts/SucursalContext";
+import "./dashboard.css";
+import { FaRegArrowAltCircleRight } from "react-icons/fa";
 
 const DashboardLayout = () => {
   const { sucursales, sucursalId, setSucursalId, loading } = useSucursal();
+  const [open, setOpen] = useState(false);
 
   const handleSucursalChange = (event: ChangeEvent<HTMLSelectElement>) => {
     const value = event.target.value;
@@ -12,13 +15,23 @@ const DashboardLayout = () => {
   };
 
   return (
-    <div className="d-flex">
-      <Sidebar />
-      <main className="flex-grow-1 p-4">
-        <div className="d-flex flex-wrap align-items-center justify-content-between gap-3 mb-4">
+    <div className="d-flex layout-dashboard">
+      <button className="menu-toggle" onClick={() => setOpen(true)}>
+        <FaRegArrowAltCircleRight />
+      </button>
+
+      {/* Overlay */}
+      {open && <div className="overlay" onClick={() => setOpen(false)}></div>}
+
+      <Sidebar open={open} close={() => setOpen(false)} />
+      <main className="flex-grow-1 p-4 main-dashboard">
+        {/*<div className="d-flex flex-wrap align-items-center justify-content-between gap-3 mb-4">
           <div>
             <h1 className="h4 mb-0">Dashboard</h1>
-            <p className="text-muted mb-0">Gestioná los rubros, productos y stock según la sucursal seleccionada.</p>
+            <p className="text-muted mb-0">
+              Gestioná los rubros, productos y stock según la sucursal
+              seleccionada.
+            </p>
           </div>
           <div className="d-flex align-items-center gap-2">
             <label className="mb-0 text-muted" htmlFor="sucursal-select">
@@ -40,7 +53,7 @@ const DashboardLayout = () => {
             </select>
             {loading && <span className="text-muted small">cargando...</span>}
           </div>
-        </div>
+        </div>*/}
         <Outlet />
       </main>
     </div>
@@ -48,4 +61,3 @@ const DashboardLayout = () => {
 };
 
 export default DashboardLayout;
-

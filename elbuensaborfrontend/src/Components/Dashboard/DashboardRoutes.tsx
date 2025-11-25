@@ -8,12 +8,26 @@ import ProductosManufacturados from "./Productos/ProductosManufacturados";
 import StockAlert from "./Stock/StockAlert";
 import RegistroCompra from "./Compras/RegistroCompra";
 import ProductosVenta from "./ProductosVenta/ProductosVenta";
+import Users from "./Users/Users";
+import Sucursales from "./Sucursales/Sucursales";
+import PrivateRoute from "../PrivateRoute";
+import { AddUser } from "./Users/AddUser";
+import { EditUser } from "./Users/EditUser";
+import AddSucursal from "./Sucursales/AddSucursal";
 
 const DashboardRoutes = () => (
   <Routes>
     <Route element={<DashboardLayout />}>
       <Route index element={<DashboardHome />} />
       <Route path="home" element={<DashboardHome />} />
+      <Route element={<PrivateRoute roles={["ADMIN"]} />}>
+        <Route path="usuarios" element={<Users />} />
+        <Route path="usuarios/add" element={<AddUser />} />
+        <Route path="usuarios/edit/:id" element={<EditUser />} />
+        <Route path="sucursales" element={<Sucursales />} />
+        <Route path="sucursales/add/:id" element={<AddSucursal />} />
+        <Route path="sucursales/add" element={<AddSucursal />} />
+      </Route>
       <Route path="rubros-insumos" element={<RubrosInsumos />} />
       <Route path="rubros-productos" element={<RubrosManufacturados />} />
       <Route path="productos-insumos" element={<ProductosInsumos />} />
