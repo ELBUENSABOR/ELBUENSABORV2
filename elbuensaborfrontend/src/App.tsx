@@ -5,6 +5,7 @@ import Register from "./Components/Auth/Register";
 import Login from "./Components/Auth/Login";
 import PrivateRoute from "./Components/PrivateRoute";
 import Account from "./Components/Account/Account";
+import DashboardRoutes from "./Components/Dashboard/DashboardRoutes";
 
 function MainLayout() {
   return (
@@ -27,6 +28,9 @@ function App() {
           <Route path="/" element={<Home />} />
           <Route element={<PrivateRoute roles={["CLIENTE", "EMPLEADO", "ADMIN"]} />}>
             <Route path="/account" element={<Account />} />
+          </Route>
+          <Route element={<PrivateRoute roles={["EMPLEADO", "ADMIN"]} />}>
+            <Route path="/dashboard/*" element={<DashboardRoutes />} />
           </Route>
         </Route>
 

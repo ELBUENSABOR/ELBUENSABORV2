@@ -54,7 +54,8 @@ public class PedidoController {
     @GetMapping
     public ResponseEntity<List<PedidoResponse>> getAll(
             @RequestParam(required = false) Long clienteId,
-            @RequestParam(required = false) EstadoPedido estado) {
+            @RequestParam(required = false) EstadoPedido estado,
+            @RequestParam(required = false) Long sucursalId) {
         
         if (clienteId != null) {
             return ResponseEntity.ok(pedidoService.getByClienteId(clienteId));
@@ -62,6 +63,10 @@ public class PedidoController {
         
         if (estado != null) {
             return ResponseEntity.ok(pedidoService.getByEstado(estado));
+        }
+
+        if (sucursalId != null) {
+            return ResponseEntity.ok(pedidoService.getBySucursalId(sucursalId));
         }
         
         return ResponseEntity.ok(pedidoService.getAll());
