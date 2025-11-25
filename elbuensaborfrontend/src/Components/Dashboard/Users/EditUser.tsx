@@ -6,6 +6,8 @@ import { getUserService, updateUser } from "../../../services/userService";
 import { useNavigate, useParams } from "react-router-dom";
 import type { Sucursal } from "../../../models/Sucursal";
 import { fetchSucursales } from "../../../services/dashboardService";
+import Alert from "../../Alert/Alert";
+import axios from "axios";
 
 const initialState: UserRequestDTO = {
   username: "",
@@ -33,6 +35,10 @@ export const EditUser: React.FC = () => {
   const [form, setForm] = useState<UserRequestDTO>(initialState);
   const [localidades, setLocalidades] = useState<LocalidadDTO[]>([]);
   const [sucursales, setSucursales] = useState<Sucursal[]>([]);
+
+  const [showAlert, setShowAlert] = useState(false);
+  const [alertMessage, setAlertMessage] = useState("");
+  const [alertStatus, setAlertStatus] = useState("");
 
   useEffect(() => {
     const getData = async () => {
@@ -121,8 +127,26 @@ export const EditUser: React.FC = () => {
         console.log("Usuario creado!", res);
         navigate("/dashboard/usuarios");
       }
-    } catch (error) {
-      console.error("Error al crear el usuario");
+    } catch (err) {
+      console.error("Error al actualizar el usuario", err);
+
+      let msg = "Error al actualizar el usuario";
+
+      if (axios.isAxiosError(err) && err.response) {
+        const data = err.response.data;
+
+        if (data && typeof data === "object" && !Array.isArray(data)) {
+          msg = Object.values(data).join("\n");
+        }
+        
+        if (data.error) {
+          msg = data.error;
+        }
+      }
+
+      setAlertMessage(msg);
+      setAlertStatus("error");
+      setShowAlert(true);
     }
   };
 
@@ -164,7 +188,6 @@ export const EditUser: React.FC = () => {
           className="form-control"
           value={form.password}
           onChange={handleChange}
-          required
         />
       </div>
 
@@ -297,6 +320,14 @@ export const EditUser: React.FC = () => {
       )}
 
       <button className="btn btn-primary mt-3">Actualizar Usuario</button>
+
+      {showAlert && (
+        <Alert
+          message={alertMessage}
+          status={alertStatus as "success" | "error"}
+          onClose={() => setShowAlert(false)}
+        />
+      )}
     </form>
   );
 };

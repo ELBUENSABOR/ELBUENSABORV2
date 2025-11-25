@@ -38,3 +38,12 @@ export const getSucursalById = async (id: number) => {
     withCredentials: true,
   });
 };
+
+export const updateSucursal = async (id: number, data: Sucursal) => {
+  return axios.put(`${API_BASE}/sucursales/${id}`, data, {
+    headers: {
+      Authorization: `Bearer ${localStorage.getItem("token")}`,
+    },
+    withCredentials: true,
+  });
+};

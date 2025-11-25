@@ -13,6 +13,8 @@ public interface SucursalService {
 
     public SucursalDTO createSucursal(SucursalDTO sucursal);
 
+    public SucursalDTO updateSucursal(Long id, SucursalDTO sucursal);
+
     SucursalDTO toDTO(SucursalEmpresa sucursal);
 }
 

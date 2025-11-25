@@ -1,5 +1,6 @@
 package com.utn.elbuensabor.services.impl;
 
+import com.utn.elbuensabor.dtos.UserEditRequestDTO;
 import com.utn.elbuensabor.dtos.UserRequestDTO;
 import com.utn.elbuensabor.entities.*;
 import com.utn.elbuensabor.repositories.*;
@@ -110,13 +111,17 @@ public class UserServiceImpl implements UserService {
                 .toList();
     }
 
-    public UserDTO updateUser(Long id, UserRequestDTO userDTO) {
+    public UserDTO updateUser(Long id, UserEditRequestDTO userDTO) {
 
         Usuario usuario = usuarioRepository.findByIdWithClienteEmpleadoAndDomicilio(id)
                 .orElseThrow(() -> new RuntimeException("Usuario no encontrado"));
 
         usuario.setUsername(userDTO.username());
         usuario.setActivo(true);
+
+        if(userDTO.password() != null){
+            usuario.setPassword(userDTO.password());
+        }
 
         Cliente cliente = usuario.getCliente();
         Empleado empleado = usuario.getEmpleado();
@@ -210,7 +215,7 @@ public class UserServiceImpl implements UserService {
                 );
             }
         }
-        
+
         if (empleado != null) {
             nombre = empleado.getNombre();
             apellido = empleado.getApellido();

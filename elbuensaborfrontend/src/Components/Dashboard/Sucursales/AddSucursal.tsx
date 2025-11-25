@@ -5,6 +5,7 @@ import { useUser } from "../../../contexts/UsuarioContext";
 import {
   createSucursal,
   getSucursalById,
+  updateSucursal
 } from "../../../services/dashboardService";
 
 const initialState: Sucursal = {
@@ -52,7 +53,7 @@ const AddSucursal = () => {
 
     try {
       if (isEdit) {
-        await updateSucursal(Number(id), form, token!);
+        await updateSucursal(Number(id), form);
       } else {
         await createSucursal(form);
       }

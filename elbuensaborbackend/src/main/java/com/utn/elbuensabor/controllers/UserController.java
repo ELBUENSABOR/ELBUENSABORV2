@@ -1,5 +1,6 @@
 package com.utn.elbuensabor.controllers;
 
+import com.utn.elbuensabor.dtos.UserEditRequestDTO;
 import com.utn.elbuensabor.dtos.UserRequestDTO;
 import jakarta.validation.Valid;
 import org.apache.catalina.User;
@@ -26,19 +27,9 @@ public class UserController {
     private final UserService userService;
 
     @PostMapping
-    public ResponseEntity<?> createUser(@RequestBody UserRequestDTO dto) {
-        try {
+    public ResponseEntity<?> createUser(@RequestBody @Valid UserRequestDTO dto) {
             UserDTO result = userService.createUser(dto);
             return ResponseEntity.ok(result);
-        } catch (RuntimeException ex) {
-            Map<String, String> error = new HashMap<>();
-            error.put("error", ex.getMessage());
-            return ResponseEntity.badRequest().body(error);
-        } catch (Exception ex) {
-            Map<String, String> error = new HashMap<>();
-            error.put("error", "Error interno del servidor");
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(error);
-        }
     }
 
     @GetMapping
@@ -52,8 +43,9 @@ public class UserController {
     }
 
     @PutMapping("/{id}")
-    public  ResponseEntity<UserDTO> updateUser(@PathVariable Long id, @RequestBody @Valid UserRequestDTO user) {
-        return ResponseEntity.ok(userService.updateUser(id, user));
+    public  ResponseEntity<?> updateUser(@PathVariable Long id, @RequestBody @Valid UserEditRequestDTO user) {
+            UserDTO result = userService.updateUser(id, user);
+            return ResponseEntity.ok(result);
     }
 
     @DeleteMapping("/{id}")

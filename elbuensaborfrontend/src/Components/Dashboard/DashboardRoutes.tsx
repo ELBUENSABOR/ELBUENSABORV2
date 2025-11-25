@@ -14,6 +14,8 @@ import PrivateRoute from "../PrivateRoute";
 import { AddUser } from "./Users/AddUser";
 import { EditUser } from "./Users/EditUser";
 import AddSucursal from "./Sucursales/AddSucursal";
+import AddRubro from "./Rubros/AddRubroInsumo";
+import AddRubroManufacturado from "./Rubros/AddRubroManufacturado";
 
 const DashboardRoutes = () => (
   <Routes>
@@ -27,6 +29,21 @@ const DashboardRoutes = () => (
         <Route path="sucursales" element={<Sucursales />} />
         <Route path="sucursales/add/:id" element={<AddSucursal />} />
         <Route path="sucursales/add" element={<AddSucursal />} />
+        <Route path="insumos/rubros/add" element={<AddRubro />} />
+        <Route path="insumos/rubros/:parentId/add" element={<AddRubro />} />
+        <Route path="insumos/rubros/edit/:id" element={<AddRubro />} />
+        <Route
+          path="manufacturados/rubros/add"
+          element={<AddRubroManufacturado />}
+        />
+        <Route
+          path="manufacturados/rubros/:parentId/add"
+          element={<AddRubroManufacturado />}
+        />
+        <Route
+          path="manufacturados/rubros/edit/:id"
+          element={<AddRubroManufacturado />}
+        />
       </Route>
       <Route path="rubros-insumos" element={<RubrosInsumos />} />
       <Route path="rubros-productos" element={<RubrosManufacturados />} />

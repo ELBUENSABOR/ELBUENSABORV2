@@ -49,6 +49,19 @@ public class SucursalServiceImpl implements SucursalService {
         return toDTO(guardada);
     }
 
+    @Override
+    public SucursalDTO updateSucursal(Long id, SucursalDTO sucursal) {
+        SucursalEmpresa sucursalUpdate = sucursalRepository.findById(id).orElseThrow(() -> new RuntimeException("Sucursal no encontrada"));
+
+        sucursalUpdate.setNombre(sucursal.nombre());
+        sucursalUpdate.setHorarioApertura(sucursal.horarioApertura());
+        sucursalUpdate.setHorarioCierre(sucursal.horarioCierre());
+
+        sucursalRepository.save(sucursalUpdate);
+
+        return toDTO(sucursalUpdate);
+    }
+
     public SucursalDTO toDTO(SucursalEmpresa sucursal) {
         return new SucursalDTO(
                 sucursal.getId(),

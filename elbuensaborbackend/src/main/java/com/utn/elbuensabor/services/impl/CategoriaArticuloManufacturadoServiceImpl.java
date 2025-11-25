@@ -3,6 +3,7 @@ package com.utn.elbuensabor.services.impl;
 
 import java.util.List;
 
+import com.utn.elbuensabor.entities.CategoriaArticuloInsumo;
 import com.utn.elbuensabor.services.CategoriaArticuloManufacturadoService;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -36,6 +37,7 @@ public class CategoriaArticuloManufacturadoServiceImpl implements CategoriaArtic
     public CategoriaResponse create(CategoriaRequest request) {
         CategoriaArticuloManufacturado categoria = new CategoriaArticuloManufacturado();
         categoria.setDenominacion(request.denominacion());
+        setParent(categoria, request.categoriaPadreId());
         categoriaRepo.save(categoria);
         return toResponse(categoria);
     }
@@ -45,6 +47,7 @@ public class CategoriaArticuloManufacturadoServiceImpl implements CategoriaArtic
         CategoriaArticuloManufacturado categoria = categoriaRepo.findById(id)
                 .orElseThrow(() -> new RuntimeException("Rubro de producto no encontrado"));
         categoria.setDenominacion(request.denominacion());
+        setParent(categoria, request.categoriaPadreId());
         return toResponse(categoria);
     }
 
@@ -55,11 +58,22 @@ public class CategoriaArticuloManufacturadoServiceImpl implements CategoriaArtic
         categoriaRepo.deleteById(id);
     }
 
+    public void setParent(CategoriaArticuloManufacturado categoria, Long parentId) {
+        if (parentId != null) {
+            CategoriaArticuloManufacturado padre = categoriaRepo.findById(parentId)
+                    .orElseThrow(() -> new RuntimeException("Rubro padre no encontrado"));
+            categoria.setCategoriaPadre(padre);
+        } else {
+            categoria.setCategoriaPadre(null);
+        }
+    }
+
     public CategoriaResponse toResponse(CategoriaArticuloManufacturado entity) {
+        Long parentId = entity.getCategoriaPadre() != null ? entity.getCategoriaPadre().getId() : null;
         return new CategoriaResponse(
                 entity.getId(),
                 entity.getDenominacion(),
-                null);
+                parentId);
     }
 }
 

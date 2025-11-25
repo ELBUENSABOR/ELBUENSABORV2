@@ -1,7 +1,12 @@
 package com.utn.elbuensabor.controllers;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
+import com.utn.elbuensabor.dtos.UserDTO;
+import jakarta.validation.Valid;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -28,8 +33,15 @@ public class SucursalController {
     }
 
     @PostMapping
-    public ResponseEntity<SucursalDTO> create(@RequestBody SucursalDTO sucursal) {
-        return ResponseEntity.ok(sucursalService.createSucursal(sucursal));
+    public ResponseEntity<?> create(@RequestBody @Valid SucursalDTO sucursal) {
+        SucursalDTO result = sucursalService.createSucursal(sucursal);
+        return ResponseEntity.ok(result);
+    }
+
+    @PutMapping("/{id}")
+    public ResponseEntity<?> update(@PathVariable Long id , @RequestBody @Valid SucursalDTO sucursal) {
+        SucursalDTO result = sucursalService.updateSucursal(id, sucursal);
+        return ResponseEntity.ok(result);
     }
 }
 

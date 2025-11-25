@@ -6,11 +6,9 @@ import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 
-public record UserRequestDTO(
+public record UserEditRequestDTO(
         @NotBlank(message = "El username es obligatorio")
         String username,
-        @Valid
-        @NotBlank(message = "La contraseña es obligatoria")
         String password,
         @NotBlank(message = "El nombre es obligatorio")
         String nombre,
@@ -23,7 +21,7 @@ public record UserRequestDTO(
         @NotNull(message = "El rol es obligatorio")
         RolSistema rolSistema,
         @Valid
-        DomicilioDTO domicilio,
+        UserRequestDTO.DomicilioDTO domicilio,
         PerfilEmpleado perfilEmpleado,
         @NotNull(message = "La sucursal es obligatoria")
         Long sucursalId
@@ -41,5 +39,5 @@ public record UserRequestDTO(
             @NotNull(message = "La localidad es obligatoria")
             Long localidadId
     ) {}
-}
 
+}
