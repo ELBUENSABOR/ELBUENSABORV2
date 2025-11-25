@@ -5,8 +5,9 @@ import com.utn.elbuensabor.dtos.AuthResponse;
 import com.utn.elbuensabor.dtos.LoginRequest;
 import com.utn.elbuensabor.dtos.RegisterRequest;
 
-public interface AuthService{
+public interface AuthService {
 
     AuthResponse register(RegisterRequest req);
+
     AuthResponse login(LoginRequest req);
 }

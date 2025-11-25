@@ -2,86 +2,26 @@ package com.utn.elbuensabor.services;
 
 import java.util.List;
 
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
-
 import com.utn.elbuensabor.dtos.ArticuloInsumoRequest;
 import com.utn.elbuensabor.dtos.ArticuloResponse;
 import com.utn.elbuensabor.entities.ArticuloInsumo;
-import com.utn.elbuensabor.entities.CategoriaArticuloInsumo;
-import com.utn.elbuensabor.repositories.ArticuloInsumoRepository;
-import com.utn.elbuensabor.repositories.CategoriaArticuloInsumoRepository;
 
-import lombok.RequiredArgsConstructor;
 
-@Service
-@RequiredArgsConstructor
-public class ArticuloInsumoService {
+public interface ArticuloInsumoService {
 
-    private final ArticuloInsumoRepository insumoRepo;
-    private final CategoriaArticuloInsumoRepository categoriaRepo;
+    List<ArticuloResponse> getAll();
 
-    public List<ArticuloResponse> getAll() {
-        return insumoRepo.findAll().stream()
-                .map(this::toResponse)
-                .toList();
-    }
+    ArticuloResponse getById(Long id);
 
-    public ArticuloResponse getById(Long id) {
-        ArticuloInsumo insumo = insumoRepo.findById(id)
-                .orElseThrow(() -> new RuntimeException("Insumo no encontrado"));
-        return toResponse(insumo);
-    }
+    ArticuloResponse create(ArticuloInsumoRequest request);
 
-    @Transactional
-    public ArticuloResponse create(ArticuloInsumoRequest request) {
-        ArticuloInsumo insumo = new ArticuloInsumo();
-        fillFromRequest(insumo, request);
-        insumoRepo.save(insumo);
-        return toResponse(insumo);
-    }
+    ArticuloResponse update(Long id, ArticuloInsumoRequest request);
 
-    @Transactional
-    public ArticuloResponse update(Long id, ArticuloInsumoRequest request) {
-        ArticuloInsumo insumo = insumoRepo.findById(id)
-                .orElseThrow(() -> new RuntimeException("Insumo no encontrado"));
-        fillFromRequest(insumo, request);
-        return toResponse(insumo);
-    }
+    void delete(Long id);
 
-    public void delete(Long id) {
-        ArticuloInsumo insumo = insumoRepo.findById(id)
-                .orElseThrow(() -> new RuntimeException("Insumo no encontrado"));
-        insumo.setActivo(false);
-        insumoRepo.save(insumo);
-    }
+    void fillFromRequest(ArticuloInsumo insumo, ArticuloInsumoRequest request);
 
-    private void fillFromRequest(ArticuloInsumo insumo, ArticuloInsumoRequest request) {
-        CategoriaArticuloInsumo categoria = categoriaRepo.findById(request.categoriaId())
-                .orElseThrow(() -> new RuntimeException("Rubro de insumo no encontrado"));
-        insumo.setDenominacion(request.denominacion());
-        insumo.setPrecioVenta(request.precioVenta());
-        insumo.setPrecioCompra(request.precioCompra());
-        insumo.setCategoriaArticuloInsumo(categoria);
-        insumo.setActivo(request.activo() == null ? true : request.activo());
-        insumo.setEsParaElaborar(Boolean.TRUE.equals(request.esParaElaborar()));
-    }
+    ArticuloResponse toResponse(ArticuloInsumo insumo);
 
-    private ArticuloResponse toResponse(ArticuloInsumo insumo) {
-        String categoria = insumo.getCategoriaArticuloInsumo() != null
-                ? insumo.getCategoriaArticuloInsumo().getDenominacion()
-                : null;
-        return new ArticuloResponse(
-                insumo.getId(),
-                insumo.getDenominacion(),
-                null,
-                insumo.getPrecioVenta(),
-                insumo.getPrecioCompra(),
-                null,
-                categoria,
-                insumo.getEsParaElaborar(),
-                insumo.getActivo(),
-                List.of());
-    }
 }
 

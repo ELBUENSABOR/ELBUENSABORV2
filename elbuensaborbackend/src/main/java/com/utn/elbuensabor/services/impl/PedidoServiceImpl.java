@@ -1,11 +1,11 @@
 package com.utn.elbuensabor.services.impl;
 
-
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
 
 import com.utn.elbuensabor.services.PedidoService;
+import com.utn.elbuensabor.services.StockService;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -24,7 +24,6 @@ import com.utn.elbuensabor.repositories.ArticuloManufacturadoRepository;
 import com.utn.elbuensabor.repositories.ClienteRepository;
 import com.utn.elbuensabor.repositories.PedidoVentaRepository;
 import com.utn.elbuensabor.repositories.SucursalEmpresaRepository;
-import com.utn.elbuensabor.services.StockService;
 
 import lombok.RequiredArgsConstructor;
 
@@ -144,6 +143,12 @@ public class PedidoServiceImpl implements PedidoService {
 
     public List<PedidoResponse> getByEstado(EstadoPedido estado) {
         return pedidoRepository.findByEstadoWithDetalles(estado).stream()
+                .map(this::mapToResponse)
+                .collect(Collectors.toList());
+    }
+
+    public List<PedidoResponse> getBySucursalId(Long sucursalId) {
+        return pedidoRepository.findBySucursalIdWithDetalles(sucursalId).stream()
                 .map(this::mapToResponse)
                 .collect(Collectors.toList());
     }
