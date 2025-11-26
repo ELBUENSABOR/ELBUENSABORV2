@@ -4,6 +4,6 @@ import com.utn.elbuensabor.dtos.RegistroCompraRequest;
 
 public interface CompraInsumoService {
 
-    public void registrarCompra(Long insumoId, RegistroCompraRequest request);
+    void registrarCompra(Long insumoId, RegistroCompraRequest request);
 }
 

@@ -5,7 +5,6 @@ import com.utn.elbuensabor.dtos.UserRequestDTO;
 import com.utn.elbuensabor.entities.*;
 import com.utn.elbuensabor.repositories.*;
 import com.utn.elbuensabor.services.UserService;
-import org.apache.catalina.User;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
