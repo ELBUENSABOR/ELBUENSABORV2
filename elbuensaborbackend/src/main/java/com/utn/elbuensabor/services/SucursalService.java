@@ -7,13 +7,13 @@ import com.utn.elbuensabor.entities.SucursalEmpresa;
 
 public interface SucursalService {
 
-    public List<SucursalDTO> getAll();
+    List<SucursalDTO> getAll();
 
-    public SucursalDTO getById(Long id);
+    SucursalDTO getById(Long id);
 
-    public SucursalDTO createSucursal(SucursalDTO sucursal);
+    SucursalDTO createSucursal(SucursalDTO sucursal);
 
-    public SucursalDTO updateSucursal(Long id, SucursalDTO sucursal);
+    SucursalDTO updateSucursal(Long id, SucursalDTO sucursal);
 
     SucursalDTO toDTO(SucursalEmpresa sucursal);
 }

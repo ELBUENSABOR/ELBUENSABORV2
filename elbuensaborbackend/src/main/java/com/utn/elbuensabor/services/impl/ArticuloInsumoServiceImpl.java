@@ -1,7 +1,8 @@
-package com.utn.elbuensabor.services;
+package com.utn.elbuensabor.services.impl;
 
 import java.util.List;
 
+import com.utn.elbuensabor.services.ArticuloInsumoService;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -16,7 +17,7 @@ import lombok.RequiredArgsConstructor;
 
 @Service
 @RequiredArgsConstructor
-public class ArticuloInsumoServiceImpl implements ArticuloInsumoService{
+public class ArticuloInsumoServiceImpl implements ArticuloInsumoService {
 
     private final ArticuloInsumoRepository insumoRepo;
     private final CategoriaArticuloInsumoRepository categoriaRepo;
@@ -63,7 +64,7 @@ public class ArticuloInsumoServiceImpl implements ArticuloInsumoService{
         insumo.setPrecioVenta(request.precioVenta());
         insumo.setPrecioCompra(request.precioCompra());
         insumo.setCategoriaArticuloInsumo(categoria);
-        insumo.setActivo(request.activo() == null ? true : request.activo());
+        insumo.setActivo(request.activo() == null || request.activo());
         insumo.setEsParaElaborar(Boolean.TRUE.equals(request.esParaElaborar()));
     }
 
