@@ -8,4 +8,6 @@ export interface UsuarioDTO {
   apellido: string;
   telefono: string;
   domicilio: DomicilioDTO;
+  rolSistema: string;
+  activo?: boolean;
 }

@@ -20,7 +20,7 @@ public class Localidad extends BaseEntity {
 
     private String nombre;
 
-    @ManyToOne(cascade=CascadeType.ALL)
+    @ManyToOne()
     @JoinColumn(name = "provincia_id")
     private Provincia provincia;
 

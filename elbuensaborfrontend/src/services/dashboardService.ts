@@ -1,27 +1,49 @@
-const API_BASE = import.meta.env.VITE_API_BASE_URL ?? "";
+import axios from "axios";
+import type { Sucursal } from "../models/Sucursal";
 
-const authHeaders = (token: string) => ({
-  Authorization: `Bearer ${token}`,
-  "Content-Type": "application/json",
-});
+const API_BASE = import.meta.env.VITE_API_URL ?? "";
 
-export interface SucursalOption {
-  id: number;
-  nombre: string;
-  horarioApertura?: string;
-  horarioCierre?: string;
-}
-
-async function handleResponse<T>(response: Response): Promise<T> {
-  if (!response.ok) {
-    throw new Error("Hubo un error al comunicarse con el servidor");
+export async function fetchSucursales(): Promise<Sucursal[]> {
+  try {
+    const res = await axios.get(`${API_BASE}/sucursales`, {
+      headers: {
+        Authorization: `Bearer ${localStorage.getItem("token")}`,
+      },
+      withCredentials: true,
+    });
+    return res.data;
+  } catch (error: any) {
+    console.error(
+      "Error en fetchSucursales:",
+      error.response?.data || error.message
+    );
+    throw error;
   }
-  return response.json();
 }
 
-export async function fetchSucursales(token: string): Promise<SucursalOption[]> {
-  const response = await fetch(`${API_BASE}/api/sucursales`, {
-    headers: authHeaders(token),
+export const createSucursal = async (data: Sucursal) => {
+  return axios.post(`${API_BASE}/sucursales`, data, {
+    headers: {
+      Authorization: `Bearer ${localStorage.getItem("token")}`,
+    },
+    withCredentials: true,
   });
-  return handleResponse(response);
-}
+};
+
+export const getSucursalById = async (id: number) => {
+  return axios.get(`${API_BASE}/sucursales/${id}`, {
+    headers: {
+      Authorization: `Bearer ${localStorage.getItem("token")}`,
+    },
+    withCredentials: true,
+  });
+};
+
+export const updateSucursal = async (id: number, data: Sucursal) => {
+  return axios.put(`${API_BASE}/sucursales/${id}`, data, {
+    headers: {
+      Authorization: `Bearer ${localStorage.getItem("token")}`,
+    },
+    withCredentials: true,
+  });
+};

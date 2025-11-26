@@ -33,6 +33,11 @@ public class RubroManufacturadoController {
         return ResponseEntity.ok(service.getAll());
     }
 
+    @GetMapping("/{id}")
+    public ResponseEntity<CategoriaResponse> getById(@PathVariable Long id) {
+        return ResponseEntity.ok(service.getById(id));
+    }
+
     @PostMapping
     public ResponseEntity<CategoriaResponse> create(@RequestBody @Valid CategoriaRequest request) {
         return ResponseEntity.ok(service.create(request));
