@@ -104,6 +104,10 @@ public class AuthServiceImpl implements AuthService {
         Usuario u = usuarioRepo.findByUsername(req.username())
                 .orElseThrow(() -> new IllegalArgumentException("Usuario o contraseña incorrectos"));
 
+        if (Boolean.FALSE.equals(u.getActivo())) {
+            throw new IllegalArgumentException("El usuario se encuentra dado de baja");
+        }
+
         String token = jwt.generateToken(u.getUsername());
 
         return new AuthResponse(token, u.getUsername(), u.getRolSistema().name(), u.getId().toString());

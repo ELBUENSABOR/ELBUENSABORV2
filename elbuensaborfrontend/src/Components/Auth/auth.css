@@ -46,9 +46,10 @@
 }
 
 .error-color-p {
-  color: red;
+    color: red;
 }
 
+.succes-color-p,
 .success-color-p {
-  color: green;
+    color: green;
 }
