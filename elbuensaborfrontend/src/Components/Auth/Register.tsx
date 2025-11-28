@@ -5,208 +5,293 @@ import type { RegisterRequest } from "../../dtos/RegisterRequest";
 import { useNavigate } from "react-router-dom";
 import { useUser } from "../../contexts/UsuarioContext";
 
+interface Localidad {
+    id: number;
+    nombre: string;
+}
+
 const Register = () => {
-  const [form, setForm] = useState<RegisterRequest>({
-    username: "",
-    email: "",
-    password: "",
-    nombre: "",
-    apellido: "",
-    telefono: "",
-    calle: "",
-    codigoPostal: 0,
-    localidad: 0,
-    numero: "",
-  });
-  const [localidades, setLocalidades] = useState([
-    {
-      id: 0,
-      nombre: "",
-    },
-  ]);
-  const { setUser } = useUser();
-
-  const navigate = useNavigate();
-
-  const [loading, setLoading] = useState(false);
-  const [msg, setMsg] = useState({
-    state: "",
-    msg: "",
-  });
-
-  useEffect(() => {
-    const getData = async () => {
-      const localidadesData = await getLocalidades();
-      console.log("localidades", localidadesData);
-      setLocalidades(localidadesData);
-    };
-    try {
-    } catch (error) {
-      console.error("Error al obtener las localidades", error);
-    }
-    getData();
-  }, []);
-
-  const handleChange = (
-    e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
-  ) => {
-    const { name, value } = e.target;
-    setForm({
-      ...form,
-      [name]: name === "localidad" ? Number(value) : value,
+    const [form, setForm] = useState<RegisterRequest>({
+        username: "",
+        email: "",
+        password: "",
+        nombre: "",
+        apellido: "",
+        telefono: "",
+        calle: "",
+        codigoPostal: 0,
+        localidad: 0,
+        numero: "",
     });
-  };
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setLoading(true);
-    setMsg((prev) => ({
-      ...prev,
-      state: "",
-      msg: "",
-    }));
+    const [confirmPassword, setConfirmPassword] = useState("");
+    const [localidades, setLocalidades] = useState<Localidad[]>([]);
 
-    try {
-      const payload = { ...form };
-      const resp = await registerUser(payload);
-      setMsg((prev) => ({
-        ...prev,
-        state: "success",
-        msg: "¿Registro exitoso!",
-      }));
-      console.log("resp", resp);
-      setUser({
-        token: resp.data.token,
-        username: resp.data.username,
-        role: resp.data.role,
-        userId: resp.data.userId,
-      });
+    const { setUser } = useUser();
+    const navigate = useNavigate();
 
-      setTimeout(() => {
-        navigate("/");
-      }, 1500);
-    } catch (err: any) {
-      setMsg((prev) => ({
-        ...prev,
-        state: "error",
-        msg: err.response?.data?.message || "Error al registrarse",
-      }));
-    }
+    const [loading, setLoading] = useState(false);
+    const [msg, setMsg] = useState({
+        state: "",
+        msg: "",
+    });
 
-    setLoading(false);
-  };
-
-  return (
-    <div className="auth-container">
-      <form onSubmit={handleSubmit} className="form-container-auth">
-        <h2>Crear cuenta</h2>
-        <hr />
-        <input
-          type="text"
-          name="nombre"
-          placeholder="Nombre"
-          value={form.nombre}
-          onChange={handleChange}
-          className="form-control"
-        />
-
-        <input
-          type="text"
-          name="apellido"
-          placeholder="Apellido"
-          value={form.apellido}
-          onChange={handleChange}
-          className="form-control"
-        />
-
-        <input
-          type="text"
-          name="username"
-          placeholder="Nombre de usuario"
-          value={form.username}
-          onChange={handleChange}
-          className="form-control"
-        />
-
-        <input
-          type="email"
-          name="email"
-          placeholder="Correo"
-          value={form.email}
-          onChange={handleChange}
-          className="form-control"
-        />
-
-        <input
-          type="password"
-          name="password"
-          placeholder="Contraseña"
-          value={form.password}
-          onChange={handleChange}
-          className="form-control"
-        />
-
-        <input
-          type="text"
-          name="telefono"
-          placeholder="Teléfono"
-          value={form.telefono}
-          onChange={handleChange}
-          className="form-control"
-        />
-
-        <input
-          type="text"
-          name="calle"
-          placeholder="Calle"
-          value={form.calle}
-          onChange={handleChange}
-          className="form-control"
-        />
-
-        <input
-          type="text"
-          name="numero"
-          placeholder="Numero"
-          value={form.numero}
-          onChange={handleChange}
-          className="form-control"
-        />
-
-        <input
-          type="number"
-          name="codigoPostal"
-          placeholder="Codigo postal"
-          value={form.codigoPostal || ""}
-          onChange={handleChange}
-          className="form-control"
-        />
-
-        <select name="localidad" value={form.localidad} onChange={handleChange}>
-          <option value={0}>Selecciona una localidad</option>
-          {localidades.map((loc) => (
-            <option key={loc.id} value={loc.id}>
-              {loc.nombre}
-            </option>
-          ))}
-        </select>
-
-        <button type="submit" disabled={loading}>
-          {loading ? "Registrando..." : "Registrarse"}
-        </button>
-
-        {msg && (
-          <p
-            className={
-              msg.state === "error" ? "error-color-p" : "succes-color-p"
+    useEffect(() => {
+        const getData = async () => {
+            try {
+                const localidadesData = await getLocalidades();
+                setLocalidades(localidadesData);
+            } catch (error) {
+                console.error("Error al obtener las localidades", error);
+                setMsg({
+                    state: "error",
+                    msg: "No se pudieron cargar las localidades.",
+                });
             }
-          >
-            {msg.msg}
-          </p>
-        )}
-      </form>
-    </div>
-  );
+        };
+        getData();
+    }, []);
+
+    const handleChange = (
+        e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
+    ) => {
+        const { name, value } = e.target;
+        setForm((prev) => ({
+            ...prev,
+            [name]:
+                name === "localidad" || name === "codigoPostal"
+                    ? Number(value)
+                    : value,
+        }));
+    };
+
+    const validateEmail = (email: string) => {
+        const regex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        return regex.test(email);
+    };
+
+    const validatePassword = (password: string) => {
+        // Mín. 8 caracteres, una mayúscula, una minúscula y un símbolo
+        const regex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*[\W_]).{8,}$/;
+        return regex.test(password);
+    };
+
+    const handleSubmit = async (e: React.FormEvent) => {
+        e.preventDefault();
+        setLoading(true);
+        setMsg({ state: "", msg: "" });
+
+        if (!form.username.trim()) {
+            setMsg({
+                state: "error",
+                msg: "El nombre de usuario es obligatorio.",
+            });
+            setLoading(false);
+            return;
+        }
+
+        if (!validateEmail(form.email)) {
+            setMsg({
+                state: "error",
+                msg: "El correo electrónico no tiene un formato válido.",
+            });
+            setLoading(false);
+            return;
+        }
+
+        if (!validatePassword(form.password)) {
+            setMsg({
+                state: "error",
+                msg:
+                    "La contraseña debe tener al menos 8 caracteres, una mayúscula, una minúscula y un símbolo.",
+            });
+            setLoading(false);
+            return;
+        }
+
+        if (form.password !== confirmPassword) {
+            setMsg({
+                state: "error",
+                msg: "Las contraseñas no coinciden.",
+            });
+            setLoading(false);
+            return;
+        }
+
+        if (!form.localidad || form.localidad === 0) {
+            setMsg({
+                state: "error",
+                msg: "Selecciona una localidad.",
+            });
+            setLoading(false);
+            return;
+        }
+
+        try {
+            const payload: RegisterRequest = { ...form };
+
+            const resp = await registerUser(payload);
+
+            setMsg({
+                state: "success",
+                msg: "¡Registro exitoso!",
+            });
+
+            setUser({
+                token: resp.data.token,
+                username: resp.data.username,
+                role: resp.data.role,
+                userId: resp.data.userId,
+            });
+
+            setTimeout(() => {
+                navigate("/");
+            }, 1500);
+        } catch (err: any) {
+            setMsg({
+                state: "error",
+                msg:
+                    err.response?.data?.message ||
+                    "Error al registrarse. Recordá que el nombre de usuario y el correo deben ser únicos.",
+            });
+        }
+
+        setLoading(false);
+    };
+
+    return (
+        <div className="auth-container">
+            <form onSubmit={handleSubmit} className="form-container-auth">
+                <h2>Crear cuenta</h2>
+                <hr />
+
+                <input
+                    type="text"
+                    name="nombre"
+                    placeholder="Nombre"
+                    value={form.nombre}
+                    onChange={handleChange}
+                    className="form-control"
+                    required
+                />
+
+                <input
+                    type="text"
+                    name="apellido"
+                    placeholder="Apellido"
+                    value={form.apellido}
+                    onChange={handleChange}
+                    className="form-control"
+                    required
+                />
+
+                <input
+                    type="text"
+                    name="username"
+                    placeholder="Nombre de usuario"
+                    value={form.username}
+                    onChange={handleChange}
+                    className="form-control"
+                    required
+                />
+
+                <input
+                    type="email"
+                    name="email"
+                    placeholder="Correo electrónico"
+                    value={form.email}
+                    onChange={handleChange}
+                    className="form-control"
+                    required
+                />
+
+                <input
+                    type="password"
+                    name="password"
+                    placeholder="Contraseña"
+                    value={form.password}
+                    onChange={handleChange}
+                    className="form-control"
+                    required
+                />
+
+                <input
+                    type="password"
+                    name="confirmPassword"
+                    placeholder="Confirmar contraseña"
+                    value={confirmPassword}
+                    onChange={(e) => setConfirmPassword(e.target.value)}
+                    className="form-control"
+                    required
+                />
+
+                <input
+                    type="text"
+                    name="telefono"
+                    placeholder="Teléfono"
+                    value={form.telefono}
+                    onChange={handleChange}
+                    className="form-control"
+                />
+
+                <input
+                    type="text"
+                    name="calle"
+                    placeholder="Calle"
+                    value={form.calle}
+                    onChange={handleChange}
+                    className="form-control"
+                />
+
+                <input
+                    type="text"
+                    name="numero"
+                    placeholder="Número"
+                    value={form.numero}
+                    onChange={handleChange}
+                    className="form-control"
+                />
+
+                <input
+                    type="number"
+                    name="codigoPostal"
+                    placeholder="Código postal"
+                    value={form.codigoPostal || ""}
+                    onChange={handleChange}
+                    className="form-control"
+                />
+
+                <select
+                    name="localidad"
+                    value={form.localidad}
+                    onChange={handleChange}
+                    className="form-control"
+                    required
+                >
+                    <option value={0}>Selecciona una localidad</option>
+                    {localidades.map((loc) => (
+                        <option key={loc.id} value={loc.id}>
+                            {loc.nombre}
+                        </option>
+                    ))}
+                </select>
+
+                <button type="submit" disabled={loading}>
+                    {loading ? "Registrando..." : "Registrarse"}
+                </button>
+
+                {msg.msg && (
+                    <p
+                        className={
+                            msg.state === "error" ? "error-color-p" : "succes-color-p"
+                        }
+                    >
+                        {msg.msg}
+                    </p>
+                )}
+            </form>
+        </div>
+    );
 };
 
 export default Register;
