@@ -1,5 +1,6 @@
 import axios from "axios";
 import type { UserRequestDTO } from "../models/Usuario";
+import type { UserEditRequestDTO } from "../dtos/UserEditRequestDTO";
 
 const API_URL = import.meta.env.VITE_API_URL;
 
@@ -33,8 +34,7 @@ export const getAllUsers = async () => {
   }
 };
 
-export const updateUser = async (userId: number, data: UserRequestDTO) => {
-  try {
+export const updateUser = async (userId: number, data: UserEditRequestDTO) => {  try {
     const res = await axios.put(`${API_URL}/user/${userId}`, data, {
       headers: {
         Authorization: `Bearer ${localStorage.getItem("token")}`,
