@@ -118,8 +118,8 @@ public class UserServiceImpl implements UserService {
         usuario.setUsername(userDTO.username());
         usuario.setActivo(true);
 
-        if(userDTO.password() != null){
-            usuario.setPassword(userDTO.password());
+        if (userDTO.password() != null && !userDTO.password().isBlank()) {
+            usuario.setPassword(encoder.encode(userDTO.password()));
         }
 
         Cliente cliente = usuario.getCliente();
