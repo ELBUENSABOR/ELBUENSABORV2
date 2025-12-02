@@ -23,9 +23,19 @@ export const UserProvider = ({ children }: { children: ReactNode }) => {
         const username = localStorage.getItem("username");
         const role = localStorage.getItem("role");
         const userId = localStorage.getItem("userId");
+        const mustChangePasswordStr = localStorage.getItem("mustChangePassword");
+
+        const mustChangePassword =
+            mustChangePasswordStr === "true" ? true : false;
 
         return token && username && role && userId
-            ? { token, username, role, userId }
+            ? {
+                token,
+                username,
+                role,
+                userId,
+                mustChangePassword,
+            }
             : null;
     });
 
@@ -34,6 +44,10 @@ export const UserProvider = ({ children }: { children: ReactNode }) => {
         localStorage.setItem("username", user.username);
         localStorage.setItem("role", user.role);
         localStorage.setItem("userId", user.userId.toString());
+        localStorage.setItem(
+            "mustChangePassword",
+            user.mustChangePassword ? "true" : "false"
+        );
         localStorage.setItem("lastActivity", Date.now().toString());
         setUserState(user);
     };
@@ -43,6 +57,7 @@ export const UserProvider = ({ children }: { children: ReactNode }) => {
         localStorage.removeItem("username");
         localStorage.removeItem("role");
         localStorage.removeItem("userId");
+        localStorage.removeItem("mustChangePassword");
         localStorage.removeItem("lastActivity");
         setUserState(null);
     };
@@ -73,9 +88,7 @@ export const UserProvider = ({ children }: { children: ReactNode }) => {
         const intervalId = window.setInterval(checkInactivity, 60 * 1000);
 
         return () => {
-            events.forEach((ev) =>
-                window.removeEventListener(ev, updateActivity)
-            );
+            events.forEach((ev) => window.removeEventListener(ev, updateActivity));
             window.clearInterval(intervalId);
         };
     }, [user]);

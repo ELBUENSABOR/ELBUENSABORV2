@@ -3,6 +3,7 @@ export interface User {
     username: string;
     role: string;
     token: string;
+    mustChangePassword: boolean;
 }
 
 export type RolSistema = "CLIENTE" | "EMPLEADO" | "ADMIN";

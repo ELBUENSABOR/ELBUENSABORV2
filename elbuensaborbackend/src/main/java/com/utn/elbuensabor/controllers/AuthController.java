@@ -2,13 +2,14 @@ package com.utn.elbuensabor.controllers;
 
 import java.util.Map;
 
+import com.utn.elbuensabor.dtos.ChangePasswordRequest;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-
+import org.springframework.security.core.Authentication;
 import com.utn.elbuensabor.dtos.AuthResponse;
 import com.utn.elbuensabor.dtos.LoginRequest;
 import com.utn.elbuensabor.dtos.RegisterRequest;
@@ -48,6 +49,15 @@ public class AuthController {
                     .badRequest()
                     .body(Map.of("message", ex.getMessage()));
         }
+    }
+
+    @PostMapping("/change-password")
+    public ResponseEntity<?> changePassword(
+            @RequestBody @Valid ChangePasswordRequest req,
+            Authentication auth
+    ) {
+        authService.changePassword(auth.getName(), req);
+        return ResponseEntity.ok().build();
     }
 
 }
