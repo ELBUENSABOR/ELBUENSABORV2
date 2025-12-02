@@ -142,6 +142,7 @@ const Register = () => {
                 username: resp.data.username,
                 role: resp.data.role,
                 userId: resp.data.userId,
+                mustChangePassword: resp.data.mustChangePassword,
             });
 
             setTimeout(() => {

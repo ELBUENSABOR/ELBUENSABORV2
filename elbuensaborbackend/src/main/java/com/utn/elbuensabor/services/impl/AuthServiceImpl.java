@@ -1,6 +1,7 @@
 package com.utn.elbuensabor.services.impl;
 
 
+import com.utn.elbuensabor.dtos.ChangePasswordRequest;
 import com.utn.elbuensabor.services.AuthService;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -88,7 +89,13 @@ public class AuthServiceImpl implements AuthService {
 
         String token = jwt.generateToken(u.getUsername());
 
-        return new AuthResponse(token, u.getUsername(), "CLIENTE", u.getId().toString());
+        return new AuthResponse(
+                token,
+                u.getUsername(),
+                u.getRolSistema().name(),
+                u.getId().toString(),
+                Boolean.TRUE.equals(u.getMustChangePassword())
+        );
     }
 
     public AuthResponse login(LoginRequest req) {
@@ -110,6 +117,37 @@ public class AuthServiceImpl implements AuthService {
 
         String token = jwt.generateToken(u.getUsername());
 
-        return new AuthResponse(token, u.getUsername(), u.getRolSistema().name(), u.getId().toString());
+        return new AuthResponse(
+                token,
+                u.getUsername(),
+                u.getRolSistema().name(),
+                u.getId().toString(),
+                Boolean.TRUE.equals(u.getMustChangePassword())
+        );
     }
+
+    public void changePassword(String username, ChangePasswordRequest req) {
+
+        Usuario u = usuarioRepo.findByUsername(username)
+                .orElseThrow(() -> new IllegalArgumentException("Usuario no encontrado"));
+
+        if (!encoder.matches(req.oldPassword(), u.getPassword())) {
+            throw new IllegalArgumentException("La contraseña actual no es correcta");
+        }
+
+        // podés reusar la misma regex de validación que usás en el DTO de registro
+        if (!req.newPassword().matches("^(?=.*[a-z])(?=.*[A-Z])(?=.*[\\W_]).{8,}$")) {
+            throw new IllegalArgumentException(
+                    "La nueva contraseña no cumple con los requisitos de seguridad"
+            );
+        }
+
+        u.setPassword(encoder.encode(req.newPassword()));
+        u.setMustChangePassword(false); // ya no necesita cambiarla
+
+        usuarioRepo.save(u);
+    }
+
+
+
 }

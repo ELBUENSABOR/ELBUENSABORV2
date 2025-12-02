@@ -27,11 +27,29 @@ public class UserServiceImpl implements UserService {
     private final SucursalEmpresaRepository sucursalEmpresaRepository;
 
     public UserDTO createUser(UserRequestDTO dto) {
+
+        // Validación de email duplicado
+        if (dto.rolSistema() == RolSistema.EMPLEADO &&
+                empleadoRepository.existsByEmail(dto.email())) {
+
+            throw new IllegalArgumentException("Ya existe un empleado registrado con ese email");
+        }
+
+         if (dto.rolSistema() == RolSistema.CLIENTE &&
+             clienteRepository.existsByEmail(dto.email())) {
+             throw new IllegalArgumentException("Ya existe un cliente registrado con ese email");
+         }
+
         Usuario usuario = new Usuario();
         usuario.setUsername(dto.username());
         usuario.setPassword(encoder.encode(dto.password()));
         usuario.setActivo(true);
         usuario.setRolSistema(dto.rolSistema());
+
+        // 💡 si es EMPLEADO → debe cambiar la contraseña en el primer login
+        if (dto.rolSistema() == RolSistema.EMPLEADO) {
+            usuario.setMustChangePassword(true);
+        }
 
         SucursalEmpresa sucursal = sucursalEmpresaRepository.findById(dto.sucursalId())
                 .orElseThrow(() -> new RuntimeException("Sucursal no encontrada"));
@@ -39,6 +57,7 @@ public class UserServiceImpl implements UserService {
         usuario.setSucursal(sucursal);
 
         usuarioRepository.save(usuario);
+
 
         if (dto.rolSistema() == RolSistema.CLIENTE || dto.rolSistema() == RolSistema.ADMIN) {
 
@@ -71,20 +90,13 @@ public class UserServiceImpl implements UserService {
         }
 
         else if (dto.rolSistema() == RolSistema.EMPLEADO) {
-
             Empleado empleado = new Empleado();
             empleado.setUsuario(usuario);
-
             empleado.setNombre(dto.nombre());
             empleado.setApellido(dto.apellido());
             empleado.setEmail(dto.email());
             empleado.setTelefono(dto.telefono());
-
-            // PerfilEmpleado podría venir por DTO o tener uno por defecto
-            empleado.setPerfilEmpleado(dto.perfilEmpleado() != null
-                    ? dto.perfilEmpleado()
-                    : PerfilEmpleado.CAJERO);
-
+            empleado.setPerfilEmpleado(dto.perfilEmpleado());
             empleadoRepository.save(empleado);
         }
 

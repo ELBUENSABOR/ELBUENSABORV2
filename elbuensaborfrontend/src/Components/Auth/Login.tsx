@@ -49,16 +49,22 @@ const Login = () => {
                 msg: "¡Login exitoso!",
             });
 
+            // 👇 Desestructuramos lo que devuelve el back (incluyendo mustChangePassword)
+            const { token, username, role, userId, mustChangePassword } = resp.data;
+
+            // 👇 Guardamos el usuario completo en contexto (con el flag)
             setUser({
-                token: resp.data.token,
-                username: resp.data.username,
-                role: resp.data.role,
-                userId: resp.data.userId,
+                token,
+                username,
+                role,
+                userId,
+                mustChangePassword,
             });
 
             setTimeout(() => {
                 navigate("/");
             }, 500);
+
         } catch (err: any) {
             setMsg({
                 state: "error",

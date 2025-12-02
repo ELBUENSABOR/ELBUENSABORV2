@@ -1,6 +1,7 @@
 import Catalog from "./Catalog/Catalog";
 import "./home.css";
 import { useUser } from "../../contexts/UsuarioContext";
+import { ChangePasswordPopup } from "./ChangePasswordPopup.tsx";
 
 const Home = () => {
   const { user } = useUser();
@@ -9,6 +10,7 @@ const Home = () => {
       <div className="header-home">
         <h5>¡Bienvenido! {user?.username || ""}</h5>
         <hr />
+          <ChangePasswordPopup />
       </div>
 
       <Catalog />

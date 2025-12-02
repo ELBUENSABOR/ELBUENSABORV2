@@ -1,12 +1,6 @@
 package com.utn.elbuensabor.entities;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.EnumType;
-import jakarta.persistence.Enumerated;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.ManyToOne;
-import jakarta.persistence.OneToOne;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -20,6 +14,9 @@ public class Usuario extends BaseEntity {
     private String username;
     private String password;
     private Boolean activo;
+
+    @Column(name = "must_change_password")
+    private Boolean mustChangePassword = false;
 
     @Enumerated(EnumType.STRING)
     private RolSistema rolSistema;
