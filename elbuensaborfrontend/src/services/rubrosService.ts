@@ -7,7 +7,7 @@ export const getRubrosInsumos = async () => {
   try {
     return axios.get(`${API_BASE}/insumos/rubros`, {
       headers: {
-        Authorization: `Bearer ${localStorage.getItem("token")}`,
+        Authorization: `Bearer ${sessionStorage.getItem("token")}`,
       },
       withCredentials: true,
     });
@@ -20,7 +20,7 @@ export const getRubroInsumoById = async (id: number) => {
   try {
     return axios.get(`${API_BASE}/insumos/rubros/${id}`, {
       headers: {
-        Authorization: `Bearer ${localStorage.getItem("token")}`,
+        Authorization: `Bearer ${sessionStorage.getItem("token")}`,
       },
       withCredentials: true,
     });
@@ -33,7 +33,7 @@ export const createRubro = async (data: Rubro) => {
   try {
     return axios.post(`${API_BASE}/insumos/rubros`, data, {
       headers: {
-        Authorization: `Bearer ${localStorage.getItem("token")}`,
+        Authorization: `Bearer ${sessionStorage.getItem("token")}`,
       },
       withCredentials: true,
     });
@@ -46,7 +46,7 @@ export const updateRubro = async (id: number, data: Rubro) => {
   try {
     return axios.put(`${API_BASE}/insumos/rubros/${id}`, data, {
       headers: {
-        Authorization: `Bearer ${localStorage.getItem("token")}`,
+        Authorization: `Bearer ${sessionStorage.getItem("token")}`,
       },
       withCredentials: true,
     });
@@ -59,7 +59,7 @@ export const getRubrosManufacturados = async () => {
   try {
     return axios.get(`${API_BASE}/manufacturados/rubros`, {
       headers: {
-        Authorization: `Bearer ${localStorage.getItem("token")}`,
+        Authorization: `Bearer ${sessionStorage.getItem("token")}`,
       },
       withCredentials: true,
     });
@@ -72,7 +72,7 @@ export const getRubroManufacturadoById = async (id: number) => {
   try {
     return axios.get(`${API_BASE}/manufacturados/rubros/${id}`, {
       headers: {
-        Authorization: `Bearer ${localStorage.getItem("token")}`,
+        Authorization: `Bearer ${sessionStorage.getItem("token")}`,
       },
       withCredentials: true,
     });
@@ -85,7 +85,7 @@ export const createRubroManufacturado = async (data: Rubro) => {
   try {
     return axios.post(`${API_BASE}/manufacturados/rubros`, data, {
       headers: {
-        Authorization: `Bearer ${localStorage.getItem("token")}`,
+        Authorization: `Bearer ${sessionStorage.getItem("token")}`,
       },
       withCredentials: true,
     });
@@ -98,7 +98,7 @@ export const updateRubroManufacturado = async (id: number, data: Rubro) => {
   try {
     return axios.put(`${API_BASE}/manufacturados/rubros/${id}`, data, {
       headers: {
-        Authorization: `Bearer ${localStorage.getItem("token")}`,
+        Authorization: `Bearer ${sessionStorage.getItem("token")}`,
       },
       withCredentials: true,
     });

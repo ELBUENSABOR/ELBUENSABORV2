@@ -55,7 +55,7 @@ export const ChangePasswordPopup = () => {
                 { oldPassword: oldPass, newPassword: newPass },
                 {
                     headers: {
-                        Authorization: `Bearer ${localStorage.getItem("token")}`,
+                        Authorization: `Bearer ${sessionStorage.getItem("token")}`,
                     },
                     withCredentials: true,
                 }

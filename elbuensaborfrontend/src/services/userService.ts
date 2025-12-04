@@ -8,7 +8,7 @@ export const getUserService = async (userId: string) => {
   try {
     const res = await axios.get(`${API_URL}/user/${userId}`, {
       headers: {
-        Authorization: `Bearer ${localStorage.getItem("token")}`,
+        Authorization: `Bearer ${sessionStorage.getItem("token")}`,
       },
       withCredentials: true,
     });
@@ -23,7 +23,7 @@ export const getAllUsers = async () => {
   try {
     const res = await axios.get(`${API_URL}/user`, {
       headers: {
-        Authorization: `Bearer ${localStorage.getItem("token")}`,
+        Authorization: `Bearer ${sessionStorage.getItem("token")}`,
       },
       withCredentials: true,
     });
@@ -37,7 +37,7 @@ export const getAllUsers = async () => {
 export const updateUser = async (userId: number, data: UserEditRequestDTO) => {  try {
     const res = await axios.put(`${API_URL}/user/${userId}`, data, {
       headers: {
-        Authorization: `Bearer ${localStorage.getItem("token")}`,
+        Authorization: `Bearer ${sessionStorage.getItem("token")}`,
       },
       withCredentials: true,
     });
@@ -53,7 +53,7 @@ export const createUser = async (data: UserRequestDTO) => {
   try {
     const res = await axios.post(`${API_URL}/user`, data, {
       headers: {
-        Authorization: `Bearer ${localStorage.getItem("token")}`,
+        Authorization: `Bearer ${sessionStorage.getItem("token")}`,
       },
       withCredentials: true,
     });
@@ -69,7 +69,7 @@ export const deleteUserService = async (id: number) => {
   try {
     const res = await axios.delete(`${API_URL}/user/${id}`, {
       headers: {
-        Authorization: `Bearer ${localStorage.getItem("token")}`,
+        Authorization: `Bearer ${sessionStorage.getItem("token")}`,
       },
       withCredentials: true,
     });
