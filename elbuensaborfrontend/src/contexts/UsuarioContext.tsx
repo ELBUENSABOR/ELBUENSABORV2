@@ -15,50 +15,69 @@ interface UserContextType {
 
 const UserContext = createContext<UserContextType | undefined>(undefined);
 
-const INACTIVITY_LIMIT_MINUTES = 45; // podés ajustar esto
+const INACTIVITY_LIMIT_MINUTES = 45;
 
 export const UserProvider = ({ children }: { children: ReactNode }) => {
     const [user, setUserState] = useState<User | null>(() => {
-        const token = localStorage.getItem("token");
-        const username = localStorage.getItem("username");
-        const role = localStorage.getItem("role");
-        const userId = localStorage.getItem("userId");
-        const mustChangePasswordStr = localStorage.getItem("mustChangePassword");
+        const token = sessionStorage.getItem("token");
+        const username = sessionStorage.getItem("username");
+        const role = sessionStorage.getItem("role");
+        const userId = sessionStorage.getItem("userId");
+        const mustChangePasswordStr = sessionStorage.getItem("mustChangePassword");
+        const lastActivityStr = sessionStorage.getItem("lastActivity");
 
-        const mustChangePassword =
-            mustChangePasswordStr === "true" ? true : false;
+        // si no hay datos básicos, no hay sesión
+        if (!token || !username || !role || !userId) {
+            return null;
+        }
 
-        return token && username && role && userId
-            ? {
-                token,
-                username,
-                role,
-                userId,
-                mustChangePassword,
+        // chequeo expiración por inactividad incluso al iniciar la app
+        if (lastActivityStr) {
+            const last = Number(lastActivityStr);
+            const diffMs = Date.now() - last;
+            const limitMs = INACTIVITY_LIMIT_MINUTES * 60 * 1000;
+
+            if (diffMs > limitMs) {
+                // sesión expirada → limpio y arranco sin usuario
+                sessionStorage.removeItem("token");
+                sessionStorage.removeItem("username");
+                sessionStorage.removeItem("role");
+                sessionStorage.removeItem("userId");
+                sessionStorage.removeItem("mustChangePassword");
+                sessionStorage.removeItem("lastActivity");
+                return null;
             }
-            : null;
+        }
+
+        return {
+            token,
+            username,
+            role,
+            userId,
+            mustChangePassword: mustChangePasswordStr === "true",
+        };
     });
 
     const setUser = (user: User) => {
-        localStorage.setItem("token", user.token);
-        localStorage.setItem("username", user.username);
-        localStorage.setItem("role", user.role);
-        localStorage.setItem("userId", user.userId.toString());
-        localStorage.setItem(
+        sessionStorage.setItem("token", user.token);
+        sessionStorage.setItem("username", user.username);
+        sessionStorage.setItem("role", user.role);
+        sessionStorage.setItem("userId", user.userId.toString());
+        sessionStorage.setItem(
             "mustChangePassword",
             user.mustChangePassword ? "true" : "false"
         );
-        localStorage.setItem("lastActivity", Date.now().toString());
+        sessionStorage.setItem("lastActivity", Date.now().toString());
         setUserState(user);
     };
 
     const logout = () => {
-        localStorage.removeItem("token");
-        localStorage.removeItem("username");
-        localStorage.removeItem("role");
-        localStorage.removeItem("userId");
-        localStorage.removeItem("mustChangePassword");
-        localStorage.removeItem("lastActivity");
+        sessionStorage.removeItem("token");
+        sessionStorage.removeItem("username");
+        sessionStorage.removeItem("role");
+        sessionStorage.removeItem("userId");
+        sessionStorage.removeItem("mustChangePassword");
+        sessionStorage.removeItem("lastActivity");
         setUserState(null);
     };
 
@@ -66,11 +85,11 @@ export const UserProvider = ({ children }: { children: ReactNode }) => {
         if (!user) return;
 
         const updateActivity = () => {
-            localStorage.setItem("lastActivity", Date.now().toString());
+            sessionStorage.setItem("lastActivity", Date.now().toString());
         };
 
         const checkInactivity = () => {
-            const last = Number(localStorage.getItem("lastActivity") || Date.now());
+            const last = Number(sessionStorage.getItem("lastActivity") || Date.now());
             const diffMs = Date.now() - last;
             const limitMs = INACTIVITY_LIMIT_MINUTES * 60 * 1000;
 
@@ -82,13 +101,15 @@ export const UserProvider = ({ children }: { children: ReactNode }) => {
         const events = ["click", "keydown", "mousemove", "scroll"];
         events.forEach((ev) => window.addEventListener(ev, updateActivity));
 
-        // set inicial
+        // set inicial de actividad
         updateActivity();
 
         const intervalId = window.setInterval(checkInactivity, 60 * 1000);
 
         return () => {
-            events.forEach((ev) => window.removeEventListener(ev, updateActivity));
+            events.forEach((ev) =>
+                window.removeEventListener(ev, updateActivity)
+            );
             window.clearInterval(intervalId);
         };
     }, [user]);

@@ -7,7 +7,7 @@ export async function fetchSucursales(): Promise<Sucursal[]> {
   try {
     const res = await axios.get(`${API_BASE}/sucursales`, {
       headers: {
-        Authorization: `Bearer ${localStorage.getItem("token")}`,
+        Authorization: `Bearer ${sessionStorage.getItem("token")}`,
       },
       withCredentials: true,
     });
@@ -24,7 +24,7 @@ export async function fetchSucursales(): Promise<Sucursal[]> {
 export const createSucursal = async (data: Sucursal) => {
   return axios.post(`${API_BASE}/sucursales`, data, {
     headers: {
-      Authorization: `Bearer ${localStorage.getItem("token")}`,
+      Authorization: `Bearer ${sessionStorage.getItem("token")}`,
     },
     withCredentials: true,
   });
@@ -33,7 +33,7 @@ export const createSucursal = async (data: Sucursal) => {
 export const getSucursalById = async (id: number) => {
   return axios.get(`${API_BASE}/sucursales/${id}`, {
     headers: {
-      Authorization: `Bearer ${localStorage.getItem("token")}`,
+      Authorization: `Bearer ${sessionStorage.getItem("token")}`,
     },
     withCredentials: true,
   });
@@ -42,7 +42,7 @@ export const getSucursalById = async (id: number) => {
 export const updateSucursal = async (id: number, data: Sucursal) => {
   return axios.put(`${API_BASE}/sucursales/${id}`, data, {
     headers: {
-      Authorization: `Bearer ${localStorage.getItem("token")}`,
+      Authorization: `Bearer ${sessionStorage.getItem("token")}`,
     },
     withCredentials: true,
   });
