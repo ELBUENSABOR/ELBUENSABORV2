@@ -193,24 +193,26 @@ export const AddUser: React.FC = () => {
         />
       </div>
 
-      <div className="mb-3">
-        <label>Sucursal</label>
-        <select
-          name="sucursalId"
-          className="form-select"
-          value={form.sucursalId}
-          onChange={handleChange}
-          required
-        >
-          <option value="">Seleccionar sucursal...</option>
+      {!isCliente && (
+        <div className="mb-3">
+          <label>Sucursal</label>
+          <select
+            name="sucursalId"
+            className="form-select"
+            value={form.sucursalId}
+            onChange={handleChange}
+            required
+          >
+            <option value="">Seleccionar sucursal...</option>
 
-          {sucursales.map((s) => (
-            <option key={s.id} value={s.id}>
-              {s.nombre}
-            </option>
-          ))}
-        </select>
-      </div>
+            {sucursales.map((s) => (
+              <option key={s.id} value={s.id}>
+                {s.nombre}
+              </option>
+            ))}
+          </select>
+        </div>
+      )}
 
       {/* CAMPOS SOLO PARA CLIENTE */}
       {isCliente && (

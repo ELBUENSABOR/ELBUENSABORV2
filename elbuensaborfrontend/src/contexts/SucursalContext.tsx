@@ -1,6 +1,16 @@
-import { createContext, useContext, useEffect, useMemo, useState, type ReactNode } from "react";
+import {
+  createContext,
+  useContext,
+  useEffect,
+  useMemo,
+  useState,
+  type ReactNode,
+} from "react";
 import { useUser } from "./UsuarioContext";
-import { fetchSucursales, type SucursalOption } from "../services/dashboardService";
+import {
+  fetchSucursales,
+  type SucursalOption,
+} from "../services/dashboardService";
 
 interface SucursalContextType {
   sucursales: SucursalOption[];
@@ -9,7 +19,9 @@ interface SucursalContextType {
   setSucursalId: (id: number | null) => void;
 }
 
-const SucursalContext = createContext<SucursalContextType | undefined>(undefined);
+const SucursalContext = createContext<SucursalContextType | undefined>(
+  undefined
+);
 
 const STORAGE_KEY = "selectedSucursalId";
 
@@ -87,7 +99,11 @@ export const SucursalProvider = ({ children }: { children: ReactNode }) => {
     [sucursales, sucursalId, loading]
   );
 
-  return <SucursalContext.Provider value={contextValue}>{children}</SucursalContext.Provider>;
+  return (
+    <SucursalContext.Provider value={contextValue}>
+      {children}
+    </SucursalContext.Provider>
+  );
 };
 
 export const useSucursal = () => {
@@ -97,4 +113,3 @@ export const useSucursal = () => {
   }
   return context;
 };
-

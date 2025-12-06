@@ -2,7 +2,7 @@ package com.utn.elbuensabor.dtos;
 
 import java.util.List;
 
-public record ArticuloResponse(
+public record ArticuloInsumoResponse(
         Long id,
         String denominacion,
         String descripcion,
@@ -11,7 +11,6 @@ public record ArticuloResponse(
         Integer tiempoEstimado,
         String categoria,
         Boolean esParaElaborar,
-        Boolean activo,
-        List<RecetaItemResponse> receta) {
+        Boolean activo) {
 }
 

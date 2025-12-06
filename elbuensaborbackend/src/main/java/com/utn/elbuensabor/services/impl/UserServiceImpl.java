@@ -28,20 +28,34 @@ public class UserServiceImpl implements UserService {
     private final SucursalEmpresaRepository sucursalEmpresaRepository;
 
     public UserDTO createUser(UserRequestDTO dto) {
+
         Usuario usuario = new Usuario();
         usuario.setUsername(dto.username());
         usuario.setPassword(encoder.encode(dto.password()));
         usuario.setActivo(true);
         usuario.setRolSistema(dto.rolSistema());
 
-        SucursalEmpresa sucursal = sucursalEmpresaRepository.findById(dto.sucursalId())
-                .orElseThrow(() -> new RuntimeException("Sucursal no encontrada"));
+        if (dto.rolSistema() == RolSistema.EMPLEADO) {
 
-        usuario.setSucursal(sucursal);
+            if (dto.sucursalId() == null) {
+                throw new RuntimeException("Debe asignar una sucursal al empleado");
+            }
+
+            SucursalEmpresa sucursal = sucursalEmpresaRepository.findById(dto.sucursalId())
+                    .orElseThrow(() -> new RuntimeException("Sucursal no encontrada"));
+
+            usuario.setSucursal(sucursal);
+        } else {
+            usuario.setSucursal(null);
+        }
 
         usuarioRepository.save(usuario);
 
-        if (dto.rolSistema() == RolSistema.CLIENTE || dto.rolSistema() == RolSistema.ADMIN) {
+        if (dto.rolSistema() == RolSistema.CLIENTE) {
+
+            if (dto.domicilio() == null) {
+                throw new RuntimeException("El cliente debe tener un domicilio");
+            }
 
             Cliente cliente = new Cliente();
             cliente.setUsuario(usuario);
@@ -50,12 +64,7 @@ public class UserServiceImpl implements UserService {
             cliente.setEmail(dto.email());
             cliente.setTelefono(dto.telefono());
 
-            if (dto.domicilio() == null) {
-                throw new RuntimeException("El cliente debe tener un domicilio");
-            }
-
             var d = dto.domicilio();
-
             Domicilio domicilio = new Domicilio();
             domicilio.setCalle(d.calle());
             domicilio.setNumero(d.numero());
@@ -65,7 +74,6 @@ public class UserServiceImpl implements UserService {
                     .orElseThrow(() -> new RuntimeException("Localidad no encontrada"));
 
             domicilio.setLocalidad(localidad);
-
             cliente.setDomicilio(domicilio);
 
             clienteRepository.save(cliente);
@@ -75,16 +83,16 @@ public class UserServiceImpl implements UserService {
 
             Empleado empleado = new Empleado();
             empleado.setUsuario(usuario);
-
             empleado.setNombre(dto.nombre());
             empleado.setApellido(dto.apellido());
             empleado.setEmail(dto.email());
             empleado.setTelefono(dto.telefono());
 
-            // PerfilEmpleado podría venir por DTO o tener uno por defecto
-            empleado.setPerfilEmpleado(dto.perfilEmpleado() != null
-                    ? dto.perfilEmpleado()
-                    : PerfilEmpleado.CAJERO);
+            empleado.setPerfilEmpleado(
+                    dto.perfilEmpleado() != null
+                            ? dto.perfilEmpleado()
+                            : PerfilEmpleado.CAJERO
+            );
 
             empleadoRepository.save(empleado);
         }
@@ -95,6 +103,8 @@ public class UserServiceImpl implements UserService {
 
         return mapToUserDTO(creado);
     }
+
+
 
     public UserDTO getUser(Long id) {
         Usuario u = usuarioRepository.findByIdWithClienteEmpleadoAndDomicilio(id)
