@@ -2,14 +2,11 @@ package com.utn.elbuensabor.services.impl;
 
 import java.util.List;
 
+import com.utn.elbuensabor.dtos.*;
 import com.utn.elbuensabor.services.ArticuloManufacturadoService;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.utn.elbuensabor.dtos.ArticuloManufacturadoRequest;
-import com.utn.elbuensabor.dtos.ArticuloResponse;
-import com.utn.elbuensabor.dtos.RecetaItemRequest;
-import com.utn.elbuensabor.dtos.RecetaItemResponse;
 import com.utn.elbuensabor.entities.ArticuloInsumo;
 import com.utn.elbuensabor.entities.ArticuloManufacturado;
 import com.utn.elbuensabor.entities.ArticuloManufacturadoDetalle;
@@ -28,20 +25,20 @@ public class ArticuloManufacturadoServiceImpl implements ArticuloManufacturadoSe
     private final CategoriaArticuloManufacturadoRepository categoriaRepo;
     private final ArticuloInsumoRepository insumoRepo;
 
-    public List<ArticuloResponse> getAll() {
+    public List<ArticuloManufacturadoResponse> getAll() {
         return manufacturadoRepo.findAll().stream()
                 .map(this::toResponse)
                 .toList();
     }
 
-    public ArticuloResponse getById(Long id) {
+    public ArticuloManufacturadoResponse getById(Long id) {
         ArticuloManufacturado manufacturado = manufacturadoRepo.findById(id)
                 .orElseThrow(() -> new RuntimeException("Producto no encontrado"));
         return toResponse(manufacturado);
     }
 
     @Transactional
-    public ArticuloResponse create(ArticuloManufacturadoRequest request) {
+    public ArticuloManufacturadoResponse create(ArticuloManufacturadoRequest request) {
         ArticuloManufacturado manufacturado = new ArticuloManufacturado();
         fillFromRequest(manufacturado, request);
         manufacturadoRepo.save(manufacturado);
@@ -49,7 +46,7 @@ public class ArticuloManufacturadoServiceImpl implements ArticuloManufacturadoSe
     }
 
     @Transactional
-    public ArticuloResponse update(Long id, ArticuloManufacturadoRequest request) {
+    public ArticuloManufacturadoResponse update(Long id, ArticuloManufacturadoRequest request) {
         ArticuloManufacturado manufacturado = manufacturadoRepo.findById(id)
                 .orElseThrow(() -> new RuntimeException("Producto no encontrado"));
         manufacturado.getArticuloManufacturadoDetalles().clear();
@@ -91,17 +88,21 @@ public class ArticuloManufacturadoServiceImpl implements ArticuloManufacturadoSe
         return detalle;
     }
 
-    public ArticuloResponse toResponse(ArticuloManufacturado manufacturado) {
-        String categoria = manufacturado.getCategoria() != null
+    public ArticuloManufacturadoResponse toResponse(ArticuloManufacturado manufacturado) {
+        String categoria = (manufacturado.getCategoria() != null)
                 ? manufacturado.getCategoria().getDenominacion()
                 : null;
-        List<RecetaItemResponse> receta = manufacturado.getArticuloManufacturadoDetalles().stream()
-                .map(detalle -> new RecetaItemResponse(
-                        detalle.getArticuloInsumo().getId(),
-                        detalle.getArticuloInsumo().getDenominacion(),
-                        detalle.getCantidad()))
+
+        List<RecetaItemResponse> receta = manufacturado.getArticuloManufacturadoDetalles()
+                .stream()
+                .map(det -> new RecetaItemResponse(
+                        det.getArticuloInsumo().getId(),
+                        det.getArticuloInsumo().getDenominacion(),
+                        det.getCantidad()
+                ))
                 .toList();
-        return new ArticuloResponse(
+
+        return new ArticuloManufacturadoResponse(
                 manufacturado.getId(),
                 manufacturado.getDenominacion(),
                 manufacturado.getDescripcion(),
@@ -109,9 +110,9 @@ public class ArticuloManufacturadoServiceImpl implements ArticuloManufacturadoSe
                 manufacturado.getPrecioCosto(),
                 manufacturado.getTiempoEstimado(),
                 categoria,
-                true,
                 manufacturado.getActivo(),
-                receta);
+                receta
+        );
     }
 }
 

@@ -18,7 +18,7 @@ const links = [
   },
   {
     path: "/dashboard/productos-insumos",
-    label: "Ingredientes",
+    label: "Insumos",
     rol: ["EMPLEADO", "ADMIN"],
   },
   {
@@ -28,7 +28,7 @@ const links = [
   },
   {
     path: "/dashboard/stock",
-    label: "Alertas de stock",
+    label: "Stock",
     rol: ["EMPLEADO", "ADMIN"],
   },
   {

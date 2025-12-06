@@ -14,7 +14,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.utn.elbuensabor.dtos.ArticuloInsumoRequest;
-import com.utn.elbuensabor.dtos.ArticuloResponse;
+import com.utn.elbuensabor.dtos.ArticuloInsumoResponse;
 import com.utn.elbuensabor.services.ArticuloInsumoService;
 
 import jakarta.validation.Valid;
@@ -29,22 +29,22 @@ public class InsumoController {
     private final ArticuloInsumoService service;
 
     @GetMapping
-    public ResponseEntity<List<ArticuloResponse>> getAll() {
+    public ResponseEntity<List<ArticuloInsumoResponse>> getAll() {
         return ResponseEntity.ok(service.getAll());
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<ArticuloResponse> getById(@PathVariable Long id) {
+    public ResponseEntity<ArticuloInsumoResponse> getById(@PathVariable Long id) {
         return ResponseEntity.ok(service.getById(id));
     }
 
     @PostMapping
-    public ResponseEntity<ArticuloResponse> create(@RequestBody @Valid ArticuloInsumoRequest request) {
+    public ResponseEntity<ArticuloInsumoResponse> create(@RequestBody @Valid ArticuloInsumoRequest request) {
         return ResponseEntity.ok(service.create(request));
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<ArticuloResponse> update(
+    public ResponseEntity<ArticuloInsumoResponse> update(
             @PathVariable Long id,
             @RequestBody @Valid ArticuloInsumoRequest request) {
         return ResponseEntity.ok(service.update(id, request));

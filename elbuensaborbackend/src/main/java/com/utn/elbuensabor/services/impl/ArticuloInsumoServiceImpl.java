@@ -7,7 +7,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.utn.elbuensabor.dtos.ArticuloInsumoRequest;
-import com.utn.elbuensabor.dtos.ArticuloResponse;
+import com.utn.elbuensabor.dtos.ArticuloInsumoResponse;
 import com.utn.elbuensabor.entities.ArticuloInsumo;
 import com.utn.elbuensabor.entities.CategoriaArticuloInsumo;
 import com.utn.elbuensabor.repositories.ArticuloInsumoRepository;
@@ -22,20 +22,20 @@ public class ArticuloInsumoServiceImpl implements ArticuloInsumoService {
     private final ArticuloInsumoRepository insumoRepo;
     private final CategoriaArticuloInsumoRepository categoriaRepo;
 
-    public List<ArticuloResponse> getAll() {
+    public List<ArticuloInsumoResponse> getAll() {
         return insumoRepo.findAll().stream()
                 .map(this::toResponse)
                 .toList();
     }
 
-    public ArticuloResponse getById(Long id) {
+    public ArticuloInsumoResponse getById(Long id) {
         ArticuloInsumo insumo = insumoRepo.findById(id)
                 .orElseThrow(() -> new RuntimeException("Insumo no encontrado"));
         return toResponse(insumo);
     }
 
     @Transactional
-    public ArticuloResponse create(ArticuloInsumoRequest request) {
+    public ArticuloInsumoResponse create(ArticuloInsumoRequest request) {
         ArticuloInsumo insumo = new ArticuloInsumo();
         fillFromRequest(insumo, request);
         insumoRepo.save(insumo);
@@ -43,7 +43,7 @@ public class ArticuloInsumoServiceImpl implements ArticuloInsumoService {
     }
 
     @Transactional
-    public ArticuloResponse update(Long id, ArticuloInsumoRequest request) {
+    public ArticuloInsumoResponse update(Long id, ArticuloInsumoRequest request) {
         ArticuloInsumo insumo = insumoRepo.findById(id)
                 .orElseThrow(() -> new RuntimeException("Insumo no encontrado"));
         fillFromRequest(insumo, request);
@@ -68,11 +68,11 @@ public class ArticuloInsumoServiceImpl implements ArticuloInsumoService {
         insumo.setEsParaElaborar(Boolean.TRUE.equals(request.esParaElaborar()));
     }
 
-    public ArticuloResponse toResponse(ArticuloInsumo insumo) {
+    public ArticuloInsumoResponse toResponse(ArticuloInsumo insumo) {
         String categoria = insumo.getCategoriaArticuloInsumo() != null
                 ? insumo.getCategoriaArticuloInsumo().getDenominacion()
                 : null;
-        return new ArticuloResponse(
+        return new ArticuloInsumoResponse(
                 insumo.getId(),
                 insumo.getDenominacion(),
                 null,
@@ -81,8 +81,8 @@ public class ArticuloInsumoServiceImpl implements ArticuloInsumoService {
                 null,
                 categoria,
                 insumo.getEsParaElaborar(),
-                insumo.getActivo(),
-                List.of());
+                insumo.getActivo()
+        );
     }
 }
 

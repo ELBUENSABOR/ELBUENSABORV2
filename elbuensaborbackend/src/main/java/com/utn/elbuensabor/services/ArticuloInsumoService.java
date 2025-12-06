@@ -3,25 +3,25 @@ package com.utn.elbuensabor.services;
 import java.util.List;
 
 import com.utn.elbuensabor.dtos.ArticuloInsumoRequest;
-import com.utn.elbuensabor.dtos.ArticuloResponse;
+import com.utn.elbuensabor.dtos.ArticuloInsumoResponse;
 import com.utn.elbuensabor.entities.ArticuloInsumo;
 
 
 public interface ArticuloInsumoService {
 
-    List<ArticuloResponse> getAll();
+    List<ArticuloInsumoResponse> getAll();
 
-    ArticuloResponse getById(Long id);
+    ArticuloInsumoResponse getById(Long id);
 
-    ArticuloResponse create(ArticuloInsumoRequest request);
+    ArticuloInsumoResponse create(ArticuloInsumoRequest request);
 
-    ArticuloResponse update(Long id, ArticuloInsumoRequest request);
+    ArticuloInsumoResponse update(Long id, ArticuloInsumoRequest request);
 
     void delete(Long id);
 
     void fillFromRequest(ArticuloInsumo insumo, ArticuloInsumoRequest request);
 
-    ArticuloResponse toResponse(ArticuloInsumo insumo);
+    ArticuloInsumoResponse toResponse(ArticuloInsumo insumo);
 
 }
 
