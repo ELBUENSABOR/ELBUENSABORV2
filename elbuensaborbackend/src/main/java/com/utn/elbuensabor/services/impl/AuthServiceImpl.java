@@ -130,11 +130,12 @@ public class AuthServiceImpl implements AuthService {
         return new AuthResponse(
                 token,
                 u.getUsername(),
-                "CLIENTE",
+                u.getRolSistema().name(),
                 u.getId().toString(),
-                false,  // al registrarse no tiene obligación de cambiar la contraseña
+                Boolean.TRUE.equals(u.getMustChangePassword()),
                 sucursalId
         );
+
     }
 
     public void changePassword(String username, ChangePasswordRequest req) {
