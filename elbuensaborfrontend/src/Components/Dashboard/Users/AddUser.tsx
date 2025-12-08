@@ -35,6 +35,8 @@ export const AddUser: React.FC = () => {
     const [confirmPassword, setConfirmPassword] = useState("");
     const [errorMsg, setErrorMsg] = useState("");
 
+    const isCliente = form.rolSistema === "CLIENTE";
+
     useEffect(() => {
         const getAllLocalidades = async () => {
             try {
@@ -92,8 +94,6 @@ export const AddUser: React.FC = () => {
             },
         }));
     };
-
-    const isCliente = form.rolSistema === "CLIENTE";
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
@@ -288,24 +288,27 @@ export const AddUser: React.FC = () => {
                 />
             </div>
 
-            {/* SUCURSAL */}
-            <div className="mb-3">
-                <label>Sucursal</label>
-                <select
-                    name="sucursalId"
-                    className="form-select"
-                    value={form.sucursalId}
-                    onChange={handleChange}
-                    required
-                >
-                    <option value="">Seleccionar sucursal...</option>
-                    {sucursales.map((s) => (
-                        <option key={s.id} value={s.id}>
-                            {s.nombre}
-                        </option>
-                    ))}
-                </select>
-            </div>
+
+            {/* SUCURSAL - SOLO PARA EMPLEADOS Y ADMIN */}
+            {!isCliente && (
+                <div className="mb-3">
+                    <label>Sucursal</label>
+                    <select
+                        name="sucursalId"
+                        className="form-select"
+                        value={form.sucursalId}
+                        onChange={handleChange}
+                        required
+                    >
+                        <option value="">Seleccionar sucursal...</option>
+                        {sucursales.map((s) => (
+                            <option key={s.id} value={s.id}>
+                                {s.nombre}
+                            </option>
+                        ))}
+                    </select>
+                </div>
+            )}
 
             {/* CAMPOS SOLO PARA CLIENTE */}
             {isCliente && (
@@ -368,13 +371,15 @@ export const AddUser: React.FC = () => {
             )}
 
             {/* Mensajes de error */}
-            {errorMsg && (
-                <p className="text-danger mt-2" style={{ whiteSpace: "pre-line" }}>
-                    {errorMsg}
-                </p>
-            )}
+            {
+                errorMsg && (
+                    <p className="text-danger mt-2" style={{ whiteSpace: "pre-line" }}>
+                        {errorMsg}
+                    </p>
+                )
+            }
 
             <button className="btn btn-primary mt-3">Crear Usuario</button>
-        </form>
+        </form >
     );
 };

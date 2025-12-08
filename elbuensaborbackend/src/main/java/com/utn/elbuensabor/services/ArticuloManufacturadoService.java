@@ -3,7 +3,8 @@ package com.utn.elbuensabor.services;
 import java.util.List;
 
 import com.utn.elbuensabor.dtos.ArticuloManufacturadoRequest;
-import com.utn.elbuensabor.dtos.ArticuloResponse;
+import com.utn.elbuensabor.dtos.ArticuloInsumoResponse;
+import com.utn.elbuensabor.dtos.ArticuloManufacturadoResponse;
 import com.utn.elbuensabor.dtos.RecetaItemRequest;
 import com.utn.elbuensabor.entities.ArticuloManufacturado;
 import com.utn.elbuensabor.entities.ArticuloManufacturadoDetalle;
@@ -11,13 +12,13 @@ import com.utn.elbuensabor.entities.ArticuloManufacturadoDetalle;
 
 public interface ArticuloManufacturadoService {
 
-    List<ArticuloResponse> getAll();
+    List<ArticuloManufacturadoResponse> getAll();
 
-    ArticuloResponse getById(Long id);
+    ArticuloManufacturadoResponse getById(Long id);
 
-    ArticuloResponse create(ArticuloManufacturadoRequest request);
+    ArticuloManufacturadoResponse create(ArticuloManufacturadoRequest request);
 
-    ArticuloResponse update(Long id, ArticuloManufacturadoRequest request);
+    ArticuloManufacturadoResponse update(Long id, ArticuloManufacturadoRequest request);
 
     void delete(Long id);
 
@@ -25,6 +26,6 @@ public interface ArticuloManufacturadoService {
 
     ArticuloManufacturadoDetalle toDetalle(RecetaItemRequest item);
 
-    ArticuloResponse toResponse(ArticuloManufacturado manufacturado);
+    ArticuloManufacturadoResponse toResponse(ArticuloManufacturado manufacturado);
 }
 
