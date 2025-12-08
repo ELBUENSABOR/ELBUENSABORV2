@@ -89,7 +89,19 @@ public class AuthServiceImpl implements AuthService {
 
         String token = jwt.generateToken(u.getUsername());
 
-        return new AuthResponse(token, u.getUsername(), "CLIENTE", u.getId().toString(), u.getSucursal().getId().toString());
+        String sucursalId = (u.getSucursal() != null)
+                ? u.getSucursal().getId().toString()
+                : null;
+
+        return new AuthResponse(
+                token,
+                u.getUsername(),
+                u.getRolSistema().name(),
+                u.getId().toString(),
+                Boolean.TRUE.equals(u.getMustChangePassword()),
+                sucursalId
+        );
+
     }
 
     public AuthResponse login(LoginRequest req) {
@@ -118,9 +130,10 @@ public class AuthServiceImpl implements AuthService {
         return new AuthResponse(
                 token,
                 u.getUsername(),
-                u.getRolSistema().name(),
-                u.getId().toString(), sucursalId,
-                Boolean.TRUE.equals(u.getMustChangePassword())
+                "CLIENTE",
+                u.getId().toString(),
+                false,  // al registrarse no tiene obligación de cambiar la contraseña
+                sucursalId
         );
     }
 
