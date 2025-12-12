@@ -35,11 +35,10 @@ public class UserServiceImpl implements UserService {
             throw new IllegalArgumentException("Ya existe un empleado registrado con ese email");
         }
 
-         if (dto.rolSistema() == RolSistema.CLIENTE &&
-             clienteRepository.existsByEmail(dto.email())) {
-             throw new IllegalArgumentException("Ya existe un cliente registrado con ese email");
-         }
-
+        if (dto.rolSistema() == RolSistema.CLIENTE &&
+                clienteRepository.existsByEmail(dto.email())) {
+            throw new IllegalArgumentException("Ya existe un cliente registrado con ese email");
+        }
 
         Usuario usuario = new Usuario();
         usuario.setUsername(dto.username());
@@ -67,8 +66,6 @@ public class UserServiceImpl implements UserService {
         }
 
         usuarioRepository.save(usuario);
-
-
 
         if (dto.rolSistema() == RolSistema.CLIENTE) {
 
@@ -109,8 +106,7 @@ public class UserServiceImpl implements UserService {
             empleado.setPerfilEmpleado(
                     dto.perfilEmpleado() != null
                             ? dto.perfilEmpleado()
-                            : PerfilEmpleado.CAJERO
-            );
+                            : PerfilEmpleado.CAJERO);
 
             empleadoRepository.save(empleado);
         }
@@ -121,8 +117,6 @@ public class UserServiceImpl implements UserService {
 
         return mapToUserDTO(creado);
     }
-
-
 
     public UserDTO getUser(Long id) {
         Usuario u = usuarioRepository.findByIdWithClienteEmpleadoAndDomicilio(id)
@@ -186,6 +180,7 @@ public class UserServiceImpl implements UserService {
             empleado.setApellido(userDTO.apellido());
             empleado.setTelefono(userDTO.telefono());
             empleado.setEmail(userDTO.email());
+            empleado.setPerfilEmpleado(userDTO.perfilEmpleado());
         }
 
         if (userDTO.sucursalId() != null) {
@@ -222,6 +217,7 @@ public class UserServiceImpl implements UserService {
         String email = null;
         String telefono = null;
         UserDTO.Domicilio domicilioDTO = null;
+        PerfilEmpleado perfilEmpleado = null;
 
         if (cliente != null) {
             nombre = cliente.getNombre();
@@ -239,8 +235,7 @@ public class UserServiceImpl implements UserService {
                         domicilio.getNumero(),
                         localidad != null
                                 ? new LocalidadDTO(localidad.getId(), localidad.getNombre())
-                                : null
-                );
+                                : null);
             }
         }
 
@@ -249,6 +244,7 @@ public class UserServiceImpl implements UserService {
             apellido = empleado.getApellido();
             email = empleado.getEmail();
             telefono = empleado.getTelefono();
+            perfilEmpleado = empleado.getPerfilEmpleado();
         }
 
         return new UserDTO(
@@ -261,8 +257,8 @@ public class UserServiceImpl implements UserService {
                 domicilioDTO,
                 u.getRolSistema(),
                 u.getActivo(),
-                u.getSucursal() != null ? u.getSucursal().getId() : null
-        );
+                u.getSucursal() != null ? u.getSucursal().getId() : null,
+                perfilEmpleado);
     }
 
 }

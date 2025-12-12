@@ -17,7 +17,7 @@ const initialState: UserRequestDTO = {
     telefono: "",
     rolSistema: "CLIENTE",
     perfilEmpleado: "CAJERO",
-    sucursalId: 0,
+    sucursalId: undefined,
     domicilio: {
         calle: "",
         numero: "",
@@ -36,6 +36,7 @@ export const AddUser: React.FC = () => {
     const [errorMsg, setErrorMsg] = useState("");
 
     const isCliente = form.rolSistema === "CLIENTE";
+    const isEmpleado = form.rolSistema === "EMPLEADO";
 
     useEffect(() => {
         const getAllLocalidades = async () => {
@@ -126,9 +127,11 @@ export const AddUser: React.FC = () => {
         }
 
         // 3) Si no es cliente, quitamos domicilio (empleados / admin no usan domicilio)
+        // 4) Si es ADMIN, quitamos sucursalId (solo empleados tienen sucursal)
         const payload: UserRequestDTO = {
             ...form,
             domicilio: isCliente ? form.domicilio : undefined,
+            sucursalId: isEmpleado ? form.sucursalId : undefined,
         };
 
         try {
@@ -289,14 +292,14 @@ export const AddUser: React.FC = () => {
             </div>
 
 
-            {/* SUCURSAL - SOLO PARA EMPLEADOS Y ADMIN */}
-            {!isCliente && (
+            {/* SUCURSAL - SOLO PARA EMPLEADOS */}
+            {isEmpleado && (
                 <div className="mb-3">
                     <label>Sucursal</label>
                     <select
                         name="sucursalId"
                         className="form-select"
-                        value={form.sucursalId}
+                        value={form.sucursalId ?? ""}
                         onChange={handleChange}
                         required
                     >

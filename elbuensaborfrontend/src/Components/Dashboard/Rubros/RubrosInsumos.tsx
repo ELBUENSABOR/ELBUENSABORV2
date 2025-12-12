@@ -4,10 +4,14 @@ import { useNavigate } from "react-router-dom";
 import ModalConfirmAction from "../../ModalConfirmAction/ModalConfirmAction";
 import Alert from "../../Alert/Alert";
 import type { Rubro } from "../../../models/Rubro";
-import { getRubrosInsumos } from "../../../services/rubrosService";
+import { getRubrosInsumos, deleteRubroInsumoService } from "../../../services/rubrosService";
+
+interface RubroWithChildren extends Rubro {
+  children?: RubroWithChildren[];
+}
 
 const RubrosInsumos = () => {
-  const [rubrosTree, setRubrosTree] = useState<any[]>([]);
+  const [rubrosTree, setRubrosTree] = useState<RubroWithChildren[]>([]);
   const [originalRubros, setOriginalRubros] = useState<Rubro[]>([]);
   const navigate = useNavigate();
 
@@ -23,9 +27,9 @@ const RubrosInsumos = () => {
 
   const [filterValue, setFilterValue] = useState("");
 
-  const buildTree = (rubros: Rubro[]) => {
-    const map = new Map<number, any>();
-    const roots: any[] = [];
+  const buildTree = (rubros: Rubro[]): RubroWithChildren[] => {
+    const map = new Map<number, RubroWithChildren>();
+    const roots: RubroWithChildren[] = [];
 
     rubros.forEach((r) => {
       map.set(r.id, { ...r, children: [] });
@@ -33,10 +37,10 @@ const RubrosInsumos = () => {
 
     rubros.forEach((r) => {
       if (!r.categoriaPadreId) {
-        roots.push(map.get(r.id));
+        roots.push(map.get(r.id)!);
       } else {
         const parent = map.get(r.categoriaPadreId);
-        if (parent) parent.children.push(map.get(r.id));
+        if (parent && parent.children) parent.children.push(map.get(r.id)!);
       }
     });
 
@@ -47,9 +51,9 @@ const RubrosInsumos = () => {
     const getData = async () => {
       try {
         const res = await getRubrosInsumos();
-        setOriginalRubros(res.data);
+        setOriginalRubros(res);
 
-        const tree = buildTree(res.data);
+        const tree = buildTree(res);
         setRubrosTree(tree);
         console.log("tree", tree);
       } catch (error) {
@@ -60,7 +64,7 @@ const RubrosInsumos = () => {
     getData();
   }, [refresh]);
 
-  const renderRows = (nodes: any[], level = 0): JSX.Element[] => {
+  const renderRows = (nodes: RubroWithChildren[], level = 0): JSX.Element[] => {
     return nodes.flatMap((node) => [
       <tr key={node.id}>
         <td>{node.id}</td>
@@ -99,20 +103,20 @@ const RubrosInsumos = () => {
         </td>
       </tr>,
 
-      ...renderRows(node.children, level + 1),
+      ...renderRows(node.children || [], level + 1),
     ]);
   };
 
-  const filterTree = (nodes: Rubro[], text: string): Rubro[] => {
+  const filterTree = (nodes: Rubro[], text: string): RubroWithChildren[] => {
     const search = text.toLowerCase();
 
-    const recursiveFilter = (node: Rubro): Rubro | null => {
+    const recursiveFilter = (node: Rubro): RubroWithChildren | null => {
       const matches = node.denominacion.toLowerCase().includes(search);
 
       const children = originalRubros
         .filter((r) => r.categoriaPadreId === node.id)
         .map(recursiveFilter)
-        .filter(Boolean) as Rubro[];
+        .filter((child): child is RubroWithChildren => child !== null);
 
       if (matches || children.length > 0) {
         return { ...node, children };
@@ -125,7 +129,7 @@ const RubrosInsumos = () => {
       (r) => !r.categoriaPadreId || r.categoriaPadreId === 0
     );
 
-    return roots.map(recursiveFilter).filter(Boolean) as Rubro[];
+    return roots.map(recursiveFilter).filter((child): child is RubroWithChildren => child !== null);
   };
 
   const filterData = (e: ChangeEvent<HTMLInputElement>) => {
@@ -143,7 +147,7 @@ const RubrosInsumos = () => {
 
   const deleteRubro = async (id: number) => {
     try {
-      const res = await deleteRubroService(id);
+      const res = await deleteRubroInsumoService(id);
       if (res) {
         setRefresh(!refresh);
         setAlertMessage("Rubro eliminado con éxito!");

@@ -1,6 +1,5 @@
 package com.utn.elbuensabor.services.impl;
 
-
 import com.utn.elbuensabor.dtos.ChangePasswordRequest;
 import com.utn.elbuensabor.services.AuthService;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -89,27 +88,20 @@ public class AuthServiceImpl implements AuthService {
 
         String token = jwt.generateToken(u.getUsername());
 
-        String sucursalId = (u.getSucursal() != null)
-                ? u.getSucursal().getId().toString()
-                : null;
-
         return new AuthResponse(
                 token,
                 u.getUsername(),
-                u.getRolSistema().name(),
+                "CLIENTE",
+                null,
                 u.getId().toString(),
                 Boolean.TRUE.equals(u.getMustChangePassword()),
-                sucursalId
-        );
-
+                null); // Los clientes no tienen sucursal asignada
     }
 
     public AuthResponse login(LoginRequest req) {
-
         try {
             authManager.authenticate(
-                    new UsernamePasswordAuthenticationToken(req.username(), req.password())
-            );
+                    new UsernamePasswordAuthenticationToken(req.username(), req.password()));
         } catch (AuthenticationException ex) {
             throw new IllegalArgumentException("Usuario o contraseña incorrectos");
         }
@@ -131,11 +123,10 @@ public class AuthServiceImpl implements AuthService {
                 token,
                 u.getUsername(),
                 u.getRolSistema().name(),
+                u.getRolSistema() == RolSistema.EMPLEADO ? u.getEmpleado().getPerfilEmpleado().toString() : null,
                 u.getId().toString(),
                 Boolean.TRUE.equals(u.getMustChangePassword()),
-                sucursalId
-        );
-
+                sucursalId); // Usar la variable ya calculada que maneja el null
     }
 
     public void changePassword(String username, ChangePasswordRequest req) {
@@ -147,11 +138,9 @@ public class AuthServiceImpl implements AuthService {
             throw new IllegalArgumentException("La contraseña actual no es correcta");
         }
 
-        // podés reusar la misma regex de validación que usás en el DTO de registro
         if (!req.newPassword().matches("^(?=.*[a-z])(?=.*[A-Z])(?=.*[\\W_]).{8,}$")) {
             throw new IllegalArgumentException(
-                    "La nueva contraseña no cumple con los requisitos de seguridad"
-            );
+                    "La nueva contraseña no cumple con los requisitos de seguridad");
         }
 
         u.setPassword(encoder.encode(req.newPassword()));
@@ -159,7 +148,5 @@ public class AuthServiceImpl implements AuthService {
 
         usuarioRepo.save(u);
     }
-
-
 
 }

@@ -3,28 +3,28 @@ import { useUser } from "../../../contexts/UsuarioContext";
 import "./sidebar.css";
 
 const links = [
-  { path: "/dashboard/home", label: "Inicio", rol: ["EMPLEADO", "ADMIN"] },
+  { path: "/dashboard/home", label: "Inicio", rol: ["COCINERO", "ADMIN"] },
   { path: "/dashboard/sucursales", label: "Sucursales", rol: ["ADMIN"] },
   { path: "/dashboard/usuarios", label: "Usuarios", rol: ["ADMIN"] },
   {
     path: "/dashboard/rubros-insumos",
     label: "Rubros de insumos",
-    rol: ["EMPLEADO", "ADMIN"],
+    rol: ["ADMIN"],
   },
   {
     path: "/dashboard/rubros-productos",
     label: "Rubros de productos",
-    rol: ["EMPLEADO", "ADMIN"],
+    rol: ["ADMIN"],
   },
   {
     path: "/dashboard/productos-insumos",
     label: "Insumos",
-    rol: ["EMPLEADO", "ADMIN"],
+    rol: ["COCINERO", "ADMIN"],
   },
   {
     path: "/dashboard/productos-manufacturados",
     label: "Productos manufacturados",
-    rol: ["EMPLEADO", "ADMIN"],
+    rol: ["COCINERO", "ADMIN"],
   },
   {
     path: "/dashboard/stock",
@@ -69,13 +69,12 @@ const Sidebar = ({ open, close }: { open: boolean; close: () => void }) => {
         {links.map(
           (link) =>
             user?.user?.role &&
-            link.rol.includes(user.user.role) && (
+            link.rol.includes(user.user.role === "EMPLEADO" ? (user.user.subRole || user.user.role) : user.user.role) && (
               <li className="nav-item" key={link.path} onClick={close}>
                 <NavLink
                   to={link.path}
                   className={({ isActive }) =>
-                    `nav-link text-white ${
-                      isActive ? "active bg-secondary" : "text-white-50"
+                    `nav-link text-white ${isActive ? "active bg-secondary" : "text-white-50"
                     }`
                   }
                 >

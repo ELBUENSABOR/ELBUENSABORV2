@@ -21,6 +21,7 @@ export const loginUser = async (data: LoginRequest) => {
     const res = await axios.post(`${API_URL}/auth/login`, data, {
       withCredentials: true,
     });
+    console.log(res);
     return res;
   } catch (error) {
     console.error("Error al iniciar sesion", error);

@@ -6,7 +6,7 @@ export interface UserEditRequestDTO {
     email: string;
     telefono: string;
     rolSistema: string; // "CLIENTE" | "EMPLEADO" | "ADMIN"
-    domicilio: {
+    domicilio?: {
         calle: string;
         numero: string;
         codigoPostal: number;

@@ -22,7 +22,7 @@ export default function MyNavbar() {
                         <Nav.Link as={Link} to="/">
                             Inicio
                         </Nav.Link>
-                        <Nav.Link as={Link} to="/productos">
+                        <Nav.Link as={Link} to="/catalog">
                             Productos
                         </Nav.Link>
                         {(user?.role === "ADMIN" || user?.role === "EMPLEADO") && (

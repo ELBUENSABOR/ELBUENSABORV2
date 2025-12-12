@@ -34,7 +34,4 @@ public class ArticuloManufacturado extends BaseEntity {
 
     @OneToMany(mappedBy = "articuloManufacturado", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<ImagenArticuloManufacturado> imagenes = new ArrayList<>();
-
-    @OneToMany(mappedBy = "manufacturado")
-    private List<SucursalManufacturado> sucursalConfig = new ArrayList<>();
 }

@@ -9,11 +9,11 @@ import {
 import { useUser } from "./UsuarioContext";
 import {
   fetchSucursales,
-  type SucursalOption,
 } from "../services/dashboardService";
+import type { Sucursal } from "../models/Sucursal";
 
 interface SucursalContextType {
-  sucursales: SucursalOption[];
+  sucursales: Sucursal[];
   sucursalId: number | null;
   loading: boolean;
   setSucursalId: (id: number | null) => void;
@@ -34,7 +34,7 @@ const readStoredSucursal = (): number | null => {
 
 export const SucursalProvider = ({ children }: { children: ReactNode }) => {
   const { user } = useUser();
-  const [sucursales, setSucursales] = useState<SucursalOption[]>([]);
+  const [sucursales, setSucursales] = useState<Sucursal[]>([]);
   const [sucursalId, setSucursalIdState] = useState<number | null>(() => {
     if (typeof window === "undefined") return null;
     return readStoredSucursal();
@@ -52,7 +52,7 @@ export const SucursalProvider = ({ children }: { children: ReactNode }) => {
     let isMounted = true;
     setLoading(true);
     const storedId = readStoredSucursal();
-    fetchSucursales(user.token)
+    fetchSucursales()
       .then((lista) => {
         if (!isMounted) return;
         setSucursales(lista);

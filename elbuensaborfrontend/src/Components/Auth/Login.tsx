@@ -50,13 +50,14 @@ const Login = () => {
             });
 
             // 👇 Desestructuramos lo que devuelve el back (incluyendo mustChangePassword)
-            const { token, username, role, userId, mustChangePassword } = resp.data;
+            const { token, username, role, subRole, userId, mustChangePassword } = resp.data;
 
             // 👇 Guardamos el usuario completo en contexto (con el flag)
             setUser({
                 token,
                 username,
                 role,
+                subRole,
                 userId,
                 mustChangePassword,
             });

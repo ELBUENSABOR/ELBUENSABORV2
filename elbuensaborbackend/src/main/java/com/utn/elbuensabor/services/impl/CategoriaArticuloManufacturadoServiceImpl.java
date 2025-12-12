@@ -37,6 +37,7 @@ public class CategoriaArticuloManufacturadoServiceImpl implements CategoriaArtic
     public CategoriaResponse create(CategoriaRequest request) {
         CategoriaArticuloManufacturado categoria = new CategoriaArticuloManufacturado();
         categoria.setDenominacion(request.denominacion());
+        categoria.setActivo(true);
         setParent(categoria, request.categoriaPadreId());
         categoriaRepo.save(categoria);
         return toResponse(categoria);
@@ -52,10 +53,10 @@ public class CategoriaArticuloManufacturadoServiceImpl implements CategoriaArtic
     }
 
     public void delete(Long id) {
-        if (!categoriaRepo.existsById(id)) {
-            throw new RuntimeException("Rubro de producto no encontrado");
-        }
-        categoriaRepo.deleteById(id);
+        CategoriaArticuloManufacturado categoria = categoriaRepo.findById(id)
+                .orElseThrow(() -> new RuntimeException("Rubro de insumo no encontrado"));
+        categoria.setActivo(false);
+        categoriaRepo.save(categoria);
     }
 
     public void setParent(CategoriaArticuloManufacturado categoria, Long parentId) {
@@ -73,7 +74,9 @@ public class CategoriaArticuloManufacturadoServiceImpl implements CategoriaArtic
         return new CategoriaResponse(
                 entity.getId(),
                 entity.getDenominacion(),
-                parentId);
+                parentId,
+                entity.isActivo()
+        );
     }
 }
 

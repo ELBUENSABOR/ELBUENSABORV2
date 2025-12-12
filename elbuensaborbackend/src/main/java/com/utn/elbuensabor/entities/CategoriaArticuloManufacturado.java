@@ -15,6 +15,8 @@ public class CategoriaArticuloManufacturado extends BaseEntity {
 
     private String denominacion;
 
+    private boolean activo;
+
     @ManyToOne
     @JoinColumn(name = "categoria_padre_id")
     private CategoriaArticuloManufacturado categoriaPadre;

@@ -21,6 +21,10 @@ public class SucursalManufacturado extends BaseEntity{
     @JoinColumn(name = "manufacturado_id", nullable = false)
     private ArticuloManufacturado manufacturado;
 
+    private Double stockActual = 0.0;
+    private Double stockMinimo = 0.0;
+    private Double stockMaximo = 0.0;
+
     private Double precioVentaSucursal;
 
     private Boolean activo = true;

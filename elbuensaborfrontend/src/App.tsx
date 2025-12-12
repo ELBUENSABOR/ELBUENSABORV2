@@ -6,6 +6,7 @@ import Login from "./Components/Auth/Login";
 import PrivateRoute from "./Components/PrivateRoute";
 import Account from "./Components/Account/Account";
 import DashboardRoutes from "./Components/Dashboard/DashboardRoutes";
+import Catalog from "./Components/Home/Catalog/Catalog";
 
 function MainLayout() {
   return (
@@ -26,6 +27,7 @@ function App() {
       <Routes>
         <Route element={<MainLayout />}>
           <Route path="/" element={<Home />} />
+          <Route path="/catalog" element={<Catalog />} />
           <Route element={<PrivateRoute roles={["CLIENTE", "EMPLEADO", "ADMIN"]} />}>
             <Route path="/account" element={<Account />} />
           </Route>
