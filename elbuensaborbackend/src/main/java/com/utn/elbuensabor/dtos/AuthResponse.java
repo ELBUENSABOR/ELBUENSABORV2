@@ -4,6 +4,8 @@ public record AuthResponse(
         String token,
         String username,
         String role,
+        String subRole,
         String userId,
-        boolean mustChangePassword
-, String sucursalId) {}
+        boolean mustChangePassword,
+        String sucursalId
+) {}

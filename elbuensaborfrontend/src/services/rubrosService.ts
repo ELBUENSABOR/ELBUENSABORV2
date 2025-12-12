@@ -5,12 +5,13 @@ const API_BASE = import.meta.env.VITE_API_URL ?? "";
 
 export const getRubrosInsumos = async () => {
   try {
-    return axios.get(`${API_BASE}/insumos/rubros`, {
+    const res = await axios.get(`${API_BASE}/insumos/rubros`, {
       headers: {
         Authorization: `Bearer ${sessionStorage.getItem("token")}`,
       },
       withCredentials: true,
     });
+    return res.data;
   } catch (error) {
     throw error;
   }
@@ -97,6 +98,19 @@ export const createRubroManufacturado = async (data: Rubro) => {
 export const updateRubroManufacturado = async (id: number, data: Rubro) => {
   try {
     return axios.put(`${API_BASE}/manufacturados/rubros/${id}`, data, {
+      headers: {
+        Authorization: `Bearer ${sessionStorage.getItem("token")}`,
+      },
+      withCredentials: true,
+    });
+  } catch (error) {
+    throw error;
+  }
+};
+
+export const deleteRubroInsumoService = async (id: number) => {
+  try {
+    return axios.delete(`${API_BASE}/insumos/rubros/${id}`, {
       headers: {
         Authorization: `Bearer ${sessionStorage.getItem("token")}`,
       },

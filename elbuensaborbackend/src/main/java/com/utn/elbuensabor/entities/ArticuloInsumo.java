@@ -8,7 +8,6 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
-import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
 import lombok.Getter;
 import lombok.Setter;
@@ -30,10 +29,13 @@ public class ArticuloInsumo extends BaseEntity {
 
     private Boolean activo = true;
 
-    @OneToOne
+    @ManyToOne
     @JoinColumn(name = "unidad_medida_id")
     private UnidadMedida unidadMedida;
 
-    @OneToMany(mappedBy = "articuloInsumo", cascade=CascadeType.ALL, orphanRemoval= true)
+    @OneToMany(mappedBy = "articuloInsumo", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<ImagenInsumo> imagenes = new ArrayList<>();
+
+    @OneToMany(mappedBy = "insumo", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<SucursalInsumo> stockSucursal = new ArrayList<>();
 }

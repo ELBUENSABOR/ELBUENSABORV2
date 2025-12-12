@@ -1,5 +1,6 @@
 package com.utn.elbuensabor.dtos;
 
+import com.utn.elbuensabor.entities.PerfilEmpleado;
 import com.utn.elbuensabor.entities.RolSistema;
 
 public record UserDTO(
@@ -12,7 +13,8 @@ public record UserDTO(
         Domicilio domicilio,
         RolSistema rolSistema,
         boolean activo,
-        Long sucursalId) {
+        Long sucursalId,
+        PerfilEmpleado perfilEmpleado) {
 
     public record Domicilio(String calle, Integer codigoPostal, String numero, LocalidadDTO localidad) {
 

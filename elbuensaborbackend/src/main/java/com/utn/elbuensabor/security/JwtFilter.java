@@ -29,11 +29,13 @@ public class JwtFilter extends OncePerRequestFilter {
     protected void doFilterInternal(
             HttpServletRequest request,
             HttpServletResponse response,
-            FilterChain filterChain
-    ) throws ServletException, IOException {
+            FilterChain filterChain) throws ServletException, IOException {
 
         String path = request.getServletPath();
-        if (path.startsWith("/api/auth/") || path.startsWith("/api/localidad/")) {
+        // Solo permitir acceso público a register, login y localidad
+        if (path.equals("/api/auth/register") ||
+                path.equals("/api/auth/login") ||
+                path.startsWith("/api/localidad/")) {
             filterChain.doFilter(request, response);
             return;
         }
@@ -52,8 +54,7 @@ public class JwtFilter extends OncePerRequestFilter {
                 var auth = new UsernamePasswordAuthenticationToken(
                         user,
                         null,
-                        user.getAuthorities()
-                );
+                        user.getAuthorities());
 
                 SecurityContextHolder.getContext().setAuthentication(auth);
             }

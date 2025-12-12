@@ -20,6 +20,10 @@ const Account = () => {
 
     const { user, logout } = useUser();
 
+    const isEmpleado = user?.role === "EMPLEADO";
+    const isCliente = user?.role === "CLIENTE";
+    const isAdministrador = user?.role === "ADMINISTRADOR";
+
     const [editMode, setEditMode] = useState(false);
     const [password, setPassword] = useState("");
     const [confirmPassword, setConfirmPassword] = useState("");
@@ -81,12 +85,14 @@ const Account = () => {
                 email: userData.email,
                 telefono: userData.telefono,
                 rolSistema: userData.rolSistema,
-                domicilio: {
-                    calle: userData.domicilio.calle,
-                    numero: userData.domicilio.numero,
-                    codigoPostal: userData.domicilio.codigoPostal,
-                    localidadId: userData.domicilio.localidad.id,
-                },
+                ...(!isEmpleado && {
+                    domicilio: {
+                        calle: userData.domicilio.calle,
+                        numero: userData.domicilio.numero,
+                        codigoPostal: userData.domicilio.codigoPostal,
+                        localidadId: userData.domicilio.localidad.id,
+                    },
+                }),
                 perfilEmpleado: (userData as any).perfilEmpleado ?? null,
                 sucursalId:
                     (userData as any).sucursalId ??
@@ -306,66 +312,85 @@ const Account = () => {
                             onChange={handleChange}
                             disabled={!editMode}
                         />
-                        <label htmlFor="calle" className="form-label">
-                            Calle
-                        </label>
-                        <input
-                            type="text"
-                            name="calle"
-                            placeholder="Calle"
-                            value={userData.domicilio.calle}
-                            className="form-control"
-                            onChange={handleChange}
-                            disabled={!editMode}
-                        />
+                        {
+                            !isEmpleado && (
+                                <>
+                                    <label htmlFor="calle" className="form-label">
+                                        Calle
+                                    </label>
+                                    <input
+                                        type="text"
+                                        name="calle"
+                                        placeholder="Calle"
+                                        value={userData.domicilio.calle}
+                                        className="form-control"
+                                        onChange={handleChange}
+                                        disabled={!editMode}
+                                    />
+                                </>
+                            )
+                        }
+
                     </div>
 
-                    <div className="row-account">
-                        <label htmlFor="numero" className="form-label">
-                            Número
-                        </label>
-                        <input
-                            type="text"
-                            name="numero"
-                            placeholder="Número"
-                            value={userData.domicilio.numero}
-                            className="form-control"
-                            onChange={handleChange}
-                            disabled={!editMode}
-                        />
-                        <label htmlFor="codigoPostal" className="form-label">
-                            Código postal
-                        </label>
-                        <input
-                            type="number"
-                            name="codigoPostal"
-                            placeholder="Código postal"
-                            value={userData.domicilio.codigoPostal}
-                            className="form-control"
-                            onChange={handleChange}
-                            disabled={!editMode}
-                        />
-                    </div>
+                    {
+                        !isEmpleado && (
+                            <>
+                                <div className="row-account">
+                                    <label htmlFor="numero" className="form-label">
+                                        Número
+                                    </label>
+                                    <input
+                                        type="text"
+                                        name="numero"
+                                        placeholder="Número"
+                                        value={userData.domicilio.numero}
+                                        className="form-control"
+                                        onChange={handleChange}
+                                        disabled={!editMode}
+                                    />
+                                    <label htmlFor="codigoPostal" className="form-label">
+                                        Código postal
+                                    </label>
+                                    <input
+                                        type="number"
+                                        name="codigoPostal"
+                                        placeholder="Código postal"
+                                        value={userData.domicilio.codigoPostal}
+                                        className="form-control"
+                                        onChange={handleChange}
+                                        disabled={!editMode}
+                                    />
+                                </div>
+                            </>
+                        )
+                    }
 
-                    <div className="row-account">
-                        <label htmlFor="localidad" className="form-label">
-                            Localidad
-                        </label>
-                        <select
-                            name="localidad"
-                            value={userData.domicilio.localidad.id}
-                            className="form-control"
-                            onChange={handleChange}
-                            disabled={!editMode}
-                        >
-                            <option value={0}>Selecciona una localidad</option>
-                            {localidades.map((loc) => (
-                                <option key={loc.id} value={loc.id}>
-                                    {loc.nombre}
-                                </option>
-                            ))}
-                        </select>
-                    </div>
+                    {
+                        !isEmpleado && (
+                            <>
+                                <div className="row-account">
+                                    <label htmlFor="localidad" className="form-label">
+                                        Localidad
+                                    </label>
+                                    <select
+                                        name="localidad"
+                                        value={userData.domicilio.localidad.id}
+                                        className="form-control"
+                                        onChange={handleChange}
+                                        disabled={!editMode}
+                                    >
+                                        <option value={0}>Selecciona una localidad</option>
+                                        {localidades.map((loc) => (
+                                            <option key={loc.id} value={loc.id}>
+                                                {loc.nombre}
+                                            </option>
+                                        ))}
+                                    </select>
+                                </div>
+                            </>
+                        )
+                    }
 
                     {/* Cambio de contraseña */}
                     <div className="row-account">

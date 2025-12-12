@@ -4,16 +4,15 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
-import jakarta.persistence.UniqueConstraint;
 import lombok.Getter;
 import lombok.Setter;
+import java.time.LocalDateTime;
 
 @Entity
-@Table(name = "sucursal_insumo", 
-       uniqueConstraints = @UniqueConstraint(columnNames = {"sucursal_id", "insumo_id"}))
+@Table(name = "compra_insumo")
 @Getter
 @Setter
-public class SucursalInsumo extends BaseEntity {
+public class CompraInsumo extends BaseEntity {
 
     @ManyToOne
     @JoinColumn(name = "sucursal_id", nullable = false)
@@ -23,9 +22,8 @@ public class SucursalInsumo extends BaseEntity {
     @JoinColumn(name = "insumo_id", nullable = false)
     private ArticuloInsumo insumo;
 
-    private Double stockActual = 0.0;
-    private Double stockMinimo = 0.0;
-    private Double stockMaximo = 0.0;
-
-    private Boolean activo = true;
+    private Double cantidad;
+    private Double precioCompra;
+    private Double totalCompra;
+    private LocalDateTime fechaCompra;
 }

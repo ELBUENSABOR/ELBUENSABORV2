@@ -1,5 +1,8 @@
 package com.utn.elbuensabor.dtos;
 
+import com.utn.elbuensabor.entities.CategoriaArticuloInsumo;
+import com.utn.elbuensabor.entities.UnidadMedida;
+
 import java.util.List;
 
 public record ArticuloInsumoResponse(
@@ -7,10 +10,13 @@ public record ArticuloInsumoResponse(
         String denominacion,
         String descripcion,
         Double precioVenta,
-        Double precioCosto,
+        Double precioCompra,
         Integer tiempoEstimado,
-        String categoria,
+        CategoriaResponse categoria,
         Boolean esParaElaborar,
-        Boolean activo) {
+        Boolean activo,
+        UnidadMedidaDTO unidadMedida,
+        List<SucursalInsumoRequest> stockSucursal
+) {
 }
 

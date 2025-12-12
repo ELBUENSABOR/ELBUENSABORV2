@@ -2,6 +2,7 @@ export interface User {
     userId: string;
     username: string;
     role: string;
+    subRole: string | null;
     token: string;
     mustChangePassword: boolean;
 }
@@ -17,8 +18,8 @@ export interface UserRequestDTO {
     email: string;
     telefono: string;
     rolSistema: RolSistema;
-    perfilEmpleado: PerfilEmpleado;
-    sucursalId: number;
+    perfilEmpleado?: PerfilEmpleado;
+    sucursalId?: number;
     domicilio?: {
         calle: string;
         numero: string;

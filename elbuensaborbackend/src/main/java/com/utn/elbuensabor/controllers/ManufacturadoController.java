@@ -15,7 +15,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.utn.elbuensabor.dtos.ArticuloManufacturadoRequest;
-import com.utn.elbuensabor.dtos.ArticuloInsumoResponse;
 import com.utn.elbuensabor.services.ArticuloManufacturadoService;
 
 import jakarta.validation.Valid;

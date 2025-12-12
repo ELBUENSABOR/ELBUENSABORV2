@@ -71,6 +71,11 @@ export const ChangePasswordPopup = () => {
             setNewPass("");
             setConfirm("");
         } catch (err: any) {
+            console.log("Error completo:", err);
+            console.log("Error response:", err?.response);
+            console.log("Error data:", err?.response?.data);
+            console.log("Error status:", err?.response?.status);
+            console.log("Error message:", err?.message);
             setMsg({
                 type: "error",
                 text:

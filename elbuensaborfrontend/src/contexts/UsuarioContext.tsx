@@ -22,6 +22,7 @@ export const UserProvider = ({ children }: { children: ReactNode }) => {
         const token = sessionStorage.getItem("token");
         const username = sessionStorage.getItem("username");
         const role = sessionStorage.getItem("role");
+        const subRole = sessionStorage.getItem("subRole");
         const userId = sessionStorage.getItem("userId");
         const mustChangePasswordStr = sessionStorage.getItem("mustChangePassword");
         const lastActivityStr = sessionStorage.getItem("lastActivity");
@@ -42,6 +43,7 @@ export const UserProvider = ({ children }: { children: ReactNode }) => {
                 sessionStorage.removeItem("token");
                 sessionStorage.removeItem("username");
                 sessionStorage.removeItem("role");
+                sessionStorage.removeItem("subRole");
                 sessionStorage.removeItem("userId");
                 sessionStorage.removeItem("mustChangePassword");
                 sessionStorage.removeItem("lastActivity");
@@ -53,6 +55,7 @@ export const UserProvider = ({ children }: { children: ReactNode }) => {
             token,
             username,
             role,
+            subRole,
             userId,
             mustChangePassword: mustChangePasswordStr === "true",
         };
@@ -62,6 +65,11 @@ export const UserProvider = ({ children }: { children: ReactNode }) => {
         sessionStorage.setItem("token", user.token);
         sessionStorage.setItem("username", user.username);
         sessionStorage.setItem("role", user.role);
+        if (user.subRole) {
+            sessionStorage.setItem("subRole", user.subRole);
+        } else {
+            sessionStorage.removeItem("subRole");
+        }
         sessionStorage.setItem("userId", user.userId.toString());
         sessionStorage.setItem(
             "mustChangePassword",
@@ -75,6 +83,7 @@ export const UserProvider = ({ children }: { children: ReactNode }) => {
         sessionStorage.removeItem("token");
         sessionStorage.removeItem("username");
         sessionStorage.removeItem("role");
+        sessionStorage.removeItem("subRole");
         sessionStorage.removeItem("userId");
         sessionStorage.removeItem("mustChangePassword");
         sessionStorage.removeItem("lastActivity");

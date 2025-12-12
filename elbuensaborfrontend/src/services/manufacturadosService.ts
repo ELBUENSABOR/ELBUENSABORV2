@@ -6,7 +6,7 @@ export const getAll = async () => {
   try {
     const res = await axios.get(`${API_URL}/manufacturados`, {
       headers: {
-        Authorization: `Bearer ${localStorage.getItem("token")}`,
+        Authorization: `Bearer ${sessionStorage.getItem("token")}`,
       },
       withCredentials: true,
     });

@@ -54,10 +54,15 @@ public class AuthController {
     @PostMapping("/change-password")
     public ResponseEntity<?> changePassword(
             @RequestBody @Valid ChangePasswordRequest req,
-            Authentication auth
-    ) {
-        authService.changePassword(auth.getName(), req);
-        return ResponseEntity.ok().build();
+            Authentication auth) {
+        try {
+            authService.changePassword(auth.getName(), req);
+            return ResponseEntity.ok(Map.of("message", "Contraseña actualizada correctamente"));
+        } catch (IllegalArgumentException ex) {
+            return ResponseEntity
+                    .badRequest()
+                    .body(Map.of("message", ex.getMessage()));
+        }
     }
 
 }

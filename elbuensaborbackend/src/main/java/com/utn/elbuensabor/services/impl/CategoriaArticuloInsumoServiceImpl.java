@@ -35,6 +35,7 @@ public class CategoriaArticuloInsumoServiceImpl implements CategoriaArticuloInsu
     public CategoriaResponse create(CategoriaRequest request) {
         CategoriaArticuloInsumo categoria = new CategoriaArticuloInsumo();
         categoria.setDenominacion(request.denominacion());
+        categoria.setActivo(true);
         setParent(categoria, request.categoriaPadreId());
         categoriaRepo.save(categoria);
         return toResponse(categoria);
@@ -50,10 +51,10 @@ public class CategoriaArticuloInsumoServiceImpl implements CategoriaArticuloInsu
     }
 
     public void delete(Long id) {
-        if (!categoriaRepo.existsById(id)) {
-            throw new RuntimeException("Rubro de insumo no encontrado");
-        }
-        categoriaRepo.deleteById(id);
+        CategoriaArticuloInsumo categoria = categoriaRepo.findById(id)
+                .orElseThrow(() -> new RuntimeException("Rubro de insumo no encontrado"));
+        categoria.setActivo(false);
+        categoriaRepo.save(categoria);
     }
 
     public void setParent(CategoriaArticuloInsumo categoria, Long parentId) {
@@ -71,7 +72,7 @@ public class CategoriaArticuloInsumoServiceImpl implements CategoriaArticuloInsu
         return new CategoriaResponse(
                 entity.getId(),
                 entity.getDenominacion(),
-                parentId);
+                parentId,
+                entity.isActivo());
     }
 }
-

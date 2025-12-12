@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
 import type { UserRequestDTO } from "../../../models/Usuario";
+import type { UserEditRequestDTO } from "../../../dtos/UserEditRequestDTO";
 import type { LocalidadDTO } from "../../../dtos/LocalidadDTO";
 import { getLocalidades } from "../../../services/authService";
 import { getUserService, updateUser } from "../../../services/userService";
@@ -22,8 +23,8 @@ const initialState: UserRequestDTO = {
   domicilio: {
     calle: "",
     numero: "",
-    codigoPostal: "",
-    localidadId: "",
+    codigoPostal: 0,
+    localidadId: 0,
   },
 };
 
@@ -111,20 +112,26 @@ export const EditUser: React.FC = () => {
   };
 
   const isCliente = form.rolSistema === "CLIENTE";
+  const isEmpleado = form.rolSistema === "EMPLEADO";
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
     // Si no es cliente, quitamos domicilio
-    const payload: UserRequestDTO = {
+    // Si no es empleado, quitamos perfilEmpleado
+    const payload: UserEditRequestDTO = {
       ...form,
+      sucursalId: form.sucursalId ?? 0,
       domicilio: isCliente ? form.domicilio : undefined,
+      perfilEmpleado: isEmpleado ? form.perfilEmpleado : undefined,
     };
+
+    console.log("Payload a enviar:", payload);
 
     try {
       const res = await updateUser(userId, payload);
       if (res) {
-        console.log("Usuario creado!", res);
+        console.log("Usuario editado!", res);
         navigate("/dashboard/usuarios");
       }
     } catch (err) {
@@ -138,7 +145,7 @@ export const EditUser: React.FC = () => {
         if (data && typeof data === "object" && !Array.isArray(data)) {
           msg = Object.values(data).join("\n");
         }
-        
+
         if (data.error) {
           msg = data.error;
         }
@@ -167,6 +174,37 @@ export const EditUser: React.FC = () => {
         />
       </div>
 
+      {
+        form.rolSistema === "EMPLEADO" && (
+          <div className="mb-3">
+            <label>Rol del Empleado</label>
+            <select
+              name="perfilEmpleado"
+              className="form-control"
+              value={form.perfilEmpleado}
+              onChange={handleChange}
+            >
+              <option value="CAJERO">Cajero</option>
+              <option value="DELIVERY">Delivery</option>
+              <option value="COCINERO">Cocinero</option>
+              <option value="ADMINISTRADOR">Administrador</option>
+            </select>
+          </div>
+        )
+      }
+
+      <div className="mb-3">
+        <label>Rol del Sistema</label>
+        <input
+          type="text"
+          name="rolSistema"
+          className="form-control"
+          value={form.rolSistema}
+          onChange={handleChange}
+          required
+        />
+      </div>
+
       {/* USERNAME */}
       <div className="mb-3">
         <label>Usuario</label>
@@ -179,17 +217,22 @@ export const EditUser: React.FC = () => {
         />
       </div>
 
-      {/* PASSWORD */}
-      <div className="mb-3">
-        <label>Contraseña</label>
-        <input
-          type="password"
-          name="password"
-          className="form-control"
-          value={form.password}
-          onChange={handleChange}
-        />
-      </div>
+      {
+        form.rolSistema !== "EMPLEADO" && (
+          <div className="mb-3">
+            <label>Contraseña</label>
+            <input
+              type="password"
+              name="password"
+              className="form-control"
+              value={form.password}
+              onChange={handleChange}
+            />
+          </div>
+        )
+      }
+
+
 
       {/* NOMBRE */}
       <div className="mb-3">

@@ -6,12 +6,12 @@ import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 
 public record ArticuloManufacturadoRequest(
-        @NotBlank String denominacion,
-        String descripcion,
-        @NotNull Double precioVenta,
-        Double precioCosto,
-        @NotNull Integer tiempoEstimado,
-        @NotNull Long categoriaId,
-        @NotNull List<RecetaItemRequest> receta) {
+                @NotBlank String denominacion,
+                String descripcion,
+                @NotNull Double precioVenta,
+                Double precioCosto,
+                @NotNull Integer tiempoEstimado,
+                @NotNull Long categoriaId,
+                @NotNull List<RecetaItemRequest> receta,
+                List<String> imagenes) {
 }
-
