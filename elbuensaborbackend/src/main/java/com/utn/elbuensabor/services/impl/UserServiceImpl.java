@@ -29,14 +29,12 @@ public class UserServiceImpl implements UserService {
     public UserDTO createUser(UserRequestDTO dto) {
 
         // Validación de email duplicado
-        if (dto.rolSistema() == RolSistema.EMPLEADO &&
-                empleadoRepository.existsByEmail(dto.email())) {
+        if (empleadoRepository.existsByEmail(dto.email())) {
 
             throw new IllegalArgumentException("Ya existe un empleado registrado con ese email");
         }
 
-        if (dto.rolSistema() == RolSistema.CLIENTE &&
-                clienteRepository.existsByEmail(dto.email())) {
+        if (clienteRepository.existsByEmail(dto.email())) {
             throw new IllegalArgumentException("Ya existe un cliente registrado con ese email");
         }
 
@@ -138,11 +136,28 @@ public class UserServiceImpl implements UserService {
         Usuario usuario = usuarioRepository.findByIdWithClienteEmpleadoAndDomicilio(id)
                 .orElseThrow(() -> new RuntimeException("Usuario no encontrado"));
 
+        Cliente cliente = usuario.getCliente();
+        Empleado empleado = usuario.getEmpleado();
+
         var existingUser = usuarioRepository.findByUsername(userDTO.username());
         if (existingUser.isPresent() && !existingUser.get().getId().equals(usuario.getId())) {
             String estado = Boolean.TRUE.equals(existingUser.get().getActivo()) ? "activo" : "inactivo";
             throw new IllegalArgumentException("Ya existe un usuario con ese username (" + estado + ")");
         }
+
+        var existingClienteEmail = clienteRepository.findByEmail(userDTO.email());
+        if (existingClienteEmail.isPresent() && (cliente == null
+                || !existingClienteEmail.get().getId().equals(cliente.getId()))) {
+            throw new IllegalArgumentException("Ya existe un usuario con ese email");
+        }
+
+        var existingEmpleadoEmail = empleadoRepository.findByEmail(userDTO.email());
+        if (existingEmpleadoEmail.isPresent() && (empleado == null
+                || !existingEmpleadoEmail.get().getId().equals(empleado.getId()))) {
+            throw new IllegalArgumentException("Ya existe un usuario con ese email");
+        }
+
+
 
         usuario.setUsername(userDTO.username());
         usuario.setActivo(true);
@@ -150,9 +165,6 @@ public class UserServiceImpl implements UserService {
         if (userDTO.password() != null && !userDTO.password().isBlank()) {
             usuario.setPassword(encoder.encode(userDTO.password()));
         }
-
-        Cliente cliente = usuario.getCliente();
-        Empleado empleado = usuario.getEmpleado();
 
         if (cliente != null) {
             cliente.setNombre(userDTO.nombre());
