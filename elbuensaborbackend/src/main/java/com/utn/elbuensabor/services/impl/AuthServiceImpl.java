@@ -20,6 +20,7 @@ import com.utn.elbuensabor.entities.RolSistema;
 import com.utn.elbuensabor.entities.Usuario;
 import com.utn.elbuensabor.repositories.ClienteRepository;
 import com.utn.elbuensabor.repositories.LocalidadRepository;
+import com.utn.elbuensabor.repositories.EmpleadoRepository;
 import com.utn.elbuensabor.repositories.PaisRepository;
 import com.utn.elbuensabor.repositories.ProvinciaRepository;
 import com.utn.elbuensabor.repositories.UsuarioRepository;
@@ -34,6 +35,7 @@ public class AuthServiceImpl implements AuthService {
 
     private final UsuarioRepository usuarioRepo;
     private final ClienteRepository clienteRepo;
+    private final EmpleadoRepository empleadoRepo;
     private final PaisRepository paisRepo;
     private final ProvinciaRepository provinciaRepo;
     private final LocalidadRepository localidadRepo;
@@ -51,6 +53,10 @@ public class AuthServiceImpl implements AuthService {
 
         if (clienteRepo.existsByEmail(req.email())) {
             throw new IllegalArgumentException("Ya existe un cliente con ese email");
+        }
+
+        if (empleadoRepo.existsByEmail(req.email())) {
+            throw new IllegalArgumentException("Ya existe un empleado con ese email");
         }
 
         Usuario u = new Usuario();
@@ -99,15 +105,28 @@ public class AuthServiceImpl implements AuthService {
     }
 
     public AuthResponse login(LoginRequest req) {
-        try {
-            authManager.authenticate(
-                    new UsernamePasswordAuthenticationToken(req.username(), req.password()));
-        } catch (AuthenticationException ex) {
-            throw new IllegalArgumentException("Usuario o contraseña incorrectos");
+        String identifier = req.username();
+        String username = usuarioRepo.findByUsername(identifier)
+                .map(Usuario::getUsername)
+                .orElseGet(() -> clienteRepo.findByEmail(identifier)
+                        .map(cliente -> cliente.getUsuario().getUsername())
+                        .orElseGet(() -> empleadoRepo.findByEmail(identifier)
+                                .map(empleado -> empleado.getUsuario().getUsername())
+                                .orElse(null)));
+
+        if (username == null) {
+            throw new IllegalArgumentException("Usuario/Email o contraseña incorrectos");
         }
 
-        Usuario u = usuarioRepo.findByUsername(req.username())
-                .orElseThrow(() -> new IllegalArgumentException("Usuario o contraseña incorrectos"));
+        try {
+            authManager.authenticate(
+                    new UsernamePasswordAuthenticationToken(username, req.password()));
+        } catch (AuthenticationException ex) {
+            throw new IllegalArgumentException("Usuario/Email o contraseña incorrectos");
+        }
+
+        Usuario u = usuarioRepo.findByUsername(username)
+                .orElseThrow(() -> new IllegalArgumentException("Usuario/Email o contraseña incorrectos"));
 
         if (Boolean.FALSE.equals(u.getActivo())) {
             throw new IllegalArgumentException("El usuario se encuentra dado de baja");
