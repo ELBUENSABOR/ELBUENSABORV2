@@ -46,7 +46,7 @@ public class UserServiceImpl implements UserService {
         usuario.setActivo(true);
         usuario.setRolSistema(dto.rolSistema());
 
-        // 💡 si es EMPLEADO → debe cambiar la contraseña en el primer login
+        // si es EMPLEADO → debe cambiar la contraseña en el primer login
         if (dto.rolSistema() == RolSistema.EMPLEADO) {
             usuario.setMustChangePassword(true);
         }
@@ -137,6 +137,12 @@ public class UserServiceImpl implements UserService {
 
         Usuario usuario = usuarioRepository.findByIdWithClienteEmpleadoAndDomicilio(id)
                 .orElseThrow(() -> new RuntimeException("Usuario no encontrado"));
+
+        var existingUser = usuarioRepository.findByUsername(userDTO.username());
+        if (existingUser.isPresent() && !existingUser.get().getId().equals(usuario.getId())) {
+            String estado = Boolean.TRUE.equals(existingUser.get().getActivo()) ? "activo" : "inactivo";
+            throw new IllegalArgumentException("Ya existe un usuario con ese username (" + estado + ")");
+        }
 
         usuario.setUsername(userDTO.username());
         usuario.setActivo(true);
