@@ -83,15 +83,16 @@ export default function MyNavbar() {
             {!user ? (
               <div className="navbar-auth-buttons">
 
-                <Link className="btn btn-outline-light" to="/login">
-                    <img
-                        src="../../../../public/images/login_icon.svg"
-                        alt="Carrito"
-                        className="cart-sidebar__icon"
-                    />
-                  Ingresar
-                </Link>
-                <Link className="btn btn-light" to="/register">
+                  <Link className="btn btn-outline-light navbar-auth-btn" to="/login">
+                      <img
+                          src="/images/login_icon.svg"
+                          alt="Ingresar"
+                          className="navbar-auth-icon"
+                      />
+                      Ingresar
+                  </Link>
+
+                  <Link className="btn btn-light" to="/register">
                   Registrarse
                 </Link>
               </div>
