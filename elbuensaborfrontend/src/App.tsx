@@ -7,6 +7,7 @@ import PrivateRoute from "./Components/PrivateRoute";
 import Account from "./Components/Account/Account";
 import DashboardRoutes from "./Components/Dashboard/DashboardRoutes";
 import Catalog from "./Components/Home/Catalog/Catalog";
+import ProductDetail from "./Components/Home/ProductDetail/ProductDetail";
 
 function MainLayout() {
   return (
@@ -28,6 +29,7 @@ function App() {
         <Route element={<MainLayout />}>
           <Route path="/" element={<Home />} />
           <Route path="/catalog" element={<Catalog />} />
+          <Route path="/producto/:id" element={<ProductDetail />} />
           <Route element={<PrivateRoute roles={["CLIENTE", "EMPLEADO", "ADMIN"]} />}>
             <Route path="/account" element={<Account />} />
           </Route>
@@ -41,8 +43,6 @@ function App() {
           <Route path="/login" element={<Login />} />
         </Route>
       </Routes>
-
-
     </BrowserRouter>
   );
 }
