@@ -15,7 +15,13 @@ const CartSidebar = () => {
     <aside className="cart-sidebar">
       <div className="cart-sidebar__header">
         <div className="cart-sidebar__title">
-          <span className="cart-sidebar__icon">🛍️</span>
+          <span>
+            <img
+                src="/images/cart_box_warm_orange_icon.svg"
+                alt="Carrito"
+                className="cart-sidebar__icon"
+            />
+          </span>
           <h5>Tu pedido</h5>
         </div>
         {items.length > 0 && (

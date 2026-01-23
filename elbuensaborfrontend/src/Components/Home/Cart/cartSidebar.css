@@ -74,6 +74,12 @@
   padding-right: 4px;
 }
 
+.cart-sidebar__icon {
+    width: 24px;
+    height: 24px;
+    display: block;
+}
+
 .cart-sidebar__item {
   display: flex;
   justify-content: space-between;
