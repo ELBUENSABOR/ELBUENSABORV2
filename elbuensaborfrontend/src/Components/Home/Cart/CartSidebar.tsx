@@ -31,7 +31,13 @@ const CartSidebar = () => {
 
       {items.length === 0 ? (
         <div className="cart-sidebar__empty">
-          <div className="cart-sidebar__empty-icon">🧺</div>
+          <div className="cart-sidebar__empty-icon">
+              <img
+                  src="../../../../public/images/cart_box_icon.svg"
+                  alt="Carrito"
+                  className="cart-sidebar__icon"
+              />
+          </div>
           <p>Tu carrito está vacío</p>
           <span>¡Agregá productos deliciosos!</span>
         </div>
