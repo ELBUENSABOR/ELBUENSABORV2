@@ -114,7 +114,7 @@ export default function MyNavbar({ onCartOpen, isCartOpen }: MyNavbarProps) {
             {!user ? (
               <div className="navbar-auth-buttons">
 
-                  <Link className="btn btn-light navbar-auth-btn" to="/login">
+                  <Link className="btn navbar-auth-btn" to="/login">
                       <img
                           src="/images/login_icon.svg"
                           alt="Ingresar"
