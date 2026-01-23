@@ -147,6 +147,7 @@
 
   .navbar-search {
     width: 100%;
+    min-width: 100%;
     margin: 12px 0;
   }
 
