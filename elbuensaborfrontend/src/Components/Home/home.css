@@ -2,132 +2,153 @@
   display: flex;
   flex-direction: column;
   width: 100%;
-  padding: 20px;
+  padding: 24px 32px 40px;
+  gap: 24px;
 }
 
 .header-home {
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: flex-start;
-  width: 100%;
+  display: none;
 }
 
-.header-home > hr{
-    width: 100%;
+.home-content {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 320px;
+  gap: 24px;
+  align-items: start;
+}
+
+.home-main {
+  min-width: 0;
+}
+
+.home-cart {
+  min-width: 0;
+}
+
+@media (max-width: 991px) {
+  .home-container {
+    padding: 20px;
+  }
+
+  .home-content {
+    grid-template-columns: 1fr;
+  }
+
+  .home-cart {
+    display: none;
+  }
 }
 
 .password-modal-backdrop {
-    position: fixed;
-    inset: 0;
-    background: rgba(15, 23, 42, 0.55); /* gris oscuro con transparencia */
-    backdrop-filter: blur(3px);
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    z-index: 9999;
+  position: fixed;
+  inset: 0;
+  background: rgba(15, 23, 42, 0.55); /* gris oscuro con transparencia */
+  backdrop-filter: blur(3px);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 9999;
 }
 
 .password-modal {
-    background: #ffffff;
-    width: 100%;
-    max-width: 420px;
-    border-radius: 16px;
-    padding: 24px 24px 20px;
-    box-shadow: 0 18px 45px rgba(15, 23, 42, 0.35);
-    animation: popupFadeIn 0.25s ease-out;
+  background: #ffffff;
+  width: 100%;
+  max-width: 420px;
+  border-radius: 16px;
+  padding: 24px 24px 20px;
+  box-shadow: 0 18px 45px rgba(15, 23, 42, 0.35);
+  animation: popupFadeIn 0.25s ease-out;
 }
 
 .password-modal-header {
-    display: flex;
-    align-items: center;
-    gap: 12px;
-    margin-bottom: 16px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 16px;
 }
 
 .password-modal-icon {
-    width: 42px;
-    height: 42px;
-    border-radius: 999px;
-    display: grid;
-    place-items: center;
-    background: #f3f4ff;
-    color: #4f46e5;
-    font-size: 20px;
+  width: 42px;
+  height: 42px;
+  border-radius: 999px;
+  display: grid;
+  place-items: center;
+  background: #f3f4ff;
+  color: #4f46e5;
+  font-size: 20px;
 }
 
 .password-modal-header h3 {
-    margin: 0;
-    font-size: 1.3rem;
-    font-weight: 600;
+  margin: 0;
+  font-size: 1.3rem;
+  font-weight: 600;
 }
 
 .password-modal-header p {
-    margin: 2px 0 0;
-    font-size: 0.9rem;
-    color: #6b7280;
+  margin: 2px 0 0;
+  font-size: 0.9rem;
+  color: #6b7280;
 }
 
 .password-modal-body {
-    display: flex;
-    flex-direction: column;
-    gap: 10px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
 }
 
 .password-field label {
-    display: block;
-    font-size: 0.85rem;
-    font-weight: 500;
-    margin-bottom: 3px;
-    color: #4b5563;
+  display: block;
+  font-size: 0.85rem;
+  font-weight: 500;
+  margin-bottom: 3px;
+  color: #4b5563;
 }
 
 .password-field input.form-control {
-    font-size: 0.9rem;
-    padding: 8px 10px;
-    border-radius: 8px;
+  font-size: 0.9rem;
+  padding: 8px 10px;
+  border-radius: 8px;
 }
 
 .password-hint {
-    font-size: 0.78rem;
-    color: #6b7280;
-    margin: 4px 0 6px;
+  font-size: 0.78rem;
+  color: #6b7280;
+  margin: 4px 0 6px;
 }
 
 .password-modal-message {
-    margin: 4px 0 6px;
-    font-size: 0.85rem;
-    padding: 6px 10px;
-    border-radius: 8px;
+  margin: 4px 0 6px;
+  font-size: 0.85rem;
+  padding: 6px 10px;
+  border-radius: 8px;
 }
 
 .password-modal-message.error {
-    background: #fef2f2;
-    color: #b91c1c;
-    border: 1px solid #fecaca;
+  background: #fef2f2;
+  color: #b91c1c;
+  border: 1px solid #fecaca;
 }
 
 .password-modal-message.success {
-    background: #ecfdf3;
-    color: #166534;
-    border: 1px solid #bbf7d0;
+  background: #ecfdf3;
+  color: #166534;
+  border: 1px solid #bbf7d0;
 }
 
 .password-modal .btn.btn-primary {
-    margin-top: 4px;
-    border-radius: 999px;
-    font-weight: 500;
+  margin-top: 4px;
+  border-radius: 999px;
+  font-weight: 500;
 }
 
 /* Animación suave */
 @keyframes popupFadeIn {
-    from {
-        opacity: 0;
-        transform: translateY(10px) scale(0.98);
-    }
-    to {
-        opacity: 1;
-        transform: translateY(0) scale(1);
-    }
+  from {
+    opacity: 0;
+    transform: translateY(10px) scale(0.98);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
 }
-

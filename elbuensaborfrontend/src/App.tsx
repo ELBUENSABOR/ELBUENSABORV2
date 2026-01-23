@@ -1,3 +1,4 @@
+import { useState } from "react";
 import { BrowserRouter, Routes, Route, Outlet } from "react-router-dom";
 import Navbar from "./Components/Navbar/Navbar";
 import Home from "./Components/Home/Home";
@@ -7,11 +8,20 @@ import PrivateRoute from "./Components/PrivateRoute";
 import Account from "./Components/Account/Account";
 import DashboardRoutes from "./Components/Dashboard/DashboardRoutes";
 import Catalog from "./Components/Home/Catalog/Catalog";
+import ProductDetail from "./Components/Home/ProductDetail/ProductDetail";
+import CartSidebar from "./Components/Home/Cart/CartSidebar";
 
 function MainLayout() {
+  const [isCartOpen, setIsCartOpen] = useState(false);
+
   return (
     <>
-      <Navbar />
+      <Navbar isCartOpen={isCartOpen} onCartOpen={() => setIsCartOpen(true)} />
+      <CartSidebar
+        variant="drawer"
+        isOpen={isCartOpen}
+        onClose={() => setIsCartOpen(false)}
+      />
       <Outlet />
     </>
   );
@@ -28,6 +38,7 @@ function App() {
         <Route element={<MainLayout />}>
           <Route path="/" element={<Home />} />
           <Route path="/catalog" element={<Catalog />} />
+          <Route path="/producto/:id" element={<ProductDetail />} />
           <Route element={<PrivateRoute roles={["CLIENTE", "EMPLEADO", "ADMIN"]} />}>
             <Route path="/account" element={<Account />} />
           </Route>
@@ -41,8 +52,6 @@ function App() {
           <Route path="/login" element={<Login />} />
         </Route>
       </Routes>
-
-
     </BrowserRouter>
   );
 }
