@@ -33,6 +33,10 @@
   .home-content {
     grid-template-columns: 1fr;
   }
+
+  .home-cart {
+    display: none;
+  }
 }
 
 .password-modal-backdrop {
