@@ -1,3 +1,4 @@
+import { useState } from "react";
 import { BrowserRouter, Routes, Route, Outlet } from "react-router-dom";
 import Navbar from "./Components/Navbar/Navbar";
 import Home from "./Components/Home/Home";
@@ -8,11 +9,19 @@ import Account from "./Components/Account/Account";
 import DashboardRoutes from "./Components/Dashboard/DashboardRoutes";
 import Catalog from "./Components/Home/Catalog/Catalog";
 import ProductDetail from "./Components/Home/ProductDetail/ProductDetail";
+import CartSidebar from "./Components/Home/Cart/CartSidebar";
 
 function MainLayout() {
+  const [isCartOpen, setIsCartOpen] = useState(false);
+
   return (
     <>
-      <Navbar />
+      <Navbar isCartOpen={isCartOpen} onCartOpen={() => setIsCartOpen(true)} />
+      <CartSidebar
+        variant="drawer"
+        isOpen={isCartOpen}
+        onClose={() => setIsCartOpen(false)}
+      />
       <Outlet />
     </>
   );
