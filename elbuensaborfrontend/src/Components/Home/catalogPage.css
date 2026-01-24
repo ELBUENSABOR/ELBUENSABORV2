@@ -11,6 +11,9 @@
     grid-template-columns: minmax(0, 1fr) 320px;
     gap: 24px;
     align-items: start;
+    max-width: 1320px;
+    width: 100%;
+    margin: 0 auto;
 }
 
 .catalog-page__main {

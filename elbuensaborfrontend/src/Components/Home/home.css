@@ -3,8 +3,10 @@
     flex-direction: column;
     gap: 72px;
     padding: 32px 48px 56px;
-    background: #faf7f3;
     color: #2d2a26;
+    max-width: 1300px;
+    width: 100%;
+    margin: 0 auto;
 }
 
 .home-hero {
