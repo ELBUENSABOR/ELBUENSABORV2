@@ -1,72 +1,75 @@
 /* Sidebar general */
 .sidebar-dashboard {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 240px;
-  min-height: 100vh;
-  background: #212529;
-  padding: 1rem;
-  z-index: 1600;
-  transition: transform 0.3s ease-in-out;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 240px;
+    min-height: 100vh;
+    background: #212529;
+    padding: 1rem;
+    z-index: 1600;
+    transition: transform 0.3s ease-in-out;
 }
 
 /* Mobile oculto */
 @media (max-width: 1000px) {
-  .sidebar-dashboard {
-    transform: translateX(-100%);
-  }
+    .sidebar-dashboard {
+        transform: translateX(-100%);
+    }
 
-  .sidebar-dashboard.open {
-    transform: translateX(0);
-  }
+    .sidebar-dashboard.open {
+        transform: translateX(0);
+    }
 
-  .menu-toggle {
-    position: absolute;
-    top: 50%;
-    left: 0;
-    z-index: 1500;
-    background: #212529;
-    border: none;
-    border-radius: 0px 5px 5px 0px;
-    color: #fff;
-    font-size: 15px;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    min-height: 60px;
-    min-width: 25px;
-  }
+    .menu-toggle {
+        position: absolute;
+        top: 50%;
+        left: 0;
+        z-index: 1500;
+        background: #212529;
+        border: none;
+        border-radius: 0px 5px 5px 0px;
+        color: #fff;
+        font-size: 15px;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        min-height: 60px;
+        min-width: 25px;
+    }
 
-  .close-btn {
-    background: none;
-    border: none;
-    color: #fff;
-    font-size: 26px;
-    margin-bottom: 1rem;
-  }
+    .close-btn {
+        background: none;
+        border: none;
+        color: #fff;
+        font-size: 26px;
+        margin-bottom: 1rem;
+    }
 
-  .overlay {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100vw;
-    height: 100vh;
-    background: rgba(0, 0, 0, 0.4);
-    z-index: 900;
-  }
+    .overlay {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100vw;
+        height: 100vh;
+        background: rgba(0, 0, 0, 0.4);
+        z-index: 900;
+    }
 }
 
 /* Desktop siempre visible */
 @media (min-width: 1000px) {
-  .sidebar-dashboard {
-    transform: translateX(0);
-    position: relative;
-  }
+    .sidebar-dashboard {
+        transform: translateX(0);
+        position: sticky;
+        top: 0;
+        height: 100vh;
+        align-self: flex-start;
+    }
 
-  .menu-toggle,
-  .close-btn,
-  .overlay {
-    display: none;
-  }
+    .menu-toggle,
+    .close-btn,
+    .overlay {
+        display: none;
+    }
 }
