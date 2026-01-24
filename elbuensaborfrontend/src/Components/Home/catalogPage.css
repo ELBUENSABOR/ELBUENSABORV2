@@ -1,0 +1,36 @@
+.catalog-page {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    padding: 24px 32px 40px;
+    gap: 24px;
+}
+
+.catalog-page__content {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) 320px;
+    gap: 24px;
+    align-items: start;
+}
+
+.catalog-page__main {
+    min-width: 0;
+}
+
+.catalog-page__cart {
+    min-width: 0;
+}
+
+@media (max-width: 991px) {
+    .catalog-page {
+        padding: 20px;
+    }
+
+    .catalog-page__content {
+        grid-template-columns: 1fr;
+    }
+
+    .catalog-page__cart {
+        display: none;
+    }
+}
