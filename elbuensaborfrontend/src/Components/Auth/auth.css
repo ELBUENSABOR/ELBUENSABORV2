@@ -1,55 +1,160 @@
 .auth-container {
-  width: 100%;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  height: 100vh;
-  background-color: #a46b3e;
+    width: 100%;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 32px 20px;
+    background: var(--gradient-hero);
+    gap: 16px;
 }
 
 .form-container-auth {
-  display: flex;
-  flex-direction: column;
-  gap: 15px;
-  width: 100%;
-  max-width: 550px;
-  height: fit-content;
-  padding: 20px;
-  border: 1px solid #b8a99a;
-  border-radius: 5px;
-  background-color: #fff;
+    width: 100%;
+    max-width: 640px;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    padding: 32px;
+    border-radius: 24px;
+    border: 1px solid hsl(var(--border));
+    background: hsl(var(--card));
+    box-shadow: var(--shadow-lg);
+}
+
+.auth-header {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+    text-align: center;
+}
+
+.auth-logo {
+    width: 56px;
+    height: 56px;
+    border-radius: 16px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    background: var(--gradient-warm);
+    color: hsl(var(--primary-foreground));
+    font-size: 26px;
+    box-shadow: var(--shadow-glow);
+}
+
+.auth-title {
+    margin: 0;
+    font-size: 28px;
+    color: hsl(var(--foreground));
+}
+
+.auth-subtitle {
+    margin: 0;
+    color: hsl(var(--muted-foreground));
 }
 
 .form-container-auth > h2 {
-  margin: 0px;
-  font-weight: 600;
+    margin: 0;
+    font-size: 28px;
+    color: hsl(var(--foreground));
 }
 
-.form-container-auth input {
-  border-radius: 5px;
-  border: 1px solid #b8a99a;
-  padding: 5px;
+.form-container-auth > hr {
+    border: 0;
+    height: 1px;
+    background: hsl(var(--border));
+}
+
+.form-container-auth input,
+.form-container-auth select {
+    height: 44px;
+    border-radius: 12px;
+    border: 1px solid hsl(var(--border));
+    padding: 0 12px;
+    background: hsl(var(--background));
+    color: hsl(var(--foreground));
+    font-weight: 500;
+    transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.form-container-auth input:focus,
+.form-container-auth select:focus {
+    outline: none;
+    border-color: hsl(var(--primary));
+    box-shadow: 0 0 0 3px hsl(var(--primary) / 0.15);
 }
 
 .form-container-auth > button {
-  border: none;
-  border-radius: 5px;
-  padding: 5px;
-  background-color: #ffbc2b;
-  font-weight: 600;
+    height: 46px;
+    border: none;
+    border-radius: 12px;
+    background: hsl(var(--primary));
+    color: hsl(var(--primary-foreground));
+    font-weight: 600;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+    box-shadow: var(--shadow-md);
 }
 
 .form-container-auth > button:hover {
-  background-color: #e0a623;
-  cursor: pointer;
+    background: hsl(var(--primary));
+    transform: translateY(-1px);
+    box-shadow: var(--shadow-lg);
+    cursor: pointer;
+}
+
+.form-container-auth > button:disabled {
+    cursor: not-allowed;
+    background: hsl(var(--disabled));
+    color: hsl(var(--disabled-foreground));
+    box-shadow: none;
 }
 
 .error-color-p {
-    color: red;
+    margin: 0;
+    color: hsl(var(--destructive));
+    font-weight: 500;
 }
 
 .succes-color-p,
 .success-color-p {
-    color: green;
+    margin: 0;
+    color: hsl(var(--success));
+    font-weight: 500;
+}
+
+.auth-footer {
+    margin: 0;
+    text-align: center;
+    color: hsl(var(--muted-foreground));
+}
+
+.auth-link {
+    color: hsl(var(--primary));
+    font-weight: 600;
+    text-decoration: none;
+}
+
+.auth-link:hover {
+    text-decoration: underline;
+}
+
+.auth-back {
+    display: inline-flex;
+    justify-content: center;
+    text-decoration: none;
+    font-weight: 600;
+    color: hsl(var(--muted-foreground));
+    margin-top: 20px;
+}
+
+.auth-back:hover {
+    color: hsl(var(--foreground));
+}
+
+@media (max-width: 720px) {
+    .form-container-auth {
+        padding: 24px;
+    }
 }

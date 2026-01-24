@@ -1,17 +1,17 @@
 .cart-sidebar {
-  background: hsl(var(--card));
-  border-radius: calc(var(--radius) * 1.25);
-  padding: 20px;
-  box-shadow: var(--shadow-lg);
-  display: flex;
-  flex-direction: column;
-  gap: 18px;
-  position: sticky;
-  top: 96px;
-  height: calc(100vh - 128px);
-  align-self: start;
-  border: 1px solid hsl(var(--border));
+    background: hsl(var(--card));
+    padding: 20px;
+    box-shadow: var(--shadow-lg);
+    display: flex;
+    flex-direction: column;
+    gap: 18px;
+    position: sticky;
+    top: 96px;
+    height: calc(100vh - 128px);
+    align-self: start;
+    border-left: 1px solid hsl(var(--border));
 }
+
 
 .cart-sidebar--drawer {
   position: fixed;
@@ -46,13 +46,15 @@
 }
 
 .cart-sidebar__header {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding-bottom: 12px;
-  border-bottom: 1px solid hsl(var(--border));
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding-bottom: 12px;
+    margin-left: -20px;
+    padding-left: 20px;
+    margin-right: -20px;
+    border-bottom: 1px solid hsl(var(--border));
 }
-
 .cart-sidebar__title {
   display: flex;
   align-items: center;
