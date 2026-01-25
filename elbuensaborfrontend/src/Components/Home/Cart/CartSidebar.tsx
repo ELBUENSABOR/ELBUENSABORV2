@@ -1,5 +1,8 @@
 import "./cartSidebar.css";
 import { useCart } from "../../../contexts/CartContext";
+import {
+    Package
+} from "lucide-react";
 
 const formatCurrency = (value: number) =>
   new Intl.NumberFormat("es-AR", {
@@ -39,13 +42,7 @@ const CartSidebar = ({
       >
         <div className="cart-sidebar__header">
           <div className="cart-sidebar__title">
-            <span>
-              <img
-                src="/images/cart_box_warm_orange_icon.svg"
-                alt="Carrito"
-                className="cart-sidebar__icon"
-              />
-            </span>
+                <Package/>
             <h5>Tu pedido</h5>
           </div>
           <div className="cart-sidebar__actions">
@@ -74,11 +71,7 @@ const CartSidebar = ({
         {items.length === 0 ? (
           <div className="cart-sidebar__empty">
             <div className="cart-sidebar__empty-icon">
-              <img
-                src="/images/cart_box_icon.svg"
-                alt="Carrito"
-                className="cart-sidebar__icon"
-              />
+                <Package/>
             </div>
             <p>Tu carrito está vacío</p>
             <span>¡Agregá productos deliciosos!</span>
