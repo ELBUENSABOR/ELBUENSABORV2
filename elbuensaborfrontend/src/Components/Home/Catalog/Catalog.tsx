@@ -5,6 +5,7 @@ import {useCatalogFilters} from "../../../contexts/CatalogFiltersContext";
 import {useCart} from "../../../contexts/CartContext";
 import type {Manufacturado} from "../../../models/Manufacturado";
 
+
 const formatCurrency = (value: number) =>
     new Intl.NumberFormat("es-AR", {
         style: "currency",

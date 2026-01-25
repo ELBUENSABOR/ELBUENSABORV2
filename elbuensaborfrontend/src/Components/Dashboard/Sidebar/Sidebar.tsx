@@ -20,15 +20,15 @@ const links = [
     {path: "/dashboard/sucursales", label: "Sucursales", icon: Building2, rol: ["ADMIN"]},
     {path: "/dashboard/usuarios", label: "Usuarios", icon: Users, rol: ["ADMIN"]},
     {path: "/dashboard/rubros-insumos", label: "Rubros de insumos", icon: Tags, rol: ["ADMIN"]},
-    {path: "/dashboard/rubros-productos", label: "Rubros de productos", icon: Package, rol: ["ADMIN"]},
-    {path: "/dashboard/productos-insumos", label: "Insumos", icon: Boxes, rol: ["COCINERO", "ADMIN"]},
+    {path: "/dashboard/rubros-productos", label: "Rubros de productos", icon: Tags, rol: ["ADMIN"]},
+    {path: "/dashboard/productos-insumos", label: "Insumos", icon: Package, rol: ["COCINERO", "ADMIN"]},
     {
         path: "/dashboard/productos-manufacturados",
         label: "Productos manufacturados",
         icon: Factory,
         rol: ["COCINERO", "ADMIN"]
     },
-    {path: "/dashboard/stock", label: "Stock", icon: BarChart3, rol: ["EMPLEADO", "ADMIN"]},
+    {path: "/dashboard/stock", label: "Stock", icon: Boxes, rol: ["EMPLEADO", "ADMIN"]},
     {path: "/dashboard/compras", label: "Registro de compras", icon: ClipboardList, rol: ["EMPLEADO", "ADMIN"]},
     {path: "/dashboard/productos-venta", label: "Productos a la venta", icon: ShoppingBag, rol: ["EMPLEADO", "ADMIN"]},
 ];
@@ -47,7 +47,7 @@ const Sidebar = ({open, close}: { open: boolean; close: () => void }) => {
             </button>
 
             <div className="sidebar-brand">
-                <div className="brand-logo"><Home/></div>
+                <div className="brand-logo"><BarChart3/></div>
                 <div>
                     <span className="brand-title">Admin Panel</span>
                     <span className="brand-subtitle">Gestión del sistema</span>

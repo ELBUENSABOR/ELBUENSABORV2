@@ -4,6 +4,7 @@ import "./navbar.css";
 import {useUser} from "../../contexts/UsuarioContext";
 import {useCatalogData} from "../../contexts/CatalogDataContext";
 import {useCatalogFilters} from "../../contexts/CatalogFiltersContext";
+import {LogIn, ShoppingCart} from 'lucide-react';
 
 interface MyNavbarProps {
     onCartOpen: () => void;
@@ -43,22 +44,7 @@ export default function MyNavbar({onCartOpen, isCartOpen}: MyNavbarProps) {
                         aria-label="Abrir carrito"
                         aria-expanded={isCartOpen}
                     >
-                        <svg
-                            viewBox="0 0 24 24"
-                            aria-hidden="true"
-                            className="navbar-icon"
-                        >
-                            <path
-                                d="M6 6h15l-1.5 9h-12L6 6zm0 0L5 3H2"
-                                fill="none"
-                                stroke="currentColor"
-                                strokeWidth="1.5"
-                                strokeLinecap="round"
-                                strokeLinejoin="round"
-                            />
-                            <circle cx="9" cy="20" r="1.5"/>
-                            <circle cx="17" cy="20" r="1.5"/>
-                        </svg>
+                        <ShoppingCart/>
                     </button>
                     <Navbar.Toggle aria-controls="main-navbar"/>
                 </div>
@@ -114,11 +100,7 @@ export default function MyNavbar({onCartOpen, isCartOpen}: MyNavbarProps) {
                             <div className="navbar-auth-buttons">
 
                                 <Link className="btn navbar-auth-btn" to="/login">
-                                    <img
-                                        src="/images/login_icon.svg"
-                                        alt="Ingresar"
-                                        className="navbar-auth-icon"
-                                    />
+                                    <LogIn/>
                                     Ingresar
                                 </Link>
 

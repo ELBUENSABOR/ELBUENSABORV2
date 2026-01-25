@@ -1,6 +1,13 @@
 import {Link} from "react-router-dom";
 import {ChangePasswordPopup} from "./ChangePasswordPopup";
 import "./home.css";
+import {
+    BadgePercent,
+    MapPinned,
+    Clock4,
+    Phone
+} from 'lucide-react';
+
 
 //Hardcodeado, tal vez podemos hacer "ofertas" con una propiedad "descuento" en los productos.
 const offers = [
@@ -41,7 +48,6 @@ const Home = () => {
         <div className="home-page">
             <ChangePasswordPopup/>
             <section className="home-hero">
-                <p className="home-hero__eyebrow">Los mejores platos, directo a tu mesa 🍽️</p>
                 <h1>
                     ¡Bienvenido a <span>El Buen Sabor</span>!
                 </h1>
@@ -55,7 +61,7 @@ const Home = () => {
 
             <section className="home-offers">
                 <div className="home-section-title">
-                    <span>％</span>
+                    <BadgePercent size={28}/>
                     <h2>Ofertas del Día</h2>
                 </div>
 
@@ -88,7 +94,7 @@ const Home = () => {
 
             <section className="home-location">
                 <div className="home-section-title">
-                    <span>📍</span>
+                    <MapPinned size={28}/>
                     <h2>Aquí estamos</h2>
                 </div>
 
@@ -103,22 +109,43 @@ const Home = () => {
                     </div>
 
                     <div className="home-location__cards">
-                        <article>
-                            <h3>Dirección</h3>
-                            <p>Av. San Martín 1234</p>
-                            <span>Ciudad de Mendoza, Mendoza</span>
+                        <article className="info-card">
+                            <div className="info-card__icon">
+                                <MapPinned size={18}/>
+                            </div>
+
+                            <div className="info-card__body">
+                                <h3>Dirección</h3>
+                                <p>Av. San Martín 1234</p>
+                                <span>Ciudad de Mendoza, Mendoza</span>
+                            </div>
                         </article>
-                        <article>
-                            <h3>Horarios</h3>
-                            <p>Lunes a Viernes: 11:00 - 23:00</p>
-                            <span>Sábados y Domingos: 12:00 - 00:00</span>
+
+                        <article className="info-card">
+                            <div className="info-card__icon">
+                                <Clock4 size={18}/>
+                            </div>
+
+                            <div className="info-card__body">
+                                <h3>Horarios</h3>
+                                <p>Lunes a Viernes: 11:00 - 23:00</p>
+                                <span>Sábados y Domingos: 12:00 - 00:00</span>
+                            </div>
                         </article>
-                        <article>
-                            <h3>Contacto</h3>
-                            <p>Tel: (261) 123-4567</p>
-                            <span>WhatsApp: +54 9 261 123-4567</span>
+
+                        <article className="info-card">
+                            <div className="info-card__icon">
+                                <Phone size={18}/>
+                            </div>
+
+                            <div className="info-card__body">
+                                <h3>Contacto</h3>
+                                <p>Tel: (261) 123-4567</p>
+                                <span>WhatsApp: +54 9 261 123-4567</span>
+                            </div>
                         </article>
                     </div>
+
                 </div>
             </section>
 
