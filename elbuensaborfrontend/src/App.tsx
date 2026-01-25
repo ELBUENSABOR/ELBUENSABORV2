@@ -1,5 +1,5 @@
 import {useState} from "react";
-import {BrowserRouter, Routes, Route, Outlet} from "react-router-dom";
+import {BrowserRouter, Routes, Route, Outlet, useLocation} from "react-router-dom";
 import Navbar from "./Components/Navbar/Navbar";
 import Home from "./Components/Home/Home";
 import Register from "./Components/Auth/Register";
@@ -13,15 +13,24 @@ import CartSidebar from "./Components/Home/Cart/CartSidebar";
 
 function MainLayout() {
     const [isCartOpen, setIsCartOpen] = useState(false);
+    const location = useLocation();
+    const isDashboardRoute = location.pathname.startsWith("/dashboard");
 
     return (
         <>
-            <Navbar isCartOpen={isCartOpen} onCartOpen={() => setIsCartOpen(true)}/>
-            <CartSidebar
-                variant="drawer"
-                isOpen={isCartOpen}
-                onClose={() => setIsCartOpen(false)}
-            />
+            {!isDashboardRoute && (
+                <>
+                    <Navbar
+                        isCartOpen={isCartOpen}
+                        onCartOpen={() => setIsCartOpen(true)}
+                    />
+                    <CartSidebar
+                        variant="drawer"
+                        isOpen={isCartOpen}
+                        onClose={() => setIsCartOpen(false)}
+                    />
+                </>
+            )}
             <Outlet/>
         </>
     );

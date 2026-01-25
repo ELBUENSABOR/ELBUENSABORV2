@@ -5,10 +5,83 @@
     left: 0;
     width: 240px;
     min-height: 100vh;
-    background: #212529;
-    padding: 1rem;
+    background: #fffaf4;
+    padding: 1.5rem 1rem;
     z-index: 1600;
     transition: transform 0.3s ease-in-out;
+    border-right: 1px solid #efe5da;
+    color: #3b2f23;
+}
+
+.sidebar-brand {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    margin-bottom: 1.5rem;
+}
+
+.brand-logo {
+    width: 42px;
+    height: 42px;
+    border-radius: 12px;
+    background: #f36b07;
+    color: #fff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 700;
+}
+
+.brand-title {
+    display: block;
+    font-weight: 600;
+    font-size: 0.95rem;
+}
+
+.brand-subtitle {
+    display: block;
+    font-size: 0.75rem;
+    color: #8a7a69;
+}
+
+.sidebar-section {
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    color: #b7a899;
+    margin-bottom: 0.75rem;
+    letter-spacing: 0.05em;
+}
+
+.sidebar-dashboard .nav {
+    gap: 0.35rem;
+}
+
+.sidebar-dashboard .nav-link {
+    color: #5a4a3d;
+    border-radius: 12px;
+    padding: 0.5rem 0.75rem;
+    font-size: 0.9rem;
+}
+
+.sidebar-dashboard .nav-link:hover {
+    background: #f4e7d7;
+    color: #e16a00;
+}
+
+.sidebar-dashboard .nav-link.active {
+    background: #f4e7d7;
+    color: #e16a00;
+    font-weight: 600;
+}
+
+.nav-link {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.nav-icon {
+    min-width: 18px;
 }
 
 /* Mobile oculto */
@@ -26,7 +99,7 @@
         top: 50%;
         left: 0;
         z-index: 1500;
-        background: #212529;
+        background: #f36b07;
         border: none;
         border-radius: 0px 5px 5px 0px;
         color: #fff;
@@ -41,7 +114,7 @@
     .close-btn {
         background: none;
         border: none;
-        color: #fff;
+        color: #3b2f23;
         font-size: 26px;
         margin-bottom: 1rem;
     }
