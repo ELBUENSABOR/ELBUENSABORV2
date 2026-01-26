@@ -1,4 +1,4 @@
-import React, { useEffect, useState, type ChangeEvent, type JSX } from "react";
+import { useEffect, useState, type ChangeEvent, type JSX } from "react";
 import "./rubros.css";
 import { useNavigate } from "react-router-dom";
 import ModalConfirmAction from "../../ModalConfirmAction/ModalConfirmAction";
@@ -160,64 +160,67 @@ const RubrosManufacturados = () => {
     }
   };
 
-  return (
-    <div className="users-container">
-      <h5>Rubros de Manufacturados</h5>
-      <hr />
+    return (
+        <div className="users-container">
+            <h5>Rubros de Manufacturados</h5>
+            <hr />
 
-      <div className="header-dashboard">
-        <input
-          name="search"
-          type="text"
-          placeholder="Buscar rubros..."
-          className="form-control"
-          value={filterValue}
-          onChange={filterData}
-        />
+            <div className="header-dashboard">
+                <input
+                    name="search"
+                    type="text"
+                    placeholder="Buscar rubros..."
+                    className="form-control"
+                    value={filterValue}
+                    onChange={filterData}
+                />
 
-        <button
-          className="btn btn-success"
-          onClick={() => navigate("/dashboard/manufacturados/rubros/add")}
-        >
-          + Nuevo Rubro
-        </button>
-      </div>
+                <button
+                    className="btn btn-success"
+                    onClick={() => navigate("/dashboard/manufacturados/rubros/add")}
+                >
+                    + Nuevo Rubro
+                </button>
+            </div>
 
-      <div className="table-container">
-        <table className="table table-hover">
-          <thead>
-            <tr>
-              <th>#</th>
-              <th>Denominación</th>
-              <th style={{ width: "280px" }}>Acciones</th>
-            </tr>
-          </thead>
+            <div className="dashboard-table-card">
+                <div className="dashboard-table-header">Lista de Rubros</div>
+                <div className="table-responsive">
+                    <table className="table table-hover dashboard-table">
+                        <thead>
+                        <tr>
+                            <th>#</th>
+                            <th>Denominación</th>
+                            <th style={{ width: "280px" }}>Acciones</th>
+                        </tr>
+                        </thead>
 
-          <tbody className="table-group-divider">
-            {renderRows(rubrosTree)}
-          </tbody>
-        </table>
-      </div>
+                        <tbody className="table-group-divider">
+                        {renderRows(rubrosTree)}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
 
-      {showModal && (
-        <ModalConfirmAction
-          show={showModal}
-          setShowModal={setShowModal}
-          headerText="¿Deseas eliminar este rubro?"
-          bodyText="Esta acción no se puede deshacer"
-          onClick={() => deleteRubro(currentId)}
-        />
-      )}
+            {showModal && (
+                <ModalConfirmAction
+                    show={showModal}
+                    setShowModal={setShowModal}
+                    headerText="¿Deseas eliminar este rubro?"
+                    bodyText="Esta acción no se puede deshacer"
+                    onClick={() => deleteRubro(currentId)}
+                />
+            )}
 
-      {showAlert && (
-        <Alert
-          message={alertMessage}
-          status={alertStatus}
-          onClose={() => setShowAlert(false)}
-        />
-      )}
-    </div>
-  );
+            {showAlert && (
+                <Alert
+                    message={alertMessage}
+                    status={alertStatus}
+                    onClose={() => setShowAlert(false)}
+                />
+            )}
+        </div>
+    );
 };
 
 export default RubrosManufacturados;

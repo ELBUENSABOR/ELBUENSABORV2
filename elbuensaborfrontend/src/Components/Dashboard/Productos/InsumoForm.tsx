@@ -16,16 +16,7 @@ const initialState: InsumoRequest = {
   denominacion: "",
   precioCompra: 0,
   precioVenta: 0,
-  stockSucursal: [
-    {
-      id: 0,
-      sucursalId: 0,
-      stockActual: 0,
-      stockMinimo: 0,
-      stockMaximo: 0,
-      activo: true,
-    },
-  ],
+  stockSucursal: [],
   esParaElaborar: false,
   categoriaId: 0,
   unidadMedidaId: 0,
@@ -84,6 +75,24 @@ const InsumoForm = () => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
+        if (!form.categoriaId || form.categoriaId <= 0) {
+            alert("Debe seleccionar una categoría válida.");
+            return;
+        }
+
+        if (!form.unidadMedidaId || form.unidadMedidaId <= 0) {
+            alert("Debe seleccionar una unidad de medida válida.");
+            return;
+        }
+
+        const stockSucursal = form.stockSucursal
+            .filter((s) => s.sucursalId && s.sucursalId > 0)
+            .map((s) => ({
+                sucursalId: s.sucursalId,
+                stockActual: s.stockActual,
+                stockMinimo: s.stockMinimo,
+                stockMaximo: s.stockMaximo,
+            }));
       const payload = {
         denominacion: form.denominacion,
         precioVenta: form.precioVenta,
@@ -92,12 +101,7 @@ const InsumoForm = () => {
         activo: form.activo,
         esParaElaborar: form.esParaElaborar,
         unidadMedidaId: form.unidadMedidaId,
-        stockSucursal: form.stockSucursal.map((s) => ({
-          sucursalId: s.sucursalId,
-          stockActual: s.stockActual,
-          stockMinimo: s.stockMinimo,
-          stockMaximo: s.stockMaximo,
-        })),
+        stockSucursal,
       };
 
       console.log("Enviando payload:", payload);

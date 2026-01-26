@@ -1,9 +1,9 @@
-import React, { useEffect, useState, type ChangeEvent } from 'react'
+import { useEffect, useState, type ChangeEvent } from 'react'
 import { useUser } from '../../../contexts/UsuarioContext';
 import { useSucursal } from '../../../contexts/SucursalContext';
 import { useNavigate } from 'react-router-dom';
-import type { InsumoRequest, InsumoResponse } from '../../../models/Insumo';
-import { getAll, getAllUnidadesMedida, deleteInsumo } from '../../../services/insumosService';
+import type {InsumoResponse } from '../../../models/Insumo';
+import { getAll, deleteInsumo } from '../../../services/insumosService';
 import UnidadMedidaModal from './UnidadesMedidaModal/UnidadMedidaModal';
 import { getRubrosInsumos } from '../../../services/rubrosService';
 import type { Rubro } from '../../../models/Rubro';
@@ -45,7 +45,7 @@ const ProductosInsumos = () => {
           setOriginalInsumos(response);
         }
       } catch (error) {
-        console.error("Error al obtener insumos");
+        console.error("Error al obtener insumos: ", error);
       }
     };
 
@@ -166,76 +166,83 @@ const ProductosInsumos = () => {
             value={filterRubroValue ?? ""}
             onChange={(e) => filterRubro(e)}
           >
-            <option value="">Todas las categorías</option>
-            {rubros?.map((rubro) => (
-              <option key={rubro.id} value={rubro.id}>
-                {rubro.denominacion}
-              </option>
-            ))}
+              <option value="">Todas las categorías</option>
+              {rubros?.map((rubro) => (
+                  <option key={rubro.id} value={rubro.id}>
+                      {rubro.denominacion}
+                  </option>
+              ))}
           </select>
 
-          <button
-            className="btn btn-primary"
-            onClick={() => setShowModalUnidadMedida(true)}
-          >
-            Unidades
-          </button>
+            <button
+                className="btn btn-primary"
+                onClick={() => setShowModalUnidadMedida(true)}
+            >
+                Unidades
+            </button>
 
-          <button
-            className="btn btn-success"
-            onClick={() => navigate("/dashboard/insumos/add")}
-          >
-            + Nuevo Insumo
-          </button>
+            <button
+                className="btn btn-success"
+                onClick={() => navigate("/dashboard/insumos/add")}
+            >
+                + Nuevo Insumo
+            </button>
         </div>
-        <table className="table table-hover">
-          <thead>
-            <th>#</th>
-            <th>Denominación</th>
-            <th>Precio de costo</th>
-            <th>Precio de venta</th>
-            <th>Categoría</th>
-            <th>Stock actual</th>
-            <th>Acciones</th>
-          </thead>
-          <tbody className="table-group-divider">
-            {insumos?.map((m, index) => (
-              <tr key={index} className={m.activo ? "" : "deleted-row"}>
-                <td>{m.id}</td>
-                <td>{m.denominacion}</td>
-                <td>${m.precioCompra}</td>
-                <td>${m.precioVenta}</td>
-                <td>{m.categoria.denominacion}</td>
-                <td>
-                  {m.stockSucursal.find((s) => s.sucursalId === sucursalId)
-                    ?.stockActual ?? 0} {m.unidadMedida.denominacion}
-                </td>
-                <td>
-                  {
-                    m.activo && (
-                      <>
-                        <button className="btn btn-primary" onClick={() => navigate(`/dashboard/insumos/edit/${m.id}`)}>Editar</button>
-                        <button className="btn btn-danger" onClick={() => handleDeleteInsumo(m.id ?? 0)}>Eliminar</button>
-                      </>
-                    )
-                  }
-                </td>
+          <div className="dashboard-table-card">
+              <div className="dashboard-table-header">Lista de Insumos</div>
+              <div className="table-responsive">
+                  <table className="table table-hover dashboard-table">
+                      <thead>
+                      <tr>
+                          <th>#</th>
+                          <th>Denominación</th>
+                          <th>Precio de costo</th>
+                          <th>Precio de venta</th>
+                          <th>Categoría</th>
+                          <th>Stock actual</th>
+                          <th>Acciones</th>
+                      </tr>
+                      </thead>
+                      <tbody className="table-group-divider">
+                      {insumos?.map((m, index) => (
+                          <tr key={index} className={m.activo ? "" : "deleted-row"}>
+                              <td>{m.id}</td>
+                              <td>{m.denominacion}</td>
+                              <td>${m.precioCompra}</td>
+                              <td>${m.precioVenta}</td>
+                              <td>{m.categoria.denominacion}</td>
+                              <td>
+                                  {m.stockSucursal.find((s) => s.sucursalId === sucursalId)
+                                      ?.stockActual ?? 0} {m.unidadMedida.denominacion}
+                              </td>
+                              <td>
+                                  {
+                                      m.activo && (
+                                          <>
+                                              <button className="btn btn-primary" onClick={() => navigate(`/dashboard/insumos/edit/${m.id}`)}>Editar</button>
+                                              <button className="btn btn-danger" onClick={() => handleDeleteInsumo(m.id ?? 0)}>Eliminar</button>
+                                          </>
+                                      )
+                                  }
+                              </td>
 
-              </tr>
-            ))}
-          </tbody>
-        </table>
+                          </tr>
+                      ))}
+                      </tbody>
+                  </table>
+              </div>
+          </div>
       </div>
-      <UnidadMedidaModal showModal={showModalUnidadMedida} setShowModal={setShowModalUnidadMedida} />
-      {showModal && (
-        <ModalConfirmAction
-          show={showModal}
-          setShowModal={setShowModal}
-          headerText="¿Deseas eliminar el insumo?"
-          bodyText="Se dara de baja el insumo y sus datos"
-          onClick={() => deleteInsumoConfirm()}
-        />
-      )}
+        <UnidadMedidaModal showModal={showModalUnidadMedida} setShowModal={setShowModalUnidadMedida} />
+        {showModal && (
+            <ModalConfirmAction
+                show={showModal}
+                setShowModal={setShowModal}
+                headerText="¿Deseas eliminar el insumo?"
+                bodyText="Se dara de baja el insumo y sus datos"
+                onClick={() => deleteInsumoConfirm()}
+            />
+        )}
     </div>
   );
 }

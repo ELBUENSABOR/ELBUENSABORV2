@@ -1,4 +1,4 @@
-import React, { useEffect, useState, type ChangeEvent } from "react";
+import { useEffect, useState, type ChangeEvent } from "react";
 import { useSucursal } from "../../../contexts/SucursalContext";
 import { useUser } from "../../../contexts/UsuarioContext";
 import { getAll } from "../../../services/manufacturadosService";
@@ -32,7 +32,7 @@ const ProductosManufacturados = () => {
           setOriginalManufacturados(response);
         }
       } catch (error) {
-        console.error("Error al obtener manufacturados");
+        console.error("Error al obtener manufacturados: ", error);
       }
     };
 
@@ -113,49 +113,56 @@ const ProductosManufacturados = () => {
             onChange={filterData}
           />
 
-          <select
-            name="status"
-            className="form-select"
-            value={filterStatus}
-            onChange={(e) => filterData(e)}
-          >
-            <option value="">Todos</option>
-            <option value="activo">Activos</option>
-            <option value="no-activo">No activos</option>
-          </select>
+            <select
+                name="status"
+                className="form-select"
+                value={filterStatus}
+                onChange={(e) => filterData(e)}
+            >
+                <option value="">Todos</option>
+                <option value="activo">Activos</option>
+                <option value="no-activo">No activos</option>
+            </select>
 
-          <button
-            className="btn btn-success"
-            onClick={() => navigate("/dashboard/manufacturados/add")}
-          >
-            + Nuevo Rubro
-          </button>
+            <button
+                className="btn btn-success"
+                onClick={() => navigate("/dashboard/manufacturados/add")}
+            >
+                + Nuevo Rubro
+            </button>
         </div>
-        <table className="table table-hover">
-          <thead>
-            <th>#</th>
-            <th>Denominación</th>
-            <th>Precio de costo</th>
-            <th>Precio de venta</th>
-            <th>Categoría</th>
-            <th>Acciones</th>
-          </thead>
-          <tbody className="table-group-divider">
-            {manufacturados?.map((m, index) => (
-              <tr key={index}>
-                <td>{m.id}</td>
-                <td>{m.denominacion}</td>
-                <td>{m.precioCosto}</td>
-                <td>{m.precioVenta}</td>
-                <td>{m.categoria.denominacion}</td>
-                <td>
-                  <button className="btn btn-primary">Editar</button>
-                  <button className="btn btn-danger">Eliminar</button>
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
+          <div className="dashboard-table-card">
+              <div className="dashboard-table-header">Lista de Productos</div>
+              <div className="table-responsive">
+                  <table className="table table-hover dashboard-table">
+                      <thead>
+                      <tr>
+                          <th>#</th>
+                          <th>Denominación</th>
+                          <th>Precio de costo</th>
+                          <th>Precio de venta</th>
+                          <th>Categoría</th>
+                          <th>Acciones</th>
+                      </tr>
+                      </thead>
+                      <tbody className="table-group-divider">
+                      {manufacturados?.map((m, index) => (
+                          <tr key={index}>
+                              <td>{m.id}</td>
+                              <td>{m.denominacion}</td>
+                              <td>{m.precioCosto}</td>
+                              <td>{m.precioVenta}</td>
+                              <td>{m.categoria.denominacion}</td>
+                              <td>
+                                  <button className="btn btn-primary">Editar</button>
+                                  <button className="btn btn-danger">Eliminar</button>
+                              </td>
+                          </tr>
+                      ))}
+                      </tbody>
+                  </table>
+              </div>
+          </div>
       </div>
     </div>
   );
