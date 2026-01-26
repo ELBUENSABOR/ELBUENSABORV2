@@ -5,7 +5,7 @@ import "./users.css";
 import { useNavigate } from "react-router-dom";
 import ModalConfirmAction from "../../ModalConfirmAction/ModalConfirmAction";
 import Alert from "../../Alert/Alert";
-import { Users } from 'lucide-react';
+import { Users as UsersIcon } from "lucide-react";
 
 const Users = () => {
     const [originalUsers, setOriginalUsers] = useState<UsuarioDTO[]>();
@@ -109,7 +109,7 @@ const Users = () => {
             <div className="users-header">
                 <div className="users-title">
           <span className="users-title-icon" aria-hidden="true">
-            <Users />
+            <UsersIcon />
           </span>
                     <div>
                         <h5>Usuarios</h5>
