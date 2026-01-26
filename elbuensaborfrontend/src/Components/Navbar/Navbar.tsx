@@ -88,8 +88,8 @@ export default function MyNavbar({onCartOpen, isCartOpen}: MyNavbarProps) {
                                 ))}
                             </NavDropdown>
                         )}
-                        {(user?.role === "ADMIN" || user?.role === "EMPLEADO") && (
-                            <Nav.Link as={Link} to="/dashboard/home">
+                        {(user?.role === "ADMIN") && (
+                            <Nav.Link as={Link} to="/dashboard/home" className="navbar-admin-link">
                                 Panel de administración
                             </Nav.Link>
                         )}
