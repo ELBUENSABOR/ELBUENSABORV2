@@ -1,4 +1,4 @@
-import React, { useEffect, useState, type ChangeEvent } from "react";
+import { useEffect, useMemo, useState, type ChangeEvent } from "react";
 import { getAllUsers, deleteUserService } from "../../../services/userService";
 import type { UsuarioDTO } from "../../../dtos/UsuarioDTO";
 import "./users.css";
@@ -7,196 +7,251 @@ import ModalConfirmAction from "../../ModalConfirmAction/ModalConfirmAction";
 import Alert from "../../Alert/Alert";
 
 const Users = () => {
-  const [users, setUsers] = useState<UsuarioDTO[]>();
-  const [originalUsers, setOriginalUsers] = useState<UsuarioDTO[]>();
-  const navigate = useNavigate();
-  const [currentId, setCurrentId] = useState(0);
-  const [showModal, setShowModal] = useState(false);
-  const [refresh, setRefresh] = useState(false);
-  const [showAlert, setShowAlert] = useState(false);
-  const [alertMessage, setAlertMessage] = useState("");
-  const [alertStatus, setAlertStatus] = useState("");
-  const [filterValue, setFilterValue] = useState("");
-  const [filterStatus, setFilterStatus] = useState("activo");
+    const [originalUsers, setOriginalUsers] = useState<UsuarioDTO[]>();
+    const navigate = useNavigate();
+    const [currentId, setCurrentId] = useState(0);
+    const [showModal, setShowModal] = useState(false);
+    const [refresh, setRefresh] = useState(false);
+    const [showAlert, setShowAlert] = useState(false);
+    const [alertMessage, setAlertMessage] = useState("");
+    const [alertStatus, setAlertStatus] = useState("");
+    const [filterValue, setFilterValue] = useState("");
+    const [statusFilter, setStatusFilter] = useState("todos");
+    const [activeTab, setActiveTab] = useState<"empleados" | "clientes">(
+        "empleados"
+    );
 
-  useEffect(() => {
-    const getData = async () => {
-      try {
-        const res = await getAllUsers();
-        console.log("res", res);
-        const filtered = res.data.filter(
-          (u: { rolSistema: string }) => u.rolSistema !== "ADMIN"
-        );
-        const activeUsers = filtered.filter(
-          (u: { activo: boolean }) => u.activo === true
-        );
-        setUsers(activeUsers);
-        setOriginalUsers(filtered);
-      } catch (error) {
-        console.error("Error al obtener los usuarios", error);
-      }
+    useEffect(() => {
+        const getData = async () => {
+            try {
+                const res = await getAllUsers();
+                console.log("res", res);
+                const filtered = res.data.filter(
+                    (u: { rolSistema: string }) => u.rolSistema !== "ADMIN"
+                );
+                setOriginalUsers(filtered);
+            } catch (error) {
+                console.error("Error al obtener los usuarios", error);
+            }
+        };
+        getData();
+    }, [refresh]);
+
+    const handleEditUser = (id: number) => {
+        navigate(`/dashboard/usuarios/edit/${id}`);
     };
-    getData();
-  }, [refresh]);
 
-  const handleEditUser = (id: number) => {
-    navigate(`/dashboard/usuarios/edit/${id}`);
-  };
+    const handleDeleteUser = (id: number) => {
+        setCurrentId(id);
+        setShowModal(true);
+    };
 
-  const handleDeleteUser = (id: number) => {
-    setCurrentId(id);
-    setShowModal(true);
-  };
+    const deleteUser = async (id: number) => {
+        try {
+            const res = await deleteUserService(id);
+            console.log("res", res);
+            if (res) {
+                setRefresh(!refresh);
+                setAlertMessage("Usuario eliminado con éxito!");
+                setAlertStatus("success");
+                setShowAlert(true);
+            }
+        } catch (error) {
+            console.error("Error", error);
+            setAlertMessage("Error al eliminar el usuario");
+            setAlertStatus("error");
+        }
+    };
 
-  const deleteUser = async (id: number) => {
-    try {
-      const res = await deleteUserService(id);
-      console.log("res", res);
-      if (res) {
-        setRefresh(!refresh);
-        setAlertMessage("Usuario eliminado con éxito!");
-        setAlertStatus("success");
-        setShowAlert(true);
-      }
-    } catch (error) {
-      console.error("Error", error);
-      setAlertMessage("Error al eliminar el usuario");
-      setAlertStatus("error");
-    }
-  };
+    const filterData = (e: ChangeEvent<HTMLInputElement>) => {
+        setFilterValue(e.target.value);
+    };
 
-  const filterData = (
-    e: ChangeEvent<HTMLInputElement> | ChangeEvent<HTMLSelectElement>
-  ) => {
-    const text = e.target.value.toLowerCase();
-    if (e.target.name === "status") {
-      setFilterStatus(text);
-    } else {
-      setFilterValue(text);
-    }
+    const handleStatusFilter = (e: ChangeEvent<HTMLSelectElement>) => {
+        setStatusFilter(e.target.value);
+    };
 
-    if (text.trim() === "") {
-      setUsers(originalUsers);
-      return;
-    }
+    const employeesCount =
+        originalUsers?.filter((u) => u.rolSistema === "EMPLEADO").length ?? 0;
+    const clientsCount =
+        originalUsers?.filter((u) => u.rolSistema === "CLIENTE").length ?? 0;
 
-    if (originalUsers) {
-      let filtered;
-      if (e.target.name === "status") {
-        filtered = originalUsers.filter((u) =>
-          e.target.value === "activo" ? u.activo === true : u.activo === false
-        );
-      } else {
-        filtered = originalUsers.filter(
-          (u) =>
-            u.username.toLowerCase().includes(text) ||
-            u.email.toLowerCase().includes(text) ||
-            u.rolSistema.toLowerCase().includes(text) ||
-            u.nombre.toLowerCase().includes(text) ||
-            u.apellido.toLowerCase().includes(text) ||
-            u.telefono.toLowerCase().includes(text)
-        );
-      }
-      setUsers(filtered);
-    }
-  };
+    const filteredUsers = useMemo(() => {
+        const list = originalUsers ?? [];
+        const role = activeTab === "empleados" ? "EMPLEADO" : "CLIENTE";
+        const normalizedFilter = filterValue.trim().toLowerCase();
+        return list.filter((u) => {
+            if (u.rolSistema !== role) {
+                return false;
+            }
+            if (statusFilter !== "todos") {
+                const isActive = u.activo === true;
+                if (statusFilter === "activos" && !isActive) {
+                    return false;
+                }
+                if (statusFilter === "inactivos" && isActive) {
+                    return false;
+                }
+            }
+            if (!normalizedFilter) {
+                return true;
+            }
+            return (
+                `${u.nombre} ${u.apellido}`.toLowerCase().includes(normalizedFilter) ||
+                u.email.toLowerCase().includes(normalizedFilter)
+            );
+        });
+    }, [activeTab, filterValue, originalUsers, statusFilter]);
 
-  return (
-    <div className="users-container">
-      <h5>Usuarios</h5>
-      <hr />
-      <div className="header-dashboard">
-        <input
-          name="search"
-          type="text"
-          placeholder="Buscar usuarios..."
-          className="form-control"
-          value={filterValue}
-          onChange={(e) => filterData(e)}
-        />
-        <select
-          name="status"
-          className="form-select"
-          value={filterStatus}
-          onChange={(e) => filterData(e)}
-        >
-          <option value="">Todos</option>
-          <option value="activo">Activos</option>
-          <option value="no-activo">No activos</option>
-        </select>
-        <button
-          className="btn btn-success"
-          onClick={() => navigate("/dashboard/usuarios/add")}
-        >
-          + Nuevo
-        </button>
-      </div>
-      <div className="table-container">
-        <table className="table table-hover">
-          <thead>
-            <tr>
-              <th>#</th>
-              <th>Nombre</th>
-              <th>Apellido</th>
-              <th>Nombre de usuario</th>
-              <th>Email</th>
-              <th>Teléfono</th>
-              <th>Rol</th>
-              <th>Acciones</th>
-            </tr>
-          </thead>
-          <tbody className="table-group-divider">
-            {users?.map((u, index) => (
-              <tr className={u.activo ? "" : "deleted-row"} key={index}>
-                <td>{u.id}</td>
-                <td>{u.nombre}</td>
-                <td>{u.apellido}</td>
-                <td>{u.username}</td>
-                <td>{u.email}</td>
-                <td>{u.telefono}</td>
-                <td>{u.rolSistema}</td>
-                <td>
-                  {u.activo && (
-                    <>
-                      <button
-                        onClick={() => handleEditUser(u.id)}
-                        className="btn btn-primary"
+    return (
+        <div className="users-container">
+            <div className="users-header">
+                <div className="users-title">
+          <span className="users-title-icon" aria-hidden="true">
+            👥
+          </span>
+                    <div>
+                        <h5>Usuarios</h5>
+                        <p>Gestión de empleados y clientes</p>
+                    </div>
+                </div>
+            </div>
+            <div className="users-controls">
+                <div className="users-search">
+          <span className="users-search-icon" aria-hidden="true">
+            🔍
+          </span>
+                    <input
+                        name="search"
+                        type="text"
+                        placeholder="Buscar por nombre o email..."
+                        className="form-control"
+                        value={filterValue}
+                        onChange={(e) => filterData(e)}
+                    />
+                </div>
+                <select
+                    name="status"
+                    className="form-select users-status"
+                    value={statusFilter}
+                    onChange={handleStatusFilter}
+                >
+                    <option value="todos">Todos</option>
+                    <option value="activos">Activos</option>
+                    <option value="inactivos">Inactivos</option>
+                </select>
+                <button
+                    className="btn users-add-button"
+                    onClick={() => navigate("/dashboard/usuarios/add")}
+                >
+                    + Nuevo
+                </button>
+            </div>
+            <div className="users-tabs" role="tablist" aria-label="Tipos de usuarios">
+                <button
+                    type="button"
+                    className={`users-tab ${activeTab === "empleados" ? "active" : ""}`}
+                    onClick={() => setActiveTab("empleados")}
+                >
+                    Empleados ({employeesCount})
+                </button>
+                <button
+                    type="button"
+                    className={`users-tab ${activeTab === "clientes" ? "active" : ""}`}
+                    onClick={() => setActiveTab("clientes")}
+                >
+                    Clientes ({clientsCount})
+                </button>
+            </div>
+            <div className="users-table-card">
+                <div className="users-table-header">
+          <span className="users-table-icon" aria-hidden="true">
+            📋
+          </span>
+                    <h6>
+                        Lista de {activeTab === "empleados" ? "Empleados" : "Clientes"}
+                    </h6>
+                </div>
+                <div className="table-container">
+                    <table className="table table-hover">
+                        <thead>
+                        <tr>
+                            <th>Nombre</th>
+                            <th>Email</th>
+                            <th>Teléfono</th>
+                            <th>Estado</th>
+                            <th>Fecha Registro</th>
+                            <th>Acciones</th>
+                        </tr>
+                        </thead>
+                        <tbody className="table-group-divider">
+                        {filteredUsers.length > 0 ? (
+                            filteredUsers.map((u) => (
+                                <tr className={u.activo ? "" : "deleted-row"} key={u.id}>
+                                    <td>{`${u.nombre} ${u.apellido}`}</td>
+                                    <td>{u.email}</td>
+                                    <td>{u.telefono}</td>
+                                    <td>
+                      <span
+                          className={`status-pill ${
+                              u.activo ? "active" : "inactive"
+                          }`}
                       >
-                        Editar
-                      </button>
-                      <button
-                        onClick={() => handleDeleteUser(u.id)}
-                        className="btn btn-danger"
-                      >
-                        Eliminar
-                      </button>
-                    </>
-                  )}
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-      </div>
+                        {u.activo ? "Activo" : "Inactivo"}
+                      </span>
+                                    </td>
+                                    <td>-</td>
+                                    <td>
+                                        {u.activo && (
+                                            <div className="users-actions">
+                                                <button
+                                                    onClick={() => handleEditUser(u.id)}
+                                                    className="action-button edit"
+                                                >
+                                                    Editar
+                                                </button>
+                                                <button
+                                                    onClick={() => handleDeleteUser(u.id)}
+                                                    className="action-button delete"
+                                                >
+                                                    Eliminar
+                                                </button>
+                                            </div>
+                                        )}
+                                    </td>
+                                </tr>
+                            ))
+                        ) : (
+                            <tr>
+                                <td colSpan={6} className="users-empty">
+                                    No hay {activeTab === "empleados" ? "empleados" : "clientes"}{" "}
+                                    registrados
+                                </td>
+                            </tr>
+                        )}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
 
-      {showModal && (
-        <ModalConfirmAction
-          show={showModal}
-          setShowModal={setShowModal}
-          headerText="¿Deseas eliminar el usuario?"
-          bodyText="Se eliminará el usuario y sus datos"
-          onClick={() => deleteUser(currentId)} // acción confirmada
-        />
-      )}
-      {showAlert && (
-        <Alert
-          message={alertMessage}
-          status={alertStatus as "success" | "error"}
-          onClose={() => setShowAlert(false)}
-        />
-      )}
-    </div>
-  );
+            {showModal && (
+                <ModalConfirmAction
+                    show={showModal}
+                    setShowModal={setShowModal}
+                    headerText="¿Deseas eliminar el usuario?"
+                    bodyText="Se eliminará el usuario y sus datos"
+                    onClick={() => deleteUser(currentId)} // acción confirmada
+                />
+            )}
+            {showAlert && (
+                <Alert
+                    message={alertMessage}
+                    status={alertStatus as "success" | "error"}
+                    onClose={() => setShowAlert(false)}
+                />
+            )}
+        </div>
+    );
 };
 
 export default Users;

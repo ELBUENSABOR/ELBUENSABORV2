@@ -3,30 +3,142 @@
     flex-direction: column;
     width: 100%;
     height: fit-content;
+    gap: 16px;
 }
 
-.header-dashboard {
+.users-header {
     display: flex;
     width: 100%;
-    padding: 20px 0px 20px 0px;
+    padding: 10px 0 0;
     align-items: center;
     justify-content: space-between;
+}
+
+.users-title {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.users-title h5 {
+    margin: 0;
+    color: hsl(var(--foreground));
+}
+
+.users-title p {
+    margin: 4px 0 0;
+    color: hsl(var(--muted-foreground));
+    font-size: 0.9rem;
+}
+
+.users-title-icon {
+    font-size: 1.6rem;
+    color: hsl(var(--primary));
+}
+
+.users-controls {
+    display: flex;
+    align-items: center;
+    width: 100%;
+    gap: 12px;
     flex-wrap: wrap;
+}
+
+.users-search {
+    position: relative;
+    width: min(360px, 100%);
+}
+
+.users-search input {
+    padding-left: 36px;
+    border-radius: 12px;
+    border: 1px solid hsl(var(--border));
+    background-color: hsl(var(--card));
+    box-shadow: var(--shadow-sm);
+}
+
+.users-status {
+    width: min(200px, 100%);
+    border-radius: 12px;
+    border: 1px solid hsl(var(--border));
+    background-color: hsl(var(--card));
+    box-shadow: var(--shadow-sm);
+}
+
+.users-add-button {
+    border-radius: 12px;
+    padding: 8px 18px;
+    font-weight: 600;
+    background: hsl(var(--primary));
+    color: hsl(var(--primary-foreground));
+    border: none;
+    box-shadow: var(--shadow-sm);
+}
+
+.users-add-button:hover {
+    background: hsl(var(--primary) / 0.9);
+    color: hsl(var(--primary-foreground));
+}
+
+.users-search-icon {
+    position: absolute;
+    left: 12px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: hsl(var(--muted-foreground));
+    font-size: 0.9rem;
+}
+
+.users-tabs {
+    display: flex;
+    gap: 8px;
+    background: hsl(var(--secondary));
+    padding: 6px;
+    border-radius: 12px;
+    width: fit-content;
+}
+
+.users-tab {
+    border: none;
+    background: transparent;
+    padding: 8px 18px;
+    border-radius: 10px;
+    font-weight: 600;
+    color: hsl(var(--secondary-foreground));
+    cursor: pointer;
+    transition: background-color 0.2s ease, color 0.2s ease;
+}
+
+.users-tab.active {
+    background: hsl(var(--card));
+    color: hsl(var(--foreground));
+    box-shadow: var(--shadow-sm);
+}
+
+.users-table-card {
+    background: hsl(var(--card));
+    border: 1px solid hsl(var(--border));
+    border-radius: 14px;
+    padding: 18px;
+    box-shadow: var(--shadow-sm);
+}
+
+.users-table-header {
+    display: flex;
+    align-items: center;
     gap: 10px;
+    margin-bottom: 12px;
 }
 
-.header-dashboard > input {
-    flex: 4;
-    min-width: 280px;
+.users-table-header h6 {
+    margin: 0;
+    color: hsl(var(--foreground));
+    font-size: 1rem;
+    font-weight: 600;
 }
 
-.header-dashboard > select {
-    flex: 2;
-    min-width: 280px;
-}
-
-.header-dashboard > button {
-    flex: 2;
+.users-table-icon {
+    color: hsl(var(--primary));
 }
 
 .table-container {
@@ -34,6 +146,74 @@
     width: 100%;
     display: flex;
     flex-direction: column;
+}
+
+.table-container table {
+    margin-bottom: 0;
+}
+
+.users-actions {
+    display: flex;
+    gap: 8px;
+}
+
+.action-button {
+    border-radius: 10px;
+    border: 1px solid transparent;
+    padding: 6px 12px;
+    font-weight: 600;
+    font-size: 0.85rem;
+    background: transparent;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.action-button.edit {
+    color: hsl(var(--primary));
+    border-color: hsl(var(--primary));
+    background: hsl(var(--primary) / 0.1);
+}
+
+.action-button.edit:hover {
+    background: hsl(var(--primary));
+    color: hsl(var(--primary-foreground));
+}
+
+.action-button.delete {
+    color: hsl(var(--destructive));
+    border-color: hsl(var(--destructive));
+    background: hsl(var(--destructive) / 0.08);
+}
+
+.action-button.delete:hover {
+    background: hsl(var(--destructive));
+    color: hsl(var(--destructive-foreground));
+}
+
+.status-pill {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 4px 10px;
+    border-radius: 999px;
+    font-size: 0.8rem;
+    font-weight: 600;
+}
+
+.status-pill.active {
+    background: hsl(var(--accent) / 0.15);
+    color: hsl(var(--accent));
+}
+
+.status-pill.inactive {
+    background: hsl(var(--destructive) / 0.12);
+    color: hsl(var(--destructive));
+}
+
+.users-empty {
+    text-align: center;
+    color: hsl(var(--muted-foreground));
+    padding: 20px 0;
 }
 
 .deleted-row {
