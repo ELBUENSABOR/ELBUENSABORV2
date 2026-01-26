@@ -33,8 +33,7 @@
 .cart-sidebar__overlay {
   position: fixed;
   inset: 0;
-  background: rgba(15, 23, 42, 0.3);
-  opacity: 0;
+  background: hsl(var(--foreground) / 0.3);  opacity: 0;
   pointer-events: none;
   transition: opacity 0.3s ease;
   z-index: 1050;

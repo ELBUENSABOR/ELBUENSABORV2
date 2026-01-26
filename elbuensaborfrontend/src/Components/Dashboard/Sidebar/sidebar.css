@@ -5,12 +5,12 @@
     left: 0;
     width: 240px;
     min-height: 100vh;
-    background: #fffaf4;
+    background: hsl(var(--sidebar-background));
     padding: 1.5rem 1rem;
     z-index: 1600;
     transition: transform 0.3s ease-in-out;
-    border-right: 1px solid #efe5da;
-    color: #3b2f23;
+    border-right: 1px solid hsl(var(--sidebar-border));
+    color: hsl(var(--sidebar-foreground));
 }
 
 .sidebar-brand {
@@ -24,8 +24,8 @@
     width: 42px;
     height: 42px;
     border-radius: 12px;
-    background: #f36b07;
-    color: #fff;
+    background: hsl(var(--sidebar-primary));
+    color: hsl(var(--sidebar-primary-foreground));
     display: flex;
     align-items: center;
     justify-content: center;
@@ -41,13 +41,13 @@
 .brand-subtitle {
     display: block;
     font-size: 0.75rem;
-    color: #8a7a69;
+    color: hsl(var(--muted-foreground));
 }
 
 .sidebar-section {
     font-size: 0.75rem;
     text-transform: uppercase;
-    color: #b7a899;
+    color: hsl(var(--muted-foreground));
     margin-bottom: 0.75rem;
     letter-spacing: 0.05em;
 }
@@ -57,20 +57,20 @@
 }
 
 .sidebar-dashboard .nav-link {
-    color: #5a4a3d;
+    color: hsl(var(--sidebar-foreground));
     border-radius: 12px;
     padding: 0.5rem 0.75rem;
     font-size: 0.9rem;
 }
 
 .sidebar-dashboard .nav-link:hover {
-    background: #f4e7d7;
-    color: #e16a00;
+    background: hsl(var(--sidebar-accent));
+    color: hsl(var(--sidebar-primary));
 }
 
 .sidebar-dashboard .nav-link.active {
-    background: #f4e7d7;
-    color: #e16a00;
+    background: hsl(var(--sidebar-accent));
+    color: hsl(var(--sidebar-primary));
     font-weight: 600;
 }
 
@@ -99,10 +99,10 @@
         top: 50%;
         left: 0;
         z-index: 1500;
-        background: #f36b07;
+        background: hsl(var(--sidebar-primary));
         border: none;
         border-radius: 0px 5px 5px 0px;
-        color: #fff;
+        color: hsl(var(--sidebar-primary-foreground));
         font-size: 15px;
         display: flex;
         justify-content: center;
@@ -114,7 +114,7 @@
     .close-btn {
         background: none;
         border: none;
-        color: #3b2f23;
+        color: hsl(var(--sidebar-foreground));
         font-size: 26px;
         margin-bottom: 1rem;
     }
@@ -125,7 +125,7 @@
         left: 0;
         width: 100vw;
         height: 100vh;
-        background: rgba(0, 0, 0, 0.4);
+        background: hsl(var(--foreground) / 0.4);
         z-index: 900;
     }
 }
