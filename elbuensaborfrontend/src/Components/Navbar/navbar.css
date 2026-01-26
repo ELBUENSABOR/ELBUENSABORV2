@@ -73,6 +73,10 @@
     margin-left: auto;
 }
 
+.navbar-admin-link {
+    white-space: nowrap;
+}
+
 .navbar-auth-buttons {
     display: flex;
     gap: 12px;
