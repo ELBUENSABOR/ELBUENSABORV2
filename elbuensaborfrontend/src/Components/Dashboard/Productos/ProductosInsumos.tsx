@@ -1,250 +1,277 @@
-import { useEffect, useState, type ChangeEvent } from 'react'
-import { useUser } from '../../../contexts/UsuarioContext';
-import { useSucursal } from '../../../contexts/SucursalContext';
-import { useNavigate } from 'react-router-dom';
-import type {InsumoResponse } from '../../../models/Insumo';
-import { getAll, deleteInsumo } from '../../../services/insumosService';
+import {useEffect, useState, type ChangeEvent} from 'react'
+import {useUser} from '../../../contexts/UsuarioContext';
+import {useSucursal} from '../../../contexts/SucursalContext';
+import {useNavigate} from 'react-router-dom';
+import type {InsumoResponse} from '../../../models/Insumo';
+import {getAll, deleteInsumo} from '../../../services/insumosService';
 import UnidadMedidaModal from './UnidadesMedidaModal/UnidadMedidaModal';
-import { getRubrosInsumos } from '../../../services/rubrosService';
-import type { Rubro } from '../../../models/Rubro';
+import {getRubrosInsumos} from '../../../services/rubrosService';
+import type {Rubro} from '../../../models/Rubro';
 import ModalConfirmAction from '../../ModalConfirmAction/ModalConfirmAction';
 
 const ProductosInsumos = () => {
-  const { sucursales, sucursalId, setSucursalId, loading } = useSucursal();
-  const { user } = useUser();
-  const [insumos, setInsumos] = useState<InsumoResponse[]>();
-  const [rubros, setRubros] = useState<Rubro[]>();
-  const [originalInsumos, setOriginalInsumos] =
-    useState<InsumoResponse[]>();
+    const {sucursales, sucursalId, setSucursalId, loading} = useSucursal();
+    const {user} = useUser();
+    const [insumos, setInsumos] = useState<InsumoResponse[]>();
+    const [rubros, setRubros] = useState<Rubro[]>();
+    const [originalInsumos, setOriginalInsumos] =
+        useState<InsumoResponse[]>();
 
-  const [filterStatusValue, setFilterStatusValue] = useState("activo");
-  const [filterValue, setFilterValue] = useState("");
-  const [filterRubroValue, setFilterRubroValue] = useState<number | null>(null);
+    const [filterStatusValue, setFilterStatusValue] = useState("activo");
+    const [filterValue, setFilterValue] = useState("");
+    const [filterRubroValue, setFilterRubroValue] = useState<number | null>(null);
 
-  const [showModal, setShowModal] = useState(false);
-  const [showModalUnidadMedida, setShowModalUnidadMedida] = useState(false);
+    const [showModal, setShowModal] = useState(false);
+    const [showModalUnidadMedida, setShowModalUnidadMedida] = useState(false);
 
-  const [currentId, setCurrentId] = useState(0);
+    const [currentId, setCurrentId] = useState(0);
 
 
-  const navigate = useNavigate();
+    const navigate = useNavigate();
 
-  const handleSucursalChange = (event: ChangeEvent<HTMLSelectElement>) => {
-    const value = event.target.value;
-    setSucursalId(value ? Number(value) : null);
-  };
-
-  useEffect(() => {
-    const getData = async () => {
-      try {
-        const response = await getAll();
-        const categorias = await getRubrosInsumos();
-        setRubros(categorias);
-        console.log(response);
-        if (response) {
-          setOriginalInsumos(response);
-        }
-      } catch (error) {
-        console.error("Error al obtener insumos: ", error);
-      }
+    const handleSucursalChange = (event: ChangeEvent<HTMLSelectElement>) => {
+        const value = event.target.value;
+        setSucursalId(value ? Number(value) : null);
     };
 
-    getData();
-  }, []);
+    useEffect(() => {
+        const getData = async () => {
+            try {
+                const response = await getAll();
+                const categorias = await getRubrosInsumos();
+                setRubros(categorias);
+                console.log(response);
+                if (response) {
+                    setOriginalInsumos(response);
+                }
+            } catch (error) {
+                console.error("Error al obtener insumos: ", error);
+            }
+        };
 
-  useEffect(() => {
-    if (!originalInsumos) return;
+        getData();
+    }, []);
 
-    let filtered = [...originalInsumos];
+    useEffect(() => {
+        if (!originalInsumos) return;
 
-    if (filterValue.trim() !== "") {
-      const search = filterValue.toLowerCase();
-      filtered = filtered.filter(
-        (u) =>
-          u.denominacion.toLowerCase().includes(search) ||
-          u.categoria.denominacion.toLowerCase().includes(search)
-      );
-    }
+        let filtered = [...originalInsumos];
 
-    if (filterRubroValue !== null) {
-      filtered = filtered.filter((u) => u.categoria.id === Number(filterRubroValue));
-    }
-    if (filterStatusValue !== "") {
-      filtered = filtered.filter(
-        (u) => filterStatusValue === "activo" ? u.activo : !u.activo
-      );
-    }
+        if (filterValue.trim() !== "") {
+            const search = filterValue.toLowerCase();
+            filtered = filtered.filter(
+                (u) =>
+                    u.denominacion.toLowerCase().includes(search) ||
+                    u.categoria.denominacion.toLowerCase().includes(search)
+            );
+        }
 
-    setInsumos(filtered);
-  }, [filterValue, filterRubroValue, filterStatusValue, originalInsumos]);
+        if (filterRubroValue !== null) {
+            filtered = filtered.filter((u) => u.categoria.id === Number(filterRubroValue));
+        }
+        if (filterStatusValue !== "") {
+            filtered = filtered.filter(
+                (u) => filterStatusValue === "activo" ? u.activo : !u.activo
+            );
+        }
 
-  const filterData = (e: ChangeEvent<HTMLInputElement>) => {
-    setFilterValue(e.target.value);
-  };
+        setInsumos(filtered);
+    }, [filterValue, filterRubroValue, filterStatusValue, originalInsumos]);
 
-  const filterRubro = (e: ChangeEvent<HTMLSelectElement>) => {
-    const value = e.target.value;
-    setFilterRubroValue(value ? Number(value) : null);
-  };
+    const filterData = (e: ChangeEvent<HTMLInputElement>) => {
+        setFilterValue(e.target.value);
+    };
 
-  const filterStatus = (e: ChangeEvent<HTMLSelectElement>) => {
-    setFilterStatusValue(e.target.value);
-  };
+    const filterRubro = (e: ChangeEvent<HTMLSelectElement>) => {
+        const value = e.target.value;
+        setFilterRubroValue(value ? Number(value) : null);
+    };
 
-  const handleDeleteInsumo = (id: number) => {
-    setCurrentId(id);
-    setShowModal(true);
-  };
+    const filterStatus = (e: ChangeEvent<HTMLSelectElement>) => {
+        setFilterStatusValue(e.target.value);
+    };
 
-  const deleteInsumoConfirm = async () => {
-    await deleteInsumo(currentId);
-    setShowModal(false);
-  };
+    const handleDeleteInsumo = (id: number) => {
+        setCurrentId(id);
+        setShowModal(true);
+    };
 
-  return (
-    <div>
-      <div>
-        <h5>Insumos</h5>
-        <hr />
+    const deleteInsumoConfirm = async () => {
+        await deleteInsumo(currentId);
+        setShowModal(false);
+    };
+
+    const getImagenUrl = (imagenes: InsumoResponse["imagenes"]) => {
+        const primera = imagenes?.[0];
+        if (!primera) return "";
+        return typeof primera === "string" ? primera : primera.url;
+    };
+
+    return (
         <div>
-          {user?.role === "ADMIN" && (
-            <div className="d-flex flex-wrap align-items-center justify-content-between gap-3 mb-4">
-              <div>
-                <p className="text-muted mb-0">
-                  Gestioná productos y stock según la sucursal seleccionada.
-                </p>
-              </div>
-              <div className="d-flex align-items-center gap-2">
-                <label className="mb-0 text-muted" htmlFor="sucursal-select">
-                  Sucursal:
-                </label>
-                <select
-                  id="sucursal-select"
-                  className="form-select form-select-sm w-auto"
-                  value={sucursalId ?? ""}
-                  onChange={handleSucursalChange}
-                  disabled={loading || sucursales.length === 0}
-                >
-                  <option value="">Seleccione</option>
-                  {sucursales.map((sucursal) => (
-                    <option key={sucursal.id} value={sucursal.id}>
-                      {sucursal.nombre}
-                    </option>
-                  ))}
-                </select>
-                {loading && (
-                  <span className="text-muted small">cargando...</span>
-                )}
-              </div>
+            <div>
+                <h5>Insumos</h5>
+                <hr/>
+                <div>
+                    {user?.role === "ADMIN" && (
+                        <div className="d-flex flex-wrap align-items-center justify-content-between gap-3 mb-4">
+                            <div>
+                                <p className="text-muted mb-0">
+                                    Gestioná productos y stock según la sucursal seleccionada.
+                                </p>
+                            </div>
+                            <div className="d-flex align-items-center gap-2">
+                                <label className="mb-0 text-muted" htmlFor="sucursal-select">
+                                    Sucursal:
+                                </label>
+                                <select
+                                    id="sucursal-select"
+                                    className="form-select form-select-sm w-auto"
+                                    value={sucursalId ?? ""}
+                                    onChange={handleSucursalChange}
+                                    disabled={loading || sucursales.length === 0}
+                                >
+                                    <option value="">Seleccione</option>
+                                    {sucursales.map((sucursal) => (
+                                        <option key={sucursal.id} value={sucursal.id}>
+                                            {sucursal.nombre}
+                                        </option>
+                                    ))}
+                                </select>
+                                {loading && (
+                                    <span className="text-muted small">cargando...</span>
+                                )}
+                            </div>
+                        </div>
+                    )}
+                </div>
+                <div className="header-dashboard">
+                    <input
+                        name="search"
+                        type="text"
+                        placeholder="Buscar insumos..."
+                        className="form-control"
+                        value={filterValue}
+                        onChange={filterData}
+                    />
+
+                    <select
+                        name="status"
+                        className="form-select"
+                        value={filterStatusValue}
+                        onChange={(e) => filterStatus(e)}
+                    >
+                        <option value="">Todos</option>
+                        <option value="activo">Activos</option>
+                        <option value="no-activo">No activos</option>
+                    </select>
+
+                    <select
+                        name="categoria"
+                        className="form-select"
+                        value={filterRubroValue ?? ""}
+                        onChange={(e) => filterRubro(e)}
+                    >
+                        <option value="">Todas las categorías</option>
+                        {rubros?.map((rubro) => (
+                            <option key={rubro.id} value={rubro.id}>
+                                {rubro.denominacion}
+                            </option>
+                        ))}
+                    </select>
+
+                    <button
+                        className="btn btn-primary"
+                        onClick={() => setShowModalUnidadMedida(true)}
+                    >
+                        Unidades
+                    </button>
+
+                    <button
+                        className="btn btn-success"
+                        onClick={() => navigate("/dashboard/insumos/add")}
+                    >
+                        + Nuevo Insumo
+                    </button>
+                </div>
+                <div className="dashboard-table-card">
+                    <div className="dashboard-table-header">Lista de Insumos</div>
+                    <div className="table-responsive">
+                        <table className="table table-hover dashboard-table">
+                            <thead>
+                            <tr>
+                                <th>#</th>
+                                <th>Imagen</th>
+                                <th>Denominación</th>
+                                <th>Precio de costo</th>
+                                <th>Precio de venta</th>
+                                <th>Categoría</th>
+                                <th>Stock actual</th>
+                                <th>Acciones</th>
+                            </tr>
+                            </thead>
+                            <tbody className="table-group-divider">
+                            {insumos?.map((m, index) => (
+                                <tr key={index} className={m.activo ? "" : "deleted-row"}>
+                                    <td>{m.id}</td>
+                                    <td>
+                                        {getImagenUrl(m.imagenes) ? (
+                                            <img
+                                                src={getImagenUrl(m.imagenes)}
+                                                alt={m.denominacion}
+                                                style={{
+                                                    width: "36px",
+                                                    height: "36px",
+                                                    objectFit: "cover",
+                                                    borderRadius: "6px",
+                                                }}
+                                            />
+                                        ) : (
+                                            <span className="text-muted small">Sin imagen</span>
+                                        )}
+                                    </td>
+                                    <td>{m.denominacion}</td>
+                                    <td>${m.precioCompra}</td>
+                                    <td>${m.precioVenta}</td>
+                                    <td>{m.categoria.denominacion}</td>
+                                    <td>
+                                        {m.stockSucursal.find((s) => s.sucursalId === sucursalId)
+                                            ?.stockActual ?? 0} {m.unidadMedida.denominacion}
+                                    </td>
+                                    <td>
+                                        {
+                                            m.activo && (
+                                                <>
+                                                    <button className="btn btn-primary"
+                                                            onClick={() => navigate(`/dashboard/insumos/edit/${m.id}`)}>Editar
+                                                    </button>
+                                                    <button className="btn btn-danger"
+                                                            onClick={() => handleDeleteInsumo(m.id ?? 0)}>Eliminar
+                                                    </button>
+                                                </>
+                                            )
+                                        }
+                                    </td>
+
+                                </tr>
+                            ))}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
             </div>
-          )}
+            <UnidadMedidaModal showModal={showModalUnidadMedida} setShowModal={setShowModalUnidadMedida}/>
+            {showModal && (
+                <ModalConfirmAction
+                    show={showModal}
+                    setShowModal={setShowModal}
+                    headerText="¿Deseas eliminar el insumo?"
+                    bodyText="Se dara de baja el insumo y sus datos"
+                    onClick={() => deleteInsumoConfirm()}
+                />
+            )}
         </div>
-        <div className="header-dashboard">
-          <input
-            name="search"
-            type="text"
-            placeholder="Buscar insumos..."
-            className="form-control"
-            value={filterValue}
-            onChange={filterData}
-          />
-
-          <select
-            name="status"
-            className="form-select"
-            value={filterStatusValue}
-            onChange={(e) => filterStatus(e)}
-          >
-            <option value="">Todos</option>
-            <option value="activo">Activos</option>
-            <option value="no-activo">No activos</option>
-          </select>
-
-          <select
-            name="categoria"
-            className="form-select"
-            value={filterRubroValue ?? ""}
-            onChange={(e) => filterRubro(e)}
-          >
-              <option value="">Todas las categorías</option>
-              {rubros?.map((rubro) => (
-                  <option key={rubro.id} value={rubro.id}>
-                      {rubro.denominacion}
-                  </option>
-              ))}
-          </select>
-
-            <button
-                className="btn btn-primary"
-                onClick={() => setShowModalUnidadMedida(true)}
-            >
-                Unidades
-            </button>
-
-            <button
-                className="btn btn-success"
-                onClick={() => navigate("/dashboard/insumos/add")}
-            >
-                + Nuevo Insumo
-            </button>
-        </div>
-          <div className="dashboard-table-card">
-              <div className="dashboard-table-header">Lista de Insumos</div>
-              <div className="table-responsive">
-                  <table className="table table-hover dashboard-table">
-                      <thead>
-                      <tr>
-                          <th>#</th>
-                          <th>Denominación</th>
-                          <th>Precio de costo</th>
-                          <th>Precio de venta</th>
-                          <th>Categoría</th>
-                          <th>Stock actual</th>
-                          <th>Acciones</th>
-                      </tr>
-                      </thead>
-                      <tbody className="table-group-divider">
-                      {insumos?.map((m, index) => (
-                          <tr key={index} className={m.activo ? "" : "deleted-row"}>
-                              <td>{m.id}</td>
-                              <td>{m.denominacion}</td>
-                              <td>${m.precioCompra}</td>
-                              <td>${m.precioVenta}</td>
-                              <td>{m.categoria.denominacion}</td>
-                              <td>
-                                  {m.stockSucursal.find((s) => s.sucursalId === sucursalId)
-                                      ?.stockActual ?? 0} {m.unidadMedida.denominacion}
-                              </td>
-                              <td>
-                                  {
-                                      m.activo && (
-                                          <>
-                                              <button className="btn btn-primary" onClick={() => navigate(`/dashboard/insumos/edit/${m.id}`)}>Editar</button>
-                                              <button className="btn btn-danger" onClick={() => handleDeleteInsumo(m.id ?? 0)}>Eliminar</button>
-                                          </>
-                                      )
-                                  }
-                              </td>
-
-                          </tr>
-                      ))}
-                      </tbody>
-                  </table>
-              </div>
-          </div>
-      </div>
-        <UnidadMedidaModal showModal={showModalUnidadMedida} setShowModal={setShowModalUnidadMedida} />
-        {showModal && (
-            <ModalConfirmAction
-                show={showModal}
-                setShowModal={setShowModal}
-                headerText="¿Deseas eliminar el insumo?"
-                bodyText="Se dara de baja el insumo y sus datos"
-                onClick={() => deleteInsumoConfirm()}
-            />
-        )}
-    </div>
-  );
+    );
 }
 
 export default ProductosInsumos

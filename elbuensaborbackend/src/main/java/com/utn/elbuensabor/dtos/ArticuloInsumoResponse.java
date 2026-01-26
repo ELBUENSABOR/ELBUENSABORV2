@@ -16,7 +16,8 @@ public record ArticuloInsumoResponse(
         Boolean esParaElaborar,
         Boolean activo,
         UnidadMedidaDTO unidadMedida,
-        List<SucursalInsumoRequest> stockSucursal
+        List<SucursalInsumoRequest> stockSucursal,
+        List<String> imagenes
 ) {
 }
 

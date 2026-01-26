@@ -75,7 +75,6 @@ public class CompraInsumoServiceImpl implements CompraInsumoService {
         return new ArticuloInsumoResponse(
                 i.getId(),
                 i.getDenominacion(),
-                "", // descripcion not present in entity
                 i.getPrecioVenta(),
                 i.getPrecioCompra(),
                 0, // tiempoEstimado not present in entity
