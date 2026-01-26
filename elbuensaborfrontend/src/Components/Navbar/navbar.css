@@ -1,30 +1,30 @@
 .navbar-container {
-  display: flex;
-  flex-direction: column;
-  width: 100%;
-  justify-content: space-between;
-  background-color: hsl(var(--card));
-  box-shadow: var(--shadow-sm);
-  border-bottom: 1px solid hsl(var(--border));
-  z-index: 10;
-  --navbar-height: 64px;
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    justify-content: space-between;
+    background-color: hsl(var(--card));
+    box-shadow: var(--shadow-sm);
+    border-bottom: 1px solid hsl(var(--border));
+    z-index: 10;
+    --navbar-height: 64px;
 }
 
 .navbar-main {
-  display: flex;
-  align-items: center;
-  width: 100%;
-  padding: 12px 24px;
-  min-height: var(--navbar-height);
+    display: flex;
+    align-items: center;
+    width: 100%;
+    padding: 12px 24px;
+    min-height: var(--navbar-height);
 }
 
 .navbar-container .navbar-brand {
-  font-weight: 700;
-  color: hsl(var(--foreground));
+    font-weight: 700;
+    color: hsl(var(--foreground));
 }
 
 .navbar-controls {
-   display: none;
+    display: none;
 }
 
 .navbar-icon-button {
@@ -95,7 +95,7 @@
 }
 
 .navbar-auth-btn {
-    background: #fff;
+    background: hsl(var(--card));
     color: hsl(var(--foreground));
 }
 
@@ -120,8 +120,8 @@
 
 .navbar-auth-buttons .btn-light:hover,
 .navbar-auth-buttons .btn-light:focus {
-    background: hsl(24 95% 58%);
-    border-color: hsl(24 95% 58%);
+    background: hsl(var(--primary));
+    border-color: hsl(var(--primary));
     color: hsl(var(--primary-foreground));
 }
 
@@ -210,9 +210,8 @@
 
     .navbar-auth-btn:hover,
     .navbar-auth-btn:focus {
-        background: hsl(24 95% 58%);
-        border-color: hsl(24 95% 58%);
+        background: hsl(var(--primary));
+        border-color: hsl(var(--primary));
         color: hsl(var(--primary-foreground));
     }
 }
-
