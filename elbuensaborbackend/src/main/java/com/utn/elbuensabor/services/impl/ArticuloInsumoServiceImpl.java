@@ -5,6 +5,7 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 import com.utn.elbuensabor.dtos.*;
+import com.utn.elbuensabor.entities.ImagenInsumo;
 import com.utn.elbuensabor.entities.SucursalInsumo;
 import com.utn.elbuensabor.entities.UnidadMedida;
 import com.utn.elbuensabor.services.ArticuloInsumoService;
@@ -115,14 +116,28 @@ public class ArticuloInsumoServiceImpl implements ArticuloInsumoService {
                 }
             }
         }
+
+        insumo.getImagenes().clear();
+        if (request.imagenes() != null && !request.imagenes().isEmpty()) {
+            List<ImagenInsumo> imagenes = request.imagenes().stream()
+                    .map(url -> {
+                        ImagenInsumo imagen = new ImagenInsumo();
+                        imagen.setDenominacion(url);
+                        imagen.setArticuloInsumo(insumo);
+                        return imagen;
+                    })
+                    .toList();
+            insumo.getImagenes().addAll(imagenes);
+        }
     }
+
 
     public ArticuloInsumoResponse toResponse(ArticuloInsumo insumo) {
         CategoriaResponse categoriaDto = getCategoriaResponse(insumo);
         UnidadMedida unidadMedida = insumo.getUnidadMedida();
 
         UnidadMedidaDTO unidadMedidaDTO = null;
-        if(unidadMedida != null){
+        if (unidadMedida != null) {
             unidadMedidaDTO = new UnidadMedidaDTO(
                     unidadMedida.getId(),
                     unidadMedida.getDenominacion()
@@ -138,6 +153,11 @@ public class ArticuloInsumoServiceImpl implements ArticuloInsumoService {
                         s.getStockMaximo()))
                 .toList();
 
+        List<String> imagenes = insumo.getImagenes()
+                .stream()
+                .map(ImagenInsumo::getDenominacion)
+                .toList();
+
         return new ArticuloInsumoResponse(
                 insumo.getId(),
                 insumo.getDenominacion(),
@@ -149,7 +169,8 @@ public class ArticuloInsumoServiceImpl implements ArticuloInsumoService {
                 insumo.getEsParaElaborar(),
                 insumo.getActivo(),
                 unidadMedidaDTO,
-                stocks);
+                stocks,
+                imagenes);
     }
 
     private static CategoriaResponse getCategoriaResponse(ArticuloInsumo insumo) {

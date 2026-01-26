@@ -13,7 +13,7 @@ export interface InsumoRequest {
     unidadMedidaId: number;
     tiempoEstimado: number;
     activo: boolean;
-    imagenes: Imagen[];
+    imagenes: Array<Imagen | string>;
     stockSucursal: SucursalInsumo[];
 }
 
@@ -27,7 +27,7 @@ export interface InsumoResponse {
     unidadMedida: UnidadMedida;
     tiempoEstimado: number;
     activo: boolean;
-    imagenes: Imagen[];
+    imagenes: Array<Imagen | string>;
     stockSucursal: SucursalInsumoDto[];
 }
 

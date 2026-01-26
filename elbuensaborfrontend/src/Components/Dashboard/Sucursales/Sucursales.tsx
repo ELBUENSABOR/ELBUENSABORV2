@@ -59,62 +59,68 @@ const Sucursales = () => {
       <h5>Sucursales</h5>
       <hr />
       <div className="header-dashboard">
-        <input
-          name="search"
-          type="text"
-          placeholder="Buscar sucursales..."
-          className="form-control"
-          value={filterValue}
-          onChange={(e) => filterData(e)}
-        />
-        <select
-          name="status"
-          className="form-select"
-          value={filterStatus}
-          onChange={(e) => filterData(e)}
-        >
-          <option value="">Todos</option>
-          <option value="activo">Activos</option>
-          <option value="no-activo">No activos</option>
-        </select>
-        <button
-          className="btn btn-success"
-          onClick={() => navigate("/dashboard/sucursales/add")}
-        >
-          + Nueva
-        </button>
+          <input
+              name="search"
+              type="text"
+              placeholder="Buscar sucursales..."
+              className="form-control"
+              value={filterValue}
+              onChange={(e) => filterData(e)}
+          />
+          <select
+              name="status"
+              className="form-select"
+              value={filterStatus}
+              onChange={(e) => filterData(e)}
+          >
+              <option value="">Todos</option>
+              <option value="activo">Activos</option>
+              <option value="no-activo">No activos</option>
+          </select>
+          <button
+              className="btn btn-success"
+              onClick={() => navigate("/dashboard/sucursales/add")}
+          >
+              + Nueva
+          </button>
       </div>
-      <table className="table table-hover">
-        <thead>
-          <tr>
-            <th>#</th>
-            <th>Nombre</th>
-            <th>Horario apertura</th>
-            <th>Horario cierre</th>
-          </tr>
-        </thead>
-        <tbody className="table-group-divider">
-          {sucursales?.map((s, index) => (
-            <tr key={index}>
-              <td>{s.id}</td>
-              <td>{s.nombre}</td>
-              <td>{s.horarioApertura}</td>
-              <td>{s.horarioCierre}</td>
-              <td>
-                <button
-                  onClick={() => {
-                    const id = s.id;
-                    if (id != null) handleEditSucursal(id);
-                  }}
-                  className="btn btn-primary"
-                >
-                  Editar
-                </button>
-              </td>
-            </tr>
-          ))}
-        </tbody>
-      </table>
+        <div className="dashboard-table-card">
+            <div className="dashboard-table-header">Lista de Sucursales</div>
+            <div className="table-responsive">
+                <table className="table table-hover dashboard-table">
+                    <thead>
+                    <tr>
+                        <th>#</th>
+                        <th>Nombre</th>
+                        <th>Horario apertura</th>
+                        <th>Horario cierre</th>
+                        <th>Acciones</th>
+                    </tr>
+                    </thead>
+                    <tbody className="table-group-divider">
+                    {sucursales?.map((s, index) => (
+                        <tr key={index}>
+                            <td>{s.id}</td>
+                            <td>{s.nombre}</td>
+                            <td>{s.horarioApertura}</td>
+                            <td>{s.horarioCierre}</td>
+                            <td>
+                                <button
+                                    onClick={() => {
+                                        const id = s.id;
+                                        if (id != null) handleEditSucursal(id);
+                                    }}
+                                    className="btn btn-primary"
+                                >
+                                    Editar
+                                </button>
+                            </td>
+                        </tr>
+                    ))}
+                    </tbody>
+                </table>
+            </div>
+        </div>
     </div>
   );
 };
