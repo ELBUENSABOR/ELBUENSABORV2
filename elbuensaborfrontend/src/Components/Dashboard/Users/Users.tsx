@@ -17,7 +17,7 @@ const Users = () => {
     const [alertMessage, setAlertMessage] = useState("");
     const [alertStatus, setAlertStatus] = useState("");
     const [filterValue, setFilterValue] = useState("");
-    const [statusFilter, setStatusFilter] = useState("todos");
+    const [statusFilter, setStatusFilter] = useState("activos");
     const [activeTab, setActiveTab] = useState<"empleados" | "clientes">(
         "empleados"
     );
