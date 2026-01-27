@@ -3,4 +3,5 @@ export interface Rubro {
   denominacion: string;
   categoriaPadreId: number | null;
   activo: boolean;
+  children?: Rubro[];
 }

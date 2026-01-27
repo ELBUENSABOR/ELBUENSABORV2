@@ -7,9 +7,10 @@ import Login from "./Components/Auth/Login";
 import PrivateRoute from "./Components/PrivateRoute";
 import Account from "./Components/Account/Account";
 import DashboardRoutes from "./Components/Dashboard/DashboardRoutes";
-import CatalogPage from "./Components/Home/CatalogPage";
-import ProductDetail from "./Components/Home/ProductDetail/ProductDetail";
-import CartSidebar from "./Components/Home/Cart/CartSidebar";
+import Catalog from "./Components/Home/Catalog/Catalog";
+import ProductDetails from "./Components/Home/Catalog/ProductDetails/ProductDetails";
+import ConfirmOrder from "./Components/Home/Cart/ConfirmOrder/ConfirmOrder";
+import OrderDetails from "./Components/Home/OrderDetails/OrderDetails";
 
 function MainLayout() {
     const [isCartOpen, setIsCartOpen] = useState(false);
@@ -41,28 +42,29 @@ function EmptyLayout() {
 }
 
 function App() {
-    return (
-        <BrowserRouter>
-            <Routes>
-                <Route element={<MainLayout/>}>
-                    <Route path="/" element={<Home/>}/>
-                    <Route path="/catalog" element={<CatalogPage/>}/>
-                    <Route path="/producto/:id" element={<ProductDetail/>}/>
-                    <Route element={<PrivateRoute roles={["CLIENTE", "EMPLEADO", "ADMIN"]}/>}>
-                        <Route path="/account" element={<Account/>}/>
-                    </Route>
-                    <Route element={<PrivateRoute roles={["EMPLEADO", "ADMIN"]}/>}>
-                        <Route path="/dashboard/*" element={<DashboardRoutes/>}/>
-                    </Route>
-                </Route>
-
-                <Route element={<EmptyLayout/>}>
-                    <Route path="/register" element={<Register/>}/>
-                    <Route path="/login" element={<Login/>}/>
-                </Route>
-            </Routes>
-        </BrowserRouter>
-    );
+  return (
+    <BrowserRouter>
+      <Routes>
+        <Route element={<MainLayout />}>
+          <Route path="/" element={<Home />} />
+          <Route path="/catalog" element={<Catalog />} />
+          <Route path="/catalog/product/:id" element={<ProductDetails />} />
+          <Route path="/confirm-order" element={<ConfirmOrder />} />
+          <Route element={<PrivateRoute roles={["CLIENTE", "EMPLEADO", "ADMIN"]} />}>
+            <Route path="/account" element={<Account />} />
+          </Route>
+          <Route element={<PrivateRoute roles={["EMPLEADO", "ADMIN"]} />}>
+            <Route path="/dashboard/*" element={<DashboardRoutes />} />
+          </Route>
+          <Route path="/pedido/:id" element={<OrderDetails />} />
+        </Route>
+        <Route element={<EmptyLayout />}>
+          <Route path="/register" element={<Register />} />
+          <Route path="/login" element={<Login />} />
+        </Route>
+      </Routes>
+    </BrowserRouter>
+  );
 }
 
 export default App;

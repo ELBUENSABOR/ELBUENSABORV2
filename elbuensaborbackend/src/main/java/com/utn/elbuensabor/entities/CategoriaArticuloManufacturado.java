@@ -21,9 +21,8 @@ public class CategoriaArticuloManufacturado extends BaseEntity {
     @JoinColumn(name = "categoria_padre_id")
     private CategoriaArticuloManufacturado categoriaPadre;
 
-    @OneToOne
-    @JoinColumn(name = "articulo_manufacturado_id")
-    private ArticuloManufacturado articuloManufacturado;
+    @OneToMany(mappedBy = "categoria")
+    private List<ArticuloManufacturado> manufacturados = new ArrayList<>();
 
     @OneToMany(mappedBy = "categoriaPadre", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<CategoriaArticuloManufacturado> subCategorias = new ArrayList<>();

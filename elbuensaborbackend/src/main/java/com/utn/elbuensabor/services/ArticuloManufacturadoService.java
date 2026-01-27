@@ -12,10 +12,6 @@ import com.utn.elbuensabor.entities.ArticuloManufacturadoDetalle;
 
 public interface ArticuloManufacturadoService {
 
-    List<ArticuloManufacturadoResponse> getAll();
-
-    ArticuloManufacturadoResponse getById(Long id);
-
     ArticuloManufacturadoResponse create(ArticuloManufacturadoRequest request);
 
     ArticuloManufacturadoResponse update(Long id, ArticuloManufacturadoRequest request);
@@ -26,6 +22,9 @@ public interface ArticuloManufacturadoService {
 
     ArticuloManufacturadoDetalle toDetalle(RecetaItemRequest item);
 
-    ArticuloManufacturadoResponse toResponse(ArticuloManufacturado manufacturado);
+    List<ArticuloManufacturadoResponse> getAllBySucursal(Long sucursalId);
+    ArticuloManufacturadoResponse getByIdBySucursal(Long id, Long sucursalId);
+
+    ArticuloManufacturadoResponse toResponse(ArticuloManufacturado manufacturado, Long sucursalId);
 }
 

@@ -42,27 +42,18 @@ export const SucursalProvider = ({ children }: { children: ReactNode }) => {
   const [loading, setLoading] = useState(false);
 
   useEffect(() => {
-    if (!user?.token) {
-      setSucursales([]);
-      setSucursalIdState(null);
-      setLoading(false);
-      return;
-    }
-
     let isMounted = true;
     setLoading(true);
+
     const storedId = readStoredSucursal();
+
     fetchSucursales()
       .then((lista) => {
         if (!isMounted) return;
         setSucursales(lista);
         setSucursalIdState((prev) => {
-          if (prev && lista.some((s) => s.id === prev)) {
-            return prev;
-          }
-          if (storedId && lista.some((s) => s.id === storedId)) {
-            return storedId;
-          }
+          if (prev && lista.some((s) => s.id === prev)) return prev;
+          if (storedId && lista.some((s) => s.id === storedId)) return storedId;
           return lista[0]?.id ?? null;
         });
       })
@@ -78,7 +69,8 @@ export const SucursalProvider = ({ children }: { children: ReactNode }) => {
     return () => {
       isMounted = false;
     };
-  }, [user?.token]);
+  }, []); // ✅ ya no depende de user.token
+
 
   useEffect(() => {
     if (typeof window === "undefined") return;

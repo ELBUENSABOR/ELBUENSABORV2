@@ -155,7 +155,7 @@ public class ArticuloInsumoServiceImpl implements ArticuloInsumoService {
 
         List<String> imagenes = insumo.getImagenes()
                 .stream()
-                .map(ImagenInsumo::getDenominacion)
+                .map(img -> img.getDenominacion())
                 .toList();
 
         return new ArticuloInsumoResponse(
@@ -170,7 +170,8 @@ public class ArticuloInsumoServiceImpl implements ArticuloInsumoService {
                 insumo.getActivo(),
                 unidadMedidaDTO,
                 stocks,
-                imagenes);
+                imagenes
+                );
     }
 
     private static CategoriaResponse getCategoriaResponse(ArticuloInsumo insumo) {
