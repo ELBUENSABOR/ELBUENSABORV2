@@ -61,7 +61,7 @@ const Home = () => {
 
             <section className="home-offers">
                 <div className="home-section-title">
-                    <BadgePercent size={28}/>
+                    <BadgePercent size={38}/>
                     <h2>Ofertas del Día</h2>
                 </div>
 
@@ -94,7 +94,7 @@ const Home = () => {
 
             <section className="home-location">
                 <div className="home-section-title">
-                    <MapPinned size={28}/>
+                    <MapPinned size={32}/>
                     <h2>Aquí estamos</h2>
                 </div>
 

@@ -123,9 +123,9 @@ export default function MyNavbar({onCartOpen, isCartOpen}: MyNavbarProps) {
                 </Navbar.Collapse>
             </Container>
 
-            <div className="navbar-search-wrapper">
+            <div className="navbar-search-wrapper navbar-search--mobile" >
                 <Container>
-                    <Form className="navbar-search navbar-search--mobile">
+                    <Form className="navbar-search">
                         <Form.Control
                             type="search"
                             placeholder="Buscar comida o bebida"

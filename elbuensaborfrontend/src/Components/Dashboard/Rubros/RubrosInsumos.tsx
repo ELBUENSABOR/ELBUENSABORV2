@@ -26,7 +26,7 @@ const RubrosInsumos = () => {
     );
 
     const [filterValue, setFilterValue] = useState("");
-
+    const [statusFilter, setStatusFilter] = useState<"todos" | "activo" | "inactivo">("activo");
     const buildTree = (rubros: Rubro[]): RubroWithChildren[] => {
         const map = new Map<number, RubroWithChildren>();
         const roots: RubroWithChildren[] = [];
@@ -107,18 +107,26 @@ const RubrosInsumos = () => {
         ]);
     };
 
-    const filterTree = (nodes: Rubro[], text: string): RubroWithChildren[] => {
-        const search = text.toLowerCase();
+    const filterTree = (
+        nodes: Rubro[],
+        text: string,
+        status: "todos" | "activo" | "inactivo"
+    ): RubroWithChildren[] => {
+        const search = text.trim().toLowerCase();
+
 
         const recursiveFilter = (node: Rubro): RubroWithChildren | null => {
-            const matches = node.denominacion.toLowerCase().includes(search);
+
+            const matchesSearch = !search || node.denominacion.toLowerCase().includes(search);
+            const matchesStatus =
+                status === "todos" ? true : status === "activo" ? node.activo : !node.activo;
 
             const children = originalRubros
                 .filter((r) => r.categoriaPadreId === node.id)
                 .map(recursiveFilter)
                 .filter((child): child is RubroWithChildren => child !== null);
 
-            if (matches || children.length > 0) {
+            if ((matchesSearch && matchesStatus) || children.length > 0) {
                 return {...node, children};
             }
 
@@ -132,17 +140,19 @@ const RubrosInsumos = () => {
         return roots.map(recursiveFilter).filter((child): child is RubroWithChildren => child !== null);
     };
 
-    const filterData = (e: ChangeEvent<HTMLInputElement>) => {
-        const text = e.target.value.toLowerCase();
-        setFilterValue(text);
-
-        if (!text.trim()) {
+    useEffect(() => {
+        if (!filterValue.trim() && statusFilter === "todos") {
             setRubrosTree(buildTree(originalRubros));
             return;
         }
 
-        const filteredTree = filterTree(originalRubros, text);
+        const filteredTree = filterTree(originalRubros, filterValue, statusFilter);
         setRubrosTree(filteredTree);
+    }, [filterValue, statusFilter, originalRubros]);
+
+    const filterData = (e: ChangeEvent<HTMLInputElement>) => {
+        setFilterValue(e.target.value);
+
     };
 
     const deleteRubro = async (id: number) => {
@@ -176,6 +186,18 @@ const RubrosInsumos = () => {
                     value={filterValue}
                     onChange={filterData}
                 />
+
+                <select
+                    className="form-select"
+                    value={statusFilter}
+                    onChange={(e) =>
+                        setStatusFilter(e.target.value as "todos" | "activo" | "inactivo")
+                    }
+                >
+                    <option value="todos">Todos</option>
+                    <option value="activo">Activo</option>
+                    <option value="inactivo">Inactivo</option>
+                </select>
 
                 <button
                     className="btn btn-success"
