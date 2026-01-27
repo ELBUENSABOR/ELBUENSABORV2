@@ -1,21 +1,31 @@
 import React, { useEffect, useState, type ChangeEvent } from "react";
 import { useSucursal } from "../../../contexts/SucursalContext";
 import { useUser } from "../../../contexts/UsuarioContext";
-import { getAll } from "../../../services/manufacturadosService";
+import { getAll, deleteManufacturado } from "../../../services/manufacturadosService";
 import type { Manufacturado } from "../../../models/Manufacturado";
 import { useNavigate } from "react-router-dom";
+import { getRubrosManufacturados } from "../../../services/rubrosService";
+import type { Rubro } from "../../../models/Rubro";
+import ModalConfirmAction from "../../ModalConfirmAction/ModalConfirmAction";
 
 const ProductosManufacturados = () => {
   const { sucursales, sucursalId, setSucursalId, loading } = useSucursal();
   const { user } = useUser();
+  const [rubros, setRubros] = useState<Rubro[]>();
   const [manufacturados, setManufacturados] = useState<Manufacturado[]>();
   const [originalManufacturados, setOriginalManufacturados] =
     useState<Manufacturado[]>();
-  const [filterStatus, setFilterStatus] = useState("activo");
-
+ 
   const [filterValue, setFilterValue] = useState("");
+  const [filterStatusValue, setFilterStatusValue] = useState("activo");
+  const [filterRubroValue, setFilterRubroValue] = useState<number | null>(null);
+
+  const [showModal, setShowModal] = useState(false);
 
   const navigate = useNavigate();
+
+  const [currentId, setCurrentId] = useState(0);
+
 
   const handleSucursalChange = (event: ChangeEvent<HTMLSelectElement>) => {
     const value = event.target.value;
@@ -25,7 +35,9 @@ const ProductosManufacturados = () => {
   useEffect(() => {
     const getData = async () => {
       try {
-        const response = await getAll();
+        const response = await getAll(sucursalId ?? 0);
+        const rubros = await getRubrosManufacturados();
+        setRubros(rubros.data);
         console.log(response);
         if (response) {
           setManufacturados(response);
@@ -37,32 +49,55 @@ const ProductosManufacturados = () => {
     };
 
     getData();
-  }, []);
+  }, [sucursalId]);
 
-  const filterData = (
-    e: ChangeEvent<HTMLInputElement> | ChangeEvent<HTMLSelectElement>
-  ) => {
-    const text = e.target.value.toLowerCase();
-    if (e.target.name === "status") {
-      setFilterStatus(text);
-    } else {
-      setFilterValue(text);
-    }
+  useEffect(() => {
+    if (!originalManufacturados) return;
 
-    if (text.trim() === "") {
-      setManufacturados(originalManufacturados);
-      return;
-    }
+    let filtered = [...originalManufacturados];
 
-    if (originalManufacturados) {
-      const filtered = originalManufacturados.filter(
+    if (filterValue.trim() !== "") {
+      const search = filterValue.toLowerCase();
+      filtered = filtered.filter(
         (u) =>
-          u.denominacion.toLowerCase().includes(text) ||
-          u.categoria.denominacion.toLowerCase().includes(text)
+          u.denominacion.toLowerCase().includes(search) ||
+          u.categoria?.toLowerCase().includes(search)
       );
-
-      setManufacturados(filtered);
     }
+
+    if (filterRubroValue !== null) {
+      filtered = filtered.filter((u) => u.categoriaId === Number(filterRubroValue));
+    }
+    if (filterStatusValue !== "") {
+      filtered = filtered.filter(
+        (u) => filterStatusValue === "activo" ? u.activo : !u.activo
+      );
+    }
+
+    setManufacturados(filtered);
+  }, [filterValue, filterRubroValue, filterStatusValue, originalManufacturados]);
+
+  const filterData = (e: ChangeEvent<HTMLInputElement>) => {
+    setFilterValue(e.target.value);
+  };
+
+  const filterRubro = (e: ChangeEvent<HTMLSelectElement>) => {
+    const value = e.target.value;
+    setFilterRubroValue(value ? Number(value) : null);
+  };
+
+  const filterStatus = (e: ChangeEvent<HTMLSelectElement>) => {
+    setFilterStatusValue(e.target.value);
+  };
+
+  const handleDeleteManufacturado = (id: number) => {
+    setCurrentId(id);
+    setShowModal(true);
+  };
+
+  const deleteManufacturadoConfirm = async () => {
+    await deleteManufacturado(currentId);
+    setShowModal(false);
   };
 
   return (
@@ -116,19 +151,35 @@ const ProductosManufacturados = () => {
           <select
             name="status"
             className="form-select"
-            value={filterStatus}
-            onChange={(e) => filterData(e)}
+            value={filterStatusValue}
+            onChange={filterStatus}
           >
             <option value="">Todos</option>
             <option value="activo">Activos</option>
             <option value="no-activo">No activos</option>
           </select>
 
+          <select
+            name="rubro"
+            className="form-select"
+            value={filterRubroValue ?? ""}
+            onChange={filterRubro}
+          >
+            <option value="">Todas las categorias</option>
+            {
+              rubros?.map((rubro) => (
+                <option key={rubro.id} value={rubro.id}>
+                  {rubro.denominacion}
+                </option>
+              ))
+            }
+          </select>
+
           <button
             className="btn btn-success"
             onClick={() => navigate("/dashboard/manufacturados/add")}
           >
-            + Nuevo Rubro
+            + Nuevo Manufacturado
           </button>
         </div>
         <table className="table table-hover">
@@ -142,21 +193,36 @@ const ProductosManufacturados = () => {
           </thead>
           <tbody className="table-group-divider">
             {manufacturados?.map((m, index) => (
-              <tr key={index}>
+              <tr key={index} className={m.activo ? "" : "deleted-row"}>
                 <td>{m.id}</td>
                 <td>{m.denominacion}</td>
-                <td>{m.precioCosto}</td>
-                <td>{m.precioVenta}</td>
-                <td>{m.categoria.denominacion}</td>
+                <td>${m.precioCosto}</td>
+                <td>${m.precioVenta}</td>
+                <td>{m.categoria}</td>
                 <td>
-                  <button className="btn btn-primary">Editar</button>
-                  <button className="btn btn-danger">Eliminar</button>
+                  {
+                    m.activo && (
+                      <>
+                        <button className="btn btn-primary" onClick={() => navigate(`/dashboard/manufacturados/edit/${m.id}`)}>Editar</button>
+                        <button className="btn btn-danger" onClick={() => handleDeleteManufacturado(m.id)}>Eliminar</button>
+                      </>
+                    )
+                  }
                 </td>
               </tr>
             ))}
           </tbody>
         </table>
       </div>
+      {showModal && (
+        <ModalConfirmAction
+          show={showModal}
+          setShowModal={setShowModal}
+          headerText="¿Deseas eliminar el manufacturado?"
+          bodyText="Se dara de baja el manufacturado y sus datos"
+          onClick={() => deleteManufacturadoConfirm()}
+        />
+      )}
     </div>
   );
 };

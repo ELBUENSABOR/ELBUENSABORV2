@@ -7,6 +7,9 @@ import PrivateRoute from "./Components/PrivateRoute";
 import Account from "./Components/Account/Account";
 import DashboardRoutes from "./Components/Dashboard/DashboardRoutes";
 import Catalog from "./Components/Home/Catalog/Catalog";
+import ProductDetails from "./Components/Home/Catalog/ProductDetails/ProductDetails";
+import ConfirmOrder from "./Components/Home/Cart/ConfirmOrder/ConfirmOrder";
+import OrderDetails from "./Components/Home/OrderDetails/OrderDetails";
 
 function MainLayout() {
   return (
@@ -28,21 +31,21 @@ function App() {
         <Route element={<MainLayout />}>
           <Route path="/" element={<Home />} />
           <Route path="/catalog" element={<Catalog />} />
+          <Route path="/catalog/product/:id" element={<ProductDetails />} />
+          <Route path="/confirm-order" element={<ConfirmOrder />} />
           <Route element={<PrivateRoute roles={["CLIENTE", "EMPLEADO", "ADMIN"]} />}>
             <Route path="/account" element={<Account />} />
           </Route>
           <Route element={<PrivateRoute roles={["EMPLEADO", "ADMIN"]} />}>
             <Route path="/dashboard/*" element={<DashboardRoutes />} />
           </Route>
+          <Route path="/pedido/:id" element={<OrderDetails />} />
         </Route>
-
         <Route element={<EmptyLayout />}>
           <Route path="/register" element={<Register />} />
           <Route path="/login" element={<Login />} />
         </Route>
       </Routes>
-
-
     </BrowserRouter>
   );
 }

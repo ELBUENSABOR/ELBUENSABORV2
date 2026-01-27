@@ -37,3 +37,13 @@ export interface SucursalInsumoDto {
     stockMinimo: number;
     stockMaximo: number;
 }
+
+export interface Ingredientes {
+    insumoId: number;
+    denominacion: string;
+    cantidad: number;
+    unidadMedida: string;
+    precioCompra: number;
+    stockActual: number;
+    activo: boolean;
+}

@@ -4,8 +4,10 @@ import type { LoginRequest } from "../../dtos/LoginRequest";
 import { useState } from "react";
 import { loginUser } from "../../services/authService";
 import { useUser } from "../../contexts/UsuarioContext";
+import { useLocation } from "react-router-dom";
 
 const Login = () => {
+    const { state } = useLocation();
     const [form, setForm] = useState<LoginRequest>({
         username: "",
         password: "",
@@ -49,10 +51,8 @@ const Login = () => {
                 msg: "¡Login exitoso!",
             });
 
-            // 👇 Desestructuramos lo que devuelve el back (incluyendo mustChangePassword)
             const { token, username, role, subRole, userId, mustChangePassword } = resp.data;
 
-            // 👇 Guardamos el usuario completo en contexto (con el flag)
             setUser({
                 token,
                 username,
@@ -63,7 +63,11 @@ const Login = () => {
             });
 
             setTimeout(() => {
-                navigate("/");
+                if (state?.from === "cart") {
+                    navigate("/confirm-order");
+                } else {
+                    navigate("/");
+                }
             }, 500);
 
         } catch (err: any) {

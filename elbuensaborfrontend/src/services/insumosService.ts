@@ -168,3 +168,21 @@ export const getAllComprasInsumos = async () => {
         throw error;
     }
 };
+
+export const uploadImagenesInsumo = async (id: string, files: File[]) => {
+    try {
+        const formData = new FormData();
+        files.forEach((file) => formData.append("files", file));
+        const res = await axios.post(`${API_URL}/insumos/${id}/imagenes`, formData, {
+            headers: {
+                Authorization: `Bearer ${sessionStorage.getItem("token")}`,
+                "Content-Type": "multipart/form-data",
+            },
+            withCredentials: true,
+        });
+        return res.data;
+    } catch (error) {
+        console.error("Error al subir imágenes", error);
+        throw error;
+    }
+};

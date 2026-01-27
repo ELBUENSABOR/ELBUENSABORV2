@@ -5,10 +5,12 @@ const API_BASE = import.meta.env.VITE_API_URL ?? "";
 
 export async function fetchSucursales(): Promise<Sucursal[]> {
   try {
+    const token = sessionStorage.getItem("token");
+    const headers = token ? {
+      Authorization: `Bearer ${token}`,
+    } : {};
     const res = await axios.get(`${API_BASE}/sucursales`, {
-      headers: {
-        Authorization: `Bearer ${sessionStorage.getItem("token")}`,
-      },
+      headers,
       withCredentials: true,
     });
     return res.data;
@@ -31,10 +33,12 @@ export const createSucursal = async (data: Sucursal) => {
 };
 
 export const getSucursalById = async (id: number) => {
+  const token = sessionStorage.getItem("token");
+  const headers = token ? {
+    Authorization: `Bearer ${token}`,
+  } : {};
   return axios.get(`${API_BASE}/sucursales/${id}`, {
-    headers: {
-      Authorization: `Bearer ${sessionStorage.getItem("token")}`,
-    },
+    headers,
     withCredentials: true,
   });
 };

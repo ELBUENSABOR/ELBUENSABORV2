@@ -138,6 +138,11 @@ public class ArticuloInsumoServiceImpl implements ArticuloInsumoService {
                         s.getStockMaximo()))
                 .toList();
 
+        List<String> imagenes = insumo.getImagenes()
+                .stream()
+                .map(img -> img.getDenominacion())
+                .toList();
+
         return new ArticuloInsumoResponse(
                 insumo.getId(),
                 insumo.getDenominacion(),
@@ -149,7 +154,9 @@ public class ArticuloInsumoServiceImpl implements ArticuloInsumoService {
                 insumo.getEsParaElaborar(),
                 insumo.getActivo(),
                 unidadMedidaDTO,
-                stocks);
+                stocks,
+                imagenes
+                );
     }
 
     private static CategoriaResponse getCategoriaResponse(ArticuloInsumo insumo) {

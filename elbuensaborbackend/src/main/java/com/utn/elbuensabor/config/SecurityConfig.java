@@ -77,6 +77,11 @@ public class SecurityConfig {
                 .requestMatchers("/api/auth/register").permitAll()
                 .requestMatchers("/api/auth/login").permitAll()
                 .requestMatchers("/api/localidad/**").permitAll()
+                .requestMatchers(HttpMethod.GET, "/api/sucursales/**").permitAll()
+                .requestMatchers("/uploads/**").permitAll()
+                .requestMatchers("/api/manufacturados/**").permitAll()
+                .requestMatchers("/api/pagos/mercadopago/webhook").permitAll()
+                .requestMatchers("/api/pagos/**").authenticated()
                 .anyRequest().authenticated()
         );
 

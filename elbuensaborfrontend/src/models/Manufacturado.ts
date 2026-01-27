@@ -1,17 +1,18 @@
-import type { Imagen } from "./Imagen";
-import type { ManufacturadoDetalles } from "./ManufacturadoDetalles";
-import type { Rubro } from "./Rubro";
-import type { Sucursal } from "./Sucursal";
 
 export interface Manufacturado {
   id: number;
   denominacion: string;
+  descripcion: string;
+  receta: string;
   precioCosto: number;
   precioVenta: number;
-  categoria: Rubro;
+  categoriaId: number;
+  categoria?: string;
   tiempoEstimado: number;
   activo: boolean;
-  sucursal: Sucursal;
-  detalles: ManufacturadoDetalles[];
-  imagenes: Imagen[];
+  ingredientes: {
+    unidadMedida: string; insumoId: number; denominacion: string; cantidad: number; precioCompra: number, sucursalId?: number;
+  }[];
+  imagenes: string[];
+  disponible?: boolean;
 }

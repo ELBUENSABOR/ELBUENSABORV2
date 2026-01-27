@@ -15,17 +15,17 @@
   gap: 10px;
 }
 
-.header-dashboard > input {
+.header-dashboard>input {
   flex: 4;
   min-width: 280px;
 }
 
-.header-dashboard > select {
+.header-dashboard>select {
   flex: 2;
   min-width: 280px;
 }
 
-.header-dashboard > button {
+.header-dashboard>button {
   flex: 2;
 }
 
@@ -37,5 +37,6 @@
 }
 
 .deleted-row {
-  --bs-table-bg: rgba(255, 44, 44, 0.43);
+  --bs-table-bg: rgba(220, 53, 69, 0.15);
+  color: #6c757d;
 }
