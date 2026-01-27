@@ -1,9 +1,6 @@
 package com.utn.elbuensabor.entities;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.ManyToOne;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -13,6 +10,8 @@ import lombok.Setter;
 @Setter
 public class ImagenInsumo extends BaseEntity {
 
+    @Lob
+    @Column(columnDefinition = "TEXT")
     private String denominacion;
 
     @ManyToOne
