@@ -76,7 +76,14 @@ const ProductDetail = () => {
               type="button"
               className="btn btn-primary"
               disabled={!isAvailable}
-              onClick={() => addItem(product)}
+              onClick={() =>
+                addItem({
+                  manufacturadoId: product.id,
+                  denominacion: product.denominacion,
+                  precio: product.precioVenta,
+                  cantidad: 1,
+                })
+              }
             >
               Agregar al carrito
             </button>
