@@ -4,6 +4,7 @@ import {useCatalogData} from "../../../contexts/CatalogDataContext";
 import {useCatalogFilters} from "../../../contexts/CatalogFiltersContext";
 import {useCart} from "../../../contexts/CartContext";
 import type {Manufacturado} from "../../../models/Manufacturado";
+import {getImageUrl} from "../../../utils/image";
 
 
 const formatCurrency = (value: number) =>
@@ -37,7 +38,8 @@ const Catalog = () => {
     const {addItem} = useCart();
 
     const normalizedSearch = searchTerm.trim().toLowerCase();
-    const filteredProducts = products.filter((product) => {
+    const activeProducts = products.filter((product) => product.activo);
+    const filteredProducts = activeProducts.filter((product) => {
         const matchesSearch = normalizedSearch
             ? product.denominacion.toLowerCase().includes(normalizedSearch)
             : true;
@@ -116,7 +118,7 @@ const Catalog = () => {
                                             <div className="product-card__image">
                                                 {product.imagenes?.[0] ? (
                                                     <img
-                                                        src={product.imagenes[0]}
+                                                        src={getImageUrl(product.imagenes[0])}
                                                         alt={product.denominacion}
                                                     />
                                                 ) : (

@@ -2,6 +2,7 @@ import "./productDetail.css";
 import {Link, useParams} from "react-router-dom";
 import {useCatalogData} from "../../../../contexts/CatalogDataContext.tsx";
 import {useCart} from "../../../../contexts/CartContext.tsx";
+import {getImageUrl} from "../../../../utils/image";
 
 const formatCurrency = (value: number) =>
     new Intl.NumberFormat("es-AR", {
@@ -53,7 +54,7 @@ const ProductDetail = () => {
             <div className="product-detail__content">
                 <div className="product-detail__image">
                     {product.imagenes?.[0] ? (
-                        <img src={product.imagenes[0]} alt={product.denominacion}/>
+                        <img src={getImageUrl(product.imagenes[0])} alt={product.denominacion}/>
                     ) : (
                         <div className="product-detail__placeholder">Sin imagen</div>
                     )}

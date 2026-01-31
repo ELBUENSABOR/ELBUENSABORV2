@@ -21,11 +21,13 @@ const CatalogDataContext = createContext<CatalogDataContextValue | undefined>(
 
 const buildCategories = (products: Manufacturado[]): CatalogCategory[] => {
     const seen = new Map<number, string>();
-    products.forEach((product) => {
-        if (product.categoriaId && product.categoria) {
-            seen.set(product.categoriaId, product.categoria);
-        }
-    });
+    products
+        .filter((product) => product.activo)
+        .forEach((product) => {
+            if (product.categoriaId && product.categoria) {
+                seen.set(product.categoriaId, product.categoria);
+            }
+        });
 
     return Array.from(seen.entries())
         .sort(([, nameA], [, nameB]) => nameA.localeCompare(nameB))
