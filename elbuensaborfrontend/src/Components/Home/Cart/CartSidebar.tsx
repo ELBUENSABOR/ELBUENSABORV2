@@ -79,20 +79,20 @@ const CartSidebar = ({
         ) : (
           <div className="cart-sidebar__list">
             {items.map((item) => (
-              <div className="cart-sidebar__item" key={item.product.id}>
+              <div className="cart-sidebar__item" key={item.manufacturadoId}>
                 <div>
                   <p className="cart-sidebar__name">
-                    {item.product.denominacion}
+                    {item.denominacion}
                   </p>
                   <span className="cart-sidebar__meta">
-                    {item.quantity} × {formatCurrency(item.product.precioVenta)}
+                    {item.cantidad} × {formatCurrency(item.precio)}
                   </span>
                 </div>
                 <button
                   type="button"
                   className="btn btn-sm btn-outline-danger"
-                  onClick={() => removeItem(item.product.id)}
-                  aria-label={`Quitar ${item.product.denominacion}`}
+                  onClick={() => removeItem(item.manufacturadoId)}
+                  aria-label={`Quitar ${item.denominacion}`}
                 >
                   -
                 </button>
