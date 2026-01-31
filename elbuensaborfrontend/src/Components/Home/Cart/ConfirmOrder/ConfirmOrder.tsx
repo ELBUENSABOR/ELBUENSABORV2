@@ -90,7 +90,7 @@ const ConfirmOrder = () => {
                             className={`btn ${tipoEnvio === "TAKE_AWAY"
                                 ? "btn-primary"
                                 : "btn-outline-primary"
-                                }`}
+                            }`}
                             onClick={() => setTipoEnvio("TAKE_AWAY")}
                         >
                             Retiro en local (10% OFF)
@@ -100,7 +100,7 @@ const ConfirmOrder = () => {
                             className={`btn ${tipoEnvio === "DELIVERY"
                                 ? "btn-primary"
                                 : "btn-outline-primary"
-                                }`}
+                            }`}
                             onClick={() => setTipoEnvio("DELIVERY")}
                         >
                             Envío a domicilio
@@ -145,7 +145,7 @@ const ConfirmOrder = () => {
                                 className={`btn ${formaPago === "EFECTIVO"
                                     ? "btn-primary"
                                     : "btn-outline-primary"
-                                    }`}
+                                }`}
                                 onClick={() => setFormaPago("EFECTIVO")}
                             >
                                 Efectivo
@@ -156,7 +156,7 @@ const ConfirmOrder = () => {
                             className={`btn ${formaPago === "MP"
                                 ? "btn-primary"
                                 : "btn-outline-primary"
-                                }`}
+                            }`}
                             onClick={() => setFormaPago("MP")}
                         >
                             Mercado Pago

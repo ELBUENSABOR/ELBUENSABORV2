@@ -4,6 +4,7 @@ import {useCatalogData} from "../../../contexts/CatalogDataContext";
 import {useCatalogFilters} from "../../../contexts/CatalogFiltersContext";
 import {useCart} from "../../../contexts/CartContext";
 import type {Manufacturado} from "../../../models/Manufacturado";
+import {getImageUrl} from "../../../utils/image";
 
 
 const formatCurrency = (value: number) =>
@@ -16,10 +17,10 @@ const formatCurrency = (value: number) =>
 const buildGroups = (products: Manufacturado[]) => {
     const grouped = new Map<string, { label: string; items: Manufacturado[] }>();
     products.forEach((product) => {
-        const key = product.categoria
-            ? `categoria-${product.categoria.id}`
+        const key = product.categoriaId
+            ? `categoria-${product.categoriaId}`
             : "sin-categoria";
-        const label = product.categoria?.denominacion ?? "Sin categoría";
+        const label = product.categoria ?? "Sin categoría";
         const existing = grouped.get(key);
         if (existing) {
             existing.items.push(product);
@@ -37,12 +38,13 @@ const Catalog = () => {
     const {addItem} = useCart();
 
     const normalizedSearch = searchTerm.trim().toLowerCase();
-    const filteredProducts = products.filter((product) => {
+    const activeProducts = products.filter((product) => product.activo);
+    const filteredProducts = activeProducts.filter((product) => {
         const matchesSearch = normalizedSearch
             ? product.denominacion.toLowerCase().includes(normalizedSearch)
             : true;
         const matchesCategory = selectedCategoryId
-            ? product.categoria?.id === selectedCategoryId
+            ? product.categoriaId === selectedCategoryId
             : true;
         return matchesSearch && matchesCategory;
     });
@@ -105,7 +107,7 @@ const Catalog = () => {
                             </div>
                             <div className="catalog-grid">
                                 {group.items.map((product) => {
-                                    const isAvailable = product.activo;
+                                    const isAvailable = product.activo && (product.disponible ?? true);
                                     return (
                                         <article
                                             key={product.id}
@@ -114,9 +116,9 @@ const Catalog = () => {
                                             }`}
                                         >
                                             <div className="product-card__image">
-                                                {product.imagenes?.[0]?.url ? (
+                                                {product.imagenes?.[0] ? (
                                                     <img
-                                                        src={product.imagenes[0].url}
+                                                        src={getImageUrl(product.imagenes[0])}
                                                         alt={product.denominacion}
                                                     />
                                                 ) : (
@@ -154,7 +156,14 @@ const Catalog = () => {
                                                     type="button"
                                                     className="btn btn-sm btn-primary"
                                                     disabled={!isAvailable}
-                                                    onClick={() => addItem(product)}
+                                                    onClick={() =>
+                                                        addItem({
+                                                            manufacturadoId: product.id,
+                                                            denominacion: product.denominacion,
+                                                            precio: product.precioVenta,
+                                                            cantidad: 1,
+                                                        })
+                                                    }
                                                 >
                                                     Agregar al carrito
                                                 </button>

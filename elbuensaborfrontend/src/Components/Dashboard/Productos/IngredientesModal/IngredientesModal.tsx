@@ -6,13 +6,13 @@ import { useEffect, useState } from "react";
 const BACKEND_URL = "http://localhost:8080";
 
 const IngredientesModal = ({
-    show,
-    onClose,
-    ingredientes,
-    onSave,
-    ingredientesSelected,
-    setIngredientesSelected,
-}: {
+                               show,
+                               onClose,
+                               ingredientes,
+                               onSave,
+                               ingredientesSelected,
+                               setIngredientesSelected,
+                           }: {
     show: boolean;
     onClose: () => void;
     ingredientes: Ingredientes[];

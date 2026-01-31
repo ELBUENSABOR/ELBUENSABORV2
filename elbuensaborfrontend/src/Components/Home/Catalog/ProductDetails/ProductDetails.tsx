@@ -4,7 +4,7 @@ import { getManufacturadoById } from "../../../../services/manufacturadosService
 import type { Manufacturado } from "../../../../models/Manufacturado";
 import { useSucursal } from "../../../../contexts/SucursalContext";
 import CartSidebar from "../../Cart/CartSidebar";
-import "./productDetail.css";
+import "./productDetails.css";
 import { useCart } from "../../../../contexts/CartContext";
 
 const BACKEND_URL = "http://localhost:8080";
