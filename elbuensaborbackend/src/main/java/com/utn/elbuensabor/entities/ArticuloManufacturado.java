@@ -3,12 +3,7 @@ package com.utn.elbuensabor.entities;
 import java.util.ArrayList;
 import java.util.List;
 
-import jakarta.persistence.CascadeType;
-import jakarta.persistence.Entity;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.OneToMany;
-import jakarta.persistence.OneToOne;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -20,13 +15,14 @@ public class ArticuloManufacturado extends BaseEntity {
 
     private String denominacion;
     private String descripcion;
+    private String receta;
     private Double precioVenta;
     private Double precioCosto;
     private Integer tiempoEstimado;
     private Boolean activo = true;
 
-    @OneToOne
-    @JoinColumn(name = "categoria_articulo_manufacturado_id")
+    @ManyToOne
+    @JoinColumn(name = "categoria_articulo_manufacturado_id", nullable = false)
     private CategoriaArticuloManufacturado categoria;
 
     @OneToMany(mappedBy = "articuloManufacturado", cascade = CascadeType.ALL, orphanRemoval = true)

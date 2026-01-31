@@ -86,10 +86,10 @@ public class CompraInsumoServiceImpl implements CompraInsumoService {
                 mapToCategoriaResponse(i.getCategoriaArticuloInsumo()),
                 i.getEsParaElaborar(),
                 i.getActivo(),
-                unidadMedidaDTO,
-                new ArrayList<>(), // stockSucursal - passing empty to avoid recursion or extra query, seeing as
+                new UnidadMedidaDTO(i.getUnidadMedida().getId(), i.getUnidadMedida().getDenominacion()),
+                new ArrayList<>(),
+                new ArrayList<>() // stockSucursal - passing empty to avoid recursion or extra query, seeing as
                 // this is just for display in list
-                new ArrayList<>()
         );
     }
 

@@ -1,7 +1,7 @@
 import "./productDetail.css";
 import { Link, useParams } from "react-router-dom";
-import { useCatalogData } from "../../../contexts/CatalogDataContext";
-import { useCart } from "../../../contexts/CartContext";
+import { useCatalogData } from "../../../../contexts/CatalogDataContext.tsx";
+import { useCart } from "../../../../contexts/CartContext.tsx";
 
 const formatCurrency = (value: number) =>
   new Intl.NumberFormat("es-AR", {
