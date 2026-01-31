@@ -21,6 +21,7 @@ const initialState: Manufacturado = {
     precioCosto: 0,
     precioVenta: 0,
     categoriaId: 0,
+    categoria: "",
     tiempoEstimado: 0,
     activo: false,
     ingredientes: [],

@@ -16,10 +16,10 @@ const formatCurrency = (value: number) =>
 const buildGroups = (products: Manufacturado[]) => {
     const grouped = new Map<string, { label: string; items: Manufacturado[] }>();
     products.forEach((product) => {
-        const key = product.categoria
-            ? `categoria-${product.categoria.id}`
+        const key = product.categoriaId
+            ? `categoria-${product.categoriaId}`
             : "sin-categoria";
-        const label = product.categoria?.denominacion ?? "Sin categoría";
+        const label = product.categoria ?? "Sin categoría";
         const existing = grouped.get(key);
         if (existing) {
             existing.items.push(product);
@@ -42,7 +42,7 @@ const Catalog = () => {
             ? product.denominacion.toLowerCase().includes(normalizedSearch)
             : true;
         const matchesCategory = selectedCategoryId
-            ? product.categoria?.id === selectedCategoryId
+            ? product.categoriaId === selectedCategoryId
             : true;
         return matchesSearch && matchesCategory;
     });
@@ -105,7 +105,7 @@ const Catalog = () => {
                             </div>
                             <div className="catalog-grid">
                                 {group.items.map((product) => {
-                                    const isAvailable = product.activo;
+                                    const isAvailable = product.activo && (product.disponible ?? true);
                                     return (
                                         <article
                                             key={product.id}
@@ -114,9 +114,9 @@ const Catalog = () => {
                                             }`}
                                         >
                                             <div className="product-card__image">
-                                                {product.imagenes?.[0]?.url ? (
+                                                {product.imagenes?.[0] ? (
                                                     <img
-                                                        src={product.imagenes[0].url}
+                                                        src={product.imagenes[0]}
                                                         alt={product.denominacion}
                                                     />
                                                 ) : (

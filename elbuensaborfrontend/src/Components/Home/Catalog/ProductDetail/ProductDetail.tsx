@@ -43,7 +43,7 @@ const ProductDetail = () => {
         );
     }
 
-    const isAvailable = product.activo;
+    const isAvailable = product.activo && (product.disponible ?? true);
 
     return (
         <div className="product-detail">
@@ -52,8 +52,8 @@ const ProductDetail = () => {
             </Link>
             <div className="product-detail__content">
                 <div className="product-detail__image">
-                    {product.imagenes?.[0]?.url ? (
-                        <img src={product.imagenes[0].url} alt={product.denominacion}/>
+                    {product.imagenes?.[0] ? (
+                        <img src={product.imagenes[0]} alt={product.denominacion}/>
                     ) : (
                         <div className="product-detail__placeholder">Sin imagen</div>
                     )}
@@ -61,7 +61,7 @@ const ProductDetail = () => {
                 <div className="product-detail__info">
                     <h3>{product.denominacion}</h3>
                     <p className="product-detail__category">
-                        {product.categoria?.denominacion ?? "Sin categoría"}
+                        {product.categoria ?? "Sin categoría"}
                     </p>
                     <p className="product-detail__price">
                         {formatCurrency(product.precioVenta)}

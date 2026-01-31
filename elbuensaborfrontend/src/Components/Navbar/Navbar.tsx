@@ -65,29 +65,6 @@ export default function MyNavbar({onCartOpen, isCartOpen}: MyNavbarProps) {
                         <Nav.Link as={Link} to="/catalog">
                             Catalogo
                         </Nav.Link>
-                        {categories.length > 0 && (
-                            <NavDropdown title="Categorías" id="categories-nav-dropdown">
-                                <NavDropdown.Item
-                                    as={Link}
-                                    to={catalogPath}
-                                    onClick={() => handleCategoryClick(null)}
-                                    active={selectedCategoryId === null}
-                                >
-                                    Todas
-                                </NavDropdown.Item>
-                                {categories.map((category) => (
-                                    <NavDropdown.Item
-                                        as={Link}
-                                        key={category.id}
-                                        to={`${catalogPath}#categoria-${category.id}`}
-                                        onClick={() => handleCategoryClick(category.id)}
-                                        active={selectedCategoryId === category.id}
-                                    >
-                                        {category.name}
-                                    </NavDropdown.Item>
-                                ))}
-                            </NavDropdown>
-                        )}
                         {(user?.role === "ADMIN") && (
                             <Nav.Link as={Link} to="/dashboard/home" className="navbar-admin-link">
                                 Panel de administración

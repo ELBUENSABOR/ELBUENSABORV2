@@ -6,11 +6,16 @@ export interface Manufacturado {
     precioCosto: number;
     precioVenta: number;
     categoriaId: number;
-    categoria?: string;
+    categoria: string;
     tiempoEstimado: number;
     activo: boolean;
     ingredientes: {
-        unidadMedida: string; insumoId: number; denominacion: string; cantidad: number; precioCompra: number, sucursalId?: number;
+        unidadMedida: string;
+        insumoId: number;
+        denominacion: string;
+        cantidad: number;
+        precioCompra: number;
+        sucursalId?: number;
     }[];
     imagenes: string[];
     disponible?: boolean;
