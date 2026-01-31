@@ -2,7 +2,6 @@ import {Navbar, Nav, Container, NavDropdown, Form} from "react-bootstrap";
 import {Link} from "react-router-dom";
 import "./navbar.css";
 import {useUser} from "../../contexts/UsuarioContext";
-import {useCatalogData} from "../../contexts/CatalogDataContext";
 import {useCatalogFilters} from "../../contexts/CatalogFiltersContext";
 import {LogIn, ShoppingCart} from 'lucide-react';
 
@@ -13,21 +12,12 @@ interface MyNavbarProps {
 
 export default function MyNavbar({onCartOpen, isCartOpen}: MyNavbarProps) {
     const {user, logout} = useUser();
-    const {categories} = useCatalogData();
     const {
         searchTerm,
         setSearchTerm,
-        selectedCategoryId,
-        setSelectedCategoryId,
     } = useCatalogFilters();
 
     const dropdownTitle = user ? user.username : "Cuenta";
-
-    const handleCategoryClick = (categoryId: number | null) => {
-        setSelectedCategoryId(categoryId);
-    };
-
-    const catalogPath = "/catalog";
 
     return (
         <Navbar expand="lg" className="navbar-container" sticky="top">
