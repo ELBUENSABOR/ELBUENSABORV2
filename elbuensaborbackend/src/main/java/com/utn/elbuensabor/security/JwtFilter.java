@@ -35,8 +35,7 @@ public class JwtFilter extends OncePerRequestFilter {
         // Solo permitir acceso público a register, login y localidad
         if (path.startsWith("/uploads/") || path.equals("/api/auth/register") ||
                 path.equals("/api/auth/login") ||
-                path.startsWith("/api/localidad/") ||
-                path.startsWith("/api/sucursales")) {
+                path.startsWith("/api/localidad/")) {
             filterChain.doFilter(request, response);
             return;
         }
