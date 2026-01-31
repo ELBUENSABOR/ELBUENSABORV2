@@ -97,6 +97,12 @@ const ProductosManufacturados = () => {
 
     const deleteManufacturadoConfirm = async () => {
         await deleteManufacturado(currentId);
+        setManufacturados((prev) =>
+            prev?.map((m) => (m.id === currentId ? { ...m, activo: false } : m))
+        );
+        setOriginalManufacturados((prev) =>
+            prev?.map((m) => (m.id === currentId ? { ...m, activo: false } : m))
+        );
         setShowModal(false);
     };
 
@@ -189,6 +195,8 @@ const ProductosManufacturados = () => {
                     <th>Precio de costo</th>
                     <th>Precio de venta</th>
                     <th>Categoría</th>
+                    <th>Tiempo</th>
+                    <th>Estado</th>
                     <th>Acciones</th>
                     </thead>
                     <tbody className="table-group-divider">
@@ -199,6 +207,12 @@ const ProductosManufacturados = () => {
                             <td>${m.precioCosto}</td>
                             <td>${m.precioVenta}</td>
                             <td>{m.categoria}</td>
+                            <td>{m.tiempoEstimado} min</td>
+                            <td>
+                                <span className={`badge ${m.activo ? "text-bg-success" : "text-bg-secondary"}`}>
+                                    {m.activo ? "Alta" : "Baja"}
+                                </span>
+                            </td>
                             <td>
                                 {
                                     m.activo && (

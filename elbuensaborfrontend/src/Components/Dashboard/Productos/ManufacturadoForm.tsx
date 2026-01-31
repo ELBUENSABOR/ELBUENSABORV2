@@ -126,6 +126,19 @@ const ManufacturadoForm = () => {
         getData();
     }, [])
 
+    useEffect(() => {
+        const costoTotal = manufacturado.ingredientes?.reduce(
+            (total, ingrediente) => total + ingrediente.precioCompra * ingrediente.cantidad,
+            0
+        );
+        if (manufacturado.precioCosto !== costoTotal) {
+            setManufacturado(prev => ({
+                ...prev,
+                precioCosto: costoTotal
+            }));
+        }
+    }, [manufacturado.ingredientes, manufacturado.precioCosto]);
+
     const handleSaveIngredientes = (ingredientesSeleccionados: Ingredientes[]) => {
         setManufacturado(prev => ({
             ...prev,
@@ -136,12 +149,6 @@ const ManufacturadoForm = () => {
                 unidadMedida: i.unidadMedida,
                 precioCompra: i.precioCompra
             }))
-        }));
-
-        const costoTotal = ingredientesSeleccionados.reduce((total, ingrediente) => total + ingrediente.precioCompra * ingrediente.cantidad, 0);
-        setManufacturado(prev => ({
-            ...prev,
-            precioCosto: costoTotal
         }));
     };
 
@@ -252,7 +259,9 @@ const ManufacturadoForm = () => {
                     <option value="">Seleccione</option>
                     {
                         rubrosManufacturados.map((rubro) => (
-                            <option key={rubro.id} value={rubro.id}>{rubro.denominacion}</option>
+                            <option key={rubro.id} value={rubro.id} disabled={!rubro.activo}>
+                                {rubro.denominacion}{!rubro.activo ? " (inactivo)" : ""}
+                            </option>
                         ))
                     }
                 </select>
@@ -310,7 +319,23 @@ const ManufacturadoForm = () => {
             </div>
 
             {message && <Alert variant={message.type} onClose={() => setMessage(null)} dismissible>{message.text}</Alert>}
-            <button type="submit" className="btn btn-primary" disabled={manufacturado.ingredientes.length === 0} onClick={handleSubmit}>Guardar</button>
+            <div className="d-flex gap-2">
+                <button
+                    type="button"
+                    className="btn btn-outline-secondary"
+                    onClick={() => navigate('/dashboard/productos-manufacturados')}
+                >
+                    Cancelar
+                </button>
+                <button
+                    type="submit"
+                    className="btn btn-primary"
+                    disabled={manufacturado.ingredientes.length === 0}
+                    onClick={handleSubmit}
+                >
+                    Guardar
+                </button>
+            </div>
             <IngredientesModal
                 show={showModal}
                 onClose={() => setShowModal(false)}
