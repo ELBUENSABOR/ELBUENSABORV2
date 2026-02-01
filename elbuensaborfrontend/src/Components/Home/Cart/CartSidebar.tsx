@@ -1,8 +1,7 @@
 import "./cartSidebar.css";
 import {useCart} from "../../../contexts/CartContext";
-import {
-    Package
-} from "lucide-react";
+import {Package, Trash2} from "lucide-react";
+import {getImageUrl} from "../../../utils/image";
 
 const formatCurrency = (value: number) =>
     new Intl.NumberFormat("es-AR", {
@@ -22,7 +21,7 @@ const CartSidebar = ({
                          isOpen = false,
                          onClose,
                      }: CartSidebarProps) => {
-    const {items, removeItem, clearCart, total} = useCart();
+    const {items, removeItem, updateQuantity, clearCart, total} = useCart();
     const isDrawer = variant === "drawer";
 
     return (
@@ -46,15 +45,7 @@ const CartSidebar = ({
                         <h5>Tu pedido</h5>
                     </div>
                     <div className="cart-sidebar__actions">
-                        {items.length > 0 && (
-                            <button
-                                type="button"
-                                className="btn btn-sm btn-outline-secondary"
-                                onClick={clearCart}
-                            >
-                                Vaciar
-                            </button>
-                        )}
+
                         {isDrawer && (
                             <button
                                 type="button"
@@ -80,21 +71,65 @@ const CartSidebar = ({
                     <div className="cart-sidebar__list">
                         {items.map((item) => (
                             <div className="cart-sidebar__item" key={item.manufacturadoId}>
-                                <div>
+                                <div className="cart-sidebar__item-media">
+                                    {item.imagen ? (
+                                        <img
+                                            src={getImageUrl(item.imagen)}
+                                            alt={item.denominacion}
+                                        />
+                                    ) : (
+                                        <div className="cart-sidebar__item-placeholder">
+                                            Sin imagen
+                                        </div>
+                                    )}
+                                </div>
+                                <div className="cart-sidebar__item-body">
                                     <p className="cart-sidebar__name">
                                         {item.denominacion}
                                     </p>
-                                    <span className="cart-sidebar__meta">
-                       {item.cantidad} × {formatCurrency(item.precio)}
-                  </span>
+                                    <span className="cart-sidebar__price">
+                                        {formatCurrency(item.precio)}
+                                    </span>
+                                    <div className="cart-sidebar__quantity">
+                                        <button
+                                            type="button"
+                                            className="btn btn-sm btn-outline-secondary"
+                                            onClick={() =>
+                                                updateQuantity(
+                                                    item.manufacturadoId,
+                                                    Math.max(1, item.cantidad - 1)
+                                                )
+                                            }
+                                            aria-label={`Disminuir ${item.denominacion}`}
+                                            disabled={item.cantidad <= 1}
+                                        >
+                                            -
+                                        </button>
+                                        <span className="cart-sidebar__quantity-value">
+                                            {item.cantidad}
+                                        </span>
+                                        <button
+                                            type="button"
+                                            className="btn btn-sm btn-outline-secondary"
+                                            onClick={() =>
+                                                updateQuantity(
+                                                    item.manufacturadoId,
+                                                    item.cantidad + 1
+                                                )
+                                            }
+                                            aria-label={`Aumentar ${item.denominacion}`}
+                                        >
+                                            +
+                                        </button>
+                                    </div>
                                 </div>
                                 <button
                                     type="button"
-                                    className="btn btn-sm btn-outline-danger"
+                                    className="cart-sidebar__delete"
                                     onClick={() => removeItem(item.manufacturadoId)}
-                                    aria-label={`Quitar ${item.denominacion}`}
+                                    aria-label={`Eliminar ${item.denominacion}`}
                                 >
-                                    -
+                                    <Trash2 size={18}/>
                                 </button>
                             </div>
                         ))}
@@ -112,6 +147,14 @@ const CartSidebar = ({
                         disabled={items.length === 0}
                     >
                         Confirmar pedido
+                    </button>
+                    <button
+                        type="button"
+                        className="btn btn-outline-secondary w-100"
+                        onClick={clearCart}
+                        disabled={items.length === 0}
+                    >
+                        Vaciar carrito
                     </button>
                 </div>
             </aside>

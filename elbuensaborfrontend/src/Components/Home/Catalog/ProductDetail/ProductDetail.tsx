@@ -83,6 +83,7 @@ const ProductDetail = () => {
                                     denominacion: product.denominacion,
                                     precio: product.precioVenta,
                                     cantidad: 1,
+                                    imagen: product.imagenes?.[0],
                                 })
                             }
                         >

@@ -1,9 +1,0 @@
-.container-product-detail{
-    display: flex;
-    flex-direction: row;
-    padding: 20px;
-}
-
-.product-detail{
-    flex: 4;
-}

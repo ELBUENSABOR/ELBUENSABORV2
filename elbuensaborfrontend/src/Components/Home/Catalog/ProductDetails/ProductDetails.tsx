@@ -72,6 +72,7 @@ const ProductDetails = () => {
                                 denominacion: producto.denominacion,
                                 precio: producto.precioVenta,
                                 cantidad: 1,
+                                imagen: producto.imagenes?.[0],
                             })}
                         >
                             + Agregar al carrito
@@ -83,7 +84,7 @@ const ProductDetails = () => {
                 <ul>
                     {producto.ingredientes.map((ing) => (
                         <li key={ing.insumoId}>
-                            {ing.insumoDenominacion} – {ing.cantidad} {ing.unidadMedida}
+                            {ing.denominacion} – {ing.cantidad} {ing.unidadMedida}
                         </li>
                     ))}
                 </ul>
