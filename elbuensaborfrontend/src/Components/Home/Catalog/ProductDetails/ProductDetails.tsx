@@ -72,6 +72,7 @@ const ProductDetails = () => {
                                 denominacion: producto.denominacion,
                                 precio: producto.precioVenta,
                                 cantidad: 1,
+                                imagen: producto.imagenes?.[0],
                             })}
                         >
                             + Agregar al carrito
