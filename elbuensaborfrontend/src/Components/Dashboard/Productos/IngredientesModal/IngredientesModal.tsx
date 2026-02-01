@@ -23,7 +23,6 @@ const IngredientesModal = ({
 
     const [cantidades, setCantidades] = useState<Record<number, number>>({});
     const [selected, setSelected] = useState<number | null>(null);
-    const [stockAlert, setStockAlert] = useState<string | null>("");
 
     useEffect(() => {
         console.log("Ingredientes:", ingredientes);
@@ -55,19 +54,6 @@ const IngredientesModal = ({
 
     const handleCantidadChange = (insumoId: number, value: number) => {
         if (value <= 0) return;
-
-        const ingrediente = ingredientes.find(i => i.insumoId === insumoId);
-
-        if (!ingrediente) return;
-
-        const stockActual = ingrediente.stockActual ?? 0;
-
-        if (value > stockActual) {
-            setStockAlert("Stock insuficiente");
-            return;
-        }
-
-        setStockAlert(null);
 
         setCantidades(prev => ({
             ...prev,
@@ -124,7 +110,6 @@ const IngredientesModal = ({
                                                 )
                                             }
                                         />
-                                        {stockAlert && <p className="text-danger">{stockAlert}</p>}
                                         <button
                                             className="btn btn-primary mt-2"
                                             onClick={() => handleAgregarIngrediente(ingrediente)}
