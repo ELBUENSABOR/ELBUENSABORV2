@@ -169,3 +169,27 @@ export const getPedidosAll = async (estado?: string) => {
         throw error;
     }
 };
+export const cambiarEstadoPedido = async (pedidoId: number, estado: string) => {
+    try {
+        const token = sessionStorage.getItem("token");
+
+        const res = await axios.put(
+            `${API_URL}/pedidos/${pedidoId}/estado`,
+            { estado },
+            {
+                headers: {
+                    Authorization: `Bearer ${token}`,
+                },
+                withCredentials: true,
+            }
+        );
+
+        return res.data;
+    } catch (error: any) {
+        console.error(
+            "Error al cambiar estado del pedido:",
+            error.response?.data || error.message
+        );
+        throw error;
+    }
+};

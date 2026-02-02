@@ -295,6 +295,35 @@ public class PedidoServiceImpl implements PedidoService {
             throw new IllegalArgumentException("No se puede cambiar el estado de " + pedido.getEstado() + " a " + nuevoEstado);
         }
 
+        boolean requiereCocina = pedido.getDetalles().stream()
+                .anyMatch(detalle -> detalle.getManufacturado() != null);
+
+        if (pedido.getEstado() == EstadoPedido.A_CONFIRMAR) {
+            if (nuevoEstado == EstadoPedido.A_COCINA && !requiereCocina) {
+                throw new IllegalArgumentException("El pedido no requiere cocina, debe pasar a LISTO");
+            }
+            if (nuevoEstado == EstadoPedido.LISTO && requiereCocina) {
+                throw new IllegalArgumentException("El pedido requiere cocina, debe pasar a A_COCINA");
+            }
+        }
+
+        if (nuevoEstado == EstadoPedido.LISTO && pedido.getTipoEnvio() == TipoEnvio.DELIVERY) {
+            // Se permite llegar a listo, la salida a delivery queda validada luego
+        }
+
+        if (nuevoEstado == EstadoPedido.EN_DELIVERY && pedido.getTipoEnvio() != TipoEnvio.DELIVERY) {
+            throw new IllegalArgumentException("Solo los pedidos con envío a domicilio pueden pasar a EN_DELIVERY");
+        }
+
+        if (nuevoEstado == EstadoPedido.ENTREGADO) {
+            if (!Boolean.TRUE.equals(pedido.getPagado())) {
+                throw new IllegalArgumentException("No se puede entregar un pedido no pagado");
+            }
+            if (pedido.getTipoEnvio() == TipoEnvio.DELIVERY && pedido.getEstado() != EstadoPedido.EN_DELIVERY) {
+                throw new IllegalArgumentException("El pedido debe estar en EN_DELIVERY antes de entregarse");
+            }
+        }
+
         // Si el pedido pasa a A_COCINA, decrementar el stock
         if (nuevoEstado == EstadoPedido.A_COCINA
                 && pedido.getEstado() != EstadoPedido.A_COCINA

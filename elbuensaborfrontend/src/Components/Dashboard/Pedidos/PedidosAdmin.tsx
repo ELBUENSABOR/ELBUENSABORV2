@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { getPedidoById, getPedidosAll } from "../../../services/pedidoService";
+import { cambiarEstadoPedido, getPedidoById, getPedidosAll } from "../../../services/pedidoService";
 import type { PedidoResponse } from "../../../services/pedidoService";
 
 const ESTADOS = [
@@ -26,6 +26,7 @@ const PedidosAdmin = () => {
     const [pedidos, setPedidos] = useState<PedidoResponse[]>([]);
     const [estado, setEstado] = useState("");
     const [busquedaId, setBusquedaId] = useState("");
+    const [estadoSeleccionado, setEstadoSeleccionado] = useState<Record<number, string>>({});
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState("");
 
@@ -66,6 +67,46 @@ const PedidosAdmin = () => {
         } catch (err) {
             setPedidos([]);
             setError("No se encontró el pedido.");
+        } finally {
+            setLoading(false);
+        }
+    };
+    const obtenerOpciones = (pedido: PedidoResponse) => {
+        const requiereCocina = pedido.detalles.some(
+            (detalle) => detalle.articulo.tipo === "MANUFACTURADO"
+        );
+
+        switch (pedido.estado) {
+            case "A_CONFIRMAR":
+                return requiereCocina ? ["A_COCINA"] : ["LISTO"];
+            case "A_COCINA":
+                return ["LISTO"];
+            case "LISTO":
+                return pedido.tipoEnvio === "DELIVERY" ? ["EN_DELIVERY"] : ["ENTREGADO"];
+            case "EN_DELIVERY":
+                return ["ENTREGADO"];
+            default:
+                return [];
+        }
+    };
+
+    const puedeEntregar = (pedido: PedidoResponse) => pedido.pagado;
+
+    const actualizarEstado = async (pedido: PedidoResponse) => {
+        const nuevoEstado = estadoSeleccionado[pedido.id];
+        if (!nuevoEstado) return;
+        setLoading(true);
+        setError("");
+        try {
+            await cambiarEstadoPedido(pedido.id, nuevoEstado);
+            setEstadoSeleccionado((prev) => {
+                const next = { ...prev };
+                delete next[pedido.id];
+                return next;
+            });
+            await cargarPedidos(estado);
+        } catch (err) {
+            setError("No se pudo actualizar el estado del pedido.");
         } finally {
             setLoading(false);
         }
@@ -116,12 +157,13 @@ const PedidosAdmin = () => {
                             <th>Número</th>
                             <th>Total</th>
                             <th>Estado</th>
+                            <th className="text-end">Acción</th>
                         </tr>
                         </thead>
                         <tbody>
                         {pedidos.length === 0 ? (
                             <tr>
-                                <td colSpan={5}>No hay pedidos para mostrar.</td>
+                                <td colSpan={6}>No hay pedidos para mostrar.</td>
                             </tr>
                         ) : (
                             pedidos.map((pedido) => (
@@ -131,6 +173,39 @@ const PedidosAdmin = () => {
                                     <td>{pedido.numero}</td>
                                     <td>${pedido.total}</td>
                                     <td>{pedido.estado}</td>
+                                    <td className="text-end">
+                                        <div className="d-flex justify-content-end gap-2 flex-wrap">
+                                            <select
+                                                className="form-select form-select-sm"
+                                                style={{ width: "180px" }}
+                                                value={estadoSeleccionado[pedido.id] || ""}
+                                                onChange={(event) =>
+                                                    setEstadoSeleccionado((prev) => ({
+                                                        ...prev,
+                                                        [pedido.id]: event.target.value,
+                                                    }))
+                                                }
+                                            >
+                                                <option value="">Seleccionar</option>
+                                                {obtenerOpciones(pedido).map((opcion) => {
+                                                    const disabled =
+                                                        opcion === "ENTREGADO" && !puedeEntregar(pedido);
+                                                    return (
+                                                        <option key={opcion} value={opcion} disabled={disabled}>
+                                                            {opcion.replace(/_/g, " ")}
+                                                        </option>
+                                                    );
+                                                })}
+                                            </select>
+                                            <button
+                                                className="btn btn-sm btn-outline-primary"
+                                                disabled={!estadoSeleccionado[pedido.id]}
+                                                onClick={() => actualizarEstado(pedido)}
+                                            >
+                                                Actualizar
+                                            </button>
+                                        </div>
+                                    </td>
                                 </tr>
                             ))
                         )}
