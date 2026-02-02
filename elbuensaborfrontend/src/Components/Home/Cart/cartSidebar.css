@@ -148,72 +148,72 @@
 }
 
 .cart-sidebar__item-media {
-    width: 64px;
-    height: 64px;
-    border-radius: 14px;
-    overflow: hidden;
-    background: hsl(var(--background));
-    display: grid;
-    place-items: center;
-    flex-shrink: 0;
+  width: 64px;
+  height: 64px;
+  border-radius: 14px;
+  overflow: hidden;
+  background: hsl(var(--background));
+  display: grid;
+  place-items: center;
+  flex-shrink: 0;
 }
 
 .cart-sidebar__item-media img {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
 }
 
 .cart-sidebar__item-placeholder {
-    font-size: 0.65rem;
-    color: hsl(var(--muted-foreground));
-    text-align: center;
-    padding: 6px;
+  font-size: 0.65rem;
+  color: hsl(var(--muted-foreground));
+  text-align: center;
+  padding: 6px;
 }
 
 .cart-sidebar__item-body {
-    flex: 1;
-    display: flex;
-    flex-direction: column;
-    gap: 6px;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
 }
 
 .cart-sidebar__price {
-    font-weight: 600;
-    color: hsl(var(--primary));
-    font-size: 0.9rem;
+  font-weight: 600;
+  color: hsl(var(--primary));
+  font-size: 0.9rem;
 }
 
 .cart-sidebar__quantity {
-    display: inline-flex;
-    align-items: center;
-    gap: 8px;
-    background: hsl(var(--background));
-    padding: 4px 8px;
-    border-radius: 999px;
-    width: fit-content;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background: hsl(var(--background));
+  padding: 4px 8px;
+  border-radius: 999px;
+  width: fit-content;
 }
 
 .cart-sidebar__quantity-value {
-    min-width: 18px;
-    text-align: center;
-    font-weight: 600;
-    font-size: 0.9rem;
+  min-width: 18px;
+  text-align: center;
+  font-weight: 600;
+  font-size: 0.9rem;
 }
 
 .cart-sidebar__delete {
-    border: none;
-    background: transparent;
-    color: hsl(var(--destructive, 0 84% 60%));
-    padding: 6px;
-    border-radius: 999px;
-    display: grid;
-    place-items: center;
+  border: none;
+  background: transparent;
+  color: hsl(var(--destructive, 0 84% 60%));
+  padding: 6px;
+  border-radius: 999px;
+  display: grid;
+  place-items: center;
 }
 
 .cart-sidebar__delete:hover,
 .cart-sidebar__delete:focus {
-    background: hsl(var(--background));
+  background: hsl(var(--background));
 }
 
 .cart-sidebar__name {

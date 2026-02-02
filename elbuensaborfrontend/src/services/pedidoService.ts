@@ -16,6 +16,8 @@ export interface PedidoRequest {
     detalles: PedidoDetalleDTO[];
     descuento?: number;
     observaciones?: string;
+    direccionEntrega?: string;
+    telefonoEntrega?: string;
 }
 
 export interface PedidoResponse {
@@ -30,6 +32,8 @@ export interface PedidoResponse {
     totalCosto: number;
     pagado: boolean;
     observaciones: string;
+    direccionEntrega?: string | null;
+    telefonoEntrega?: string | null;
     estado: string;
     tipoEnvio: "DELIVERY" | "TAKE_AWAY";
     formaPago: "EFECTIVO" | "MP";
@@ -48,6 +52,13 @@ export interface PedidoResponse {
         id: number;
         nombre: string;
     };
+    factura?: {
+        id: number;
+        numeroComprobante: string;
+        fechaFacturacion: string;
+        totalVenta: number;
+        pdfUrl?: string | null;
+    } | null;
     detalles: {
         id: number;
         articulo: {
@@ -115,8 +126,9 @@ export const getPedidosByCliente = async (clienteId: number) => {
         const token = sessionStorage.getItem("token");
 
         const res = await axios.get(
-            `${API_URL}/pedidos/cliente/${clienteId}`,
+            `${API_URL}/pedidos`,
             {
+                params: { clienteId },
                 headers: {
                     Authorization: `Bearer ${token}`,
                 },
@@ -128,6 +140,54 @@ export const getPedidosByCliente = async (clienteId: number) => {
     } catch (error: any) {
         console.error(
             "Error al obtener pedidos del cliente:",
+            error.response?.data || error.message
+        );
+        throw error;
+    }
+};
+export const getPedidosAll = async (estado?: string) => {
+    try {
+        const token = sessionStorage.getItem("token");
+
+        const res = await axios.get(
+            `${API_URL}/pedidos`,
+            {
+                params: estado ? { estado } : undefined,
+                headers: {
+                    Authorization: `Bearer ${token}`,
+                },
+                withCredentials: true,
+            }
+        );
+
+        return res.data;
+    } catch (error: any) {
+        console.error(
+            "Error al obtener pedidos:",
+            error.response?.data || error.message
+        );
+        throw error;
+    }
+};
+export const cambiarEstadoPedido = async (pedidoId: number, estado: string) => {
+    try {
+        const token = sessionStorage.getItem("token");
+
+        const res = await axios.put(
+            `${API_URL}/pedidos/${pedidoId}/estado`,
+            { estado },
+            {
+                headers: {
+                    Authorization: `Bearer ${token}`,
+                },
+                withCredentials: true,
+            }
+        );
+
+        return res.data;
+    } catch (error: any) {
+        console.error(
+            "Error al cambiar estado del pedido:",
             error.response?.data || error.message
         );
         throw error;

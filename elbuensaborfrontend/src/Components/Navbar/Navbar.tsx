@@ -80,6 +80,11 @@ export default function MyNavbar({onCartOpen, isCartOpen}: MyNavbarProps) {
                                 <NavDropdown.Item as={Link} to="/account">
                                     Perfil
                                 </NavDropdown.Item>
+                                {user?.role === "CLIENTE" && (
+                                    <NavDropdown.Item as={Link} to="/pedidos">
+                                        Mis pedidos
+                                    </NavDropdown.Item>
+                                )}
                                 <hr/>
                                 <NavDropdown.Item onClick={logout}>
                                     Cerrar sesión

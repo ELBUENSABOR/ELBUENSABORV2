@@ -30,6 +30,7 @@ const links = [
     },
     {path: "/dashboard/stock", label: "Stock", icon: Boxes, rol: ["EMPLEADO", "ADMIN"]},
     {path: "/dashboard/compras", label: "Registro de compras", icon: ClipboardList, rol: ["EMPLEADO", "ADMIN"]},
+    {path: "/dashboard/pedidos", label: "Pedidos", icon: ClipboardList, rol: ["CAJERO", "ADMIN"]},
     {path: "/dashboard/productos-venta", label: "Productos a la venta", icon: ShoppingBag, rol: ["EMPLEADO", "ADMIN"]},
 ];
 

@@ -5,6 +5,8 @@ import { useSucursal } from "../../../../contexts/SucursalContext";
 import { useNavigate } from "react-router-dom";
 import "./confirmOrder.css";
 import { createPedido } from "../../../../services/pedidoService";
+import { getUserService } from "../../../../services/userService";
+import type { UsuarioDTO } from "../../../../dtos/UsuarioDTO";
 
 type TipoEnvio = "TAKE_AWAY" | "DELIVERY";
 type FormaPago = "EFECTIVO" | "MP";
@@ -21,6 +23,7 @@ const ConfirmOrder = () => {
 
     const [direccion, setDireccion] = useState("");
     const [telefono, setTelefono] = useState("");
+    const [usuarioInfo, setUsuarioInfo] = useState<UsuarioDTO | null>(null);
 
     useEffect(() => {
         if (!user) {
@@ -31,12 +34,54 @@ const ConfirmOrder = () => {
         }
     }, [user, navigate]);
 
+    useEffect(() => {
+        if (!user?.userId) return;
+
+        getUserService(user.userId)
+            .then(res => {
+                const data = res.data as UsuarioDTO;
+                setUsuarioInfo(data);
+            })
+            .catch(() => null);
+    }, [user?.userId]);
+
+    useEffect(() => {
+        if (!usuarioInfo) return;
+
+        if (!direccion) {
+            const domicilio = usuarioInfo.domicilio;
+            if (domicilio?.calle && domicilio?.numero) {
+                setDireccion(
+                    `${domicilio.calle} ${domicilio.numero}`
+                );
+            }
+        }
+
+        if (!telefono && usuarioInfo.telefono) {
+            setTelefono(usuarioInfo.telefono);
+        }
+    }, [usuarioInfo, direccion, telefono]);
+
+    useEffect(() => {
+        if (tipoEnvio === "DELIVERY") {
+            setFormaPago("MP");
+        }
+    }, [tipoEnvio]);
+
+    const descuento = tipoEnvio === "TAKE_AWAY" ? total * 0.1 : 0;
+    const costoEnvio = tipoEnvio === "DELIVERY" ? 500 : 0;
+    const totalFinal = total - descuento + costoEnvio;
+    const puedeContinuarStep1 = (() => {
+        if (!tipoEnvio) return false;
+        if (tipoEnvio === "DELIVERY") {
+            return Boolean(direccion.trim() && telefono.trim());
+        }
+        return true;
+    })();
+
     if (!user || items.length === 0) {
         return <p className="text-muted p-4">No hay productos en el carrito</p>;
     }
-
-    const descuento = tipoEnvio === "TAKE_AWAY" ? total * 0.1 : 0;
-    const totalFinal = total - descuento;
 
     const confirmarPedido = async () => {
         if (!tipoEnvio) {
@@ -51,6 +96,10 @@ const ConfirmOrder = () => {
             alert("Elegí una sucursal");
             return;
         }
+        if (tipoEnvio === "DELIVERY" && (!direccion.trim() || !telefono.trim())) {
+            alert("Completá dirección y teléfono para el envío");
+            return;
+        }
         const payload = {
             clienteId: Number(user.userId),
             sucursalId: sucursalId!,
@@ -58,15 +107,15 @@ const ConfirmOrder = () => {
             formaPago,
             descuento,
             observaciones: "",
+            direccionEntrega: tipoEnvio === "DELIVERY" ? direccion : undefined,
+            telefonoEntrega: tipoEnvio === "DELIVERY" ? telefono : undefined,
             detalles: items.map(i => ({
                 manufacturadoId: i.manufacturadoId,
                 cantidad: i.cantidad,
             })),
         };
-        console.log("payload", payload);
         try {
             const pedidoCreado = await createPedido(payload);
-            console.log("pedidoCreado", pedidoCreado);
             clearCart();
             navigate(`/pedido/${pedidoCreado.id}`);
         } catch (error: any) {
@@ -116,18 +165,20 @@ const ConfirmOrder = () => {
                                 onChange={e => setDireccion(e.target.value)}
                             />
                             <input
-                                type="number"
                                 className="form-control mb-2"
                                 placeholder="Teléfono"
                                 value={telefono}
                                 onChange={e => setTelefono(e.target.value)}
                             />
+                            <small className="text-muted">
+                                Podés modificar los datos de entrega si es necesario.
+                            </small>
                         </>
                     )}
 
                     <button
                         className="btn btn-success"
-                        disabled={!tipoEnvio}
+                        disabled={!puedeContinuarStep1}
                         onClick={() => setStep(2)}
                     >
                         Continuar
@@ -196,6 +247,21 @@ const ConfirmOrder = () => {
                     <hr />
                     <p>Subtotal: ${total}</p>
                     {descuento > 0 && <p>Descuento: -${descuento}</p>}
+                    {costoEnvio > 0 && <p>Envío: ${costoEnvio}</p>}
+                    <p>
+                        Entrega:{" "}
+                        {tipoEnvio === "DELIVERY" ? "Envío a domicilio" : "Retiro en local"}
+                    </p>
+                    {tipoEnvio === "DELIVERY" && (
+                        <>
+                            <p>Dirección: {direccion}</p>
+                            <p>Teléfono: {telefono}</p>
+                        </>
+                    )}
+                    <p>
+                        Forma de pago:{" "}
+                        {formaPago === "MP" ? "Mercado Pago" : "Efectivo"}
+                    </p>
                     <strong>Total: ${totalFinal}</strong>
 
                     <div className="mt-3">

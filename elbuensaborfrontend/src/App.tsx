@@ -12,7 +12,7 @@ import CatalogPage from "./Components/Home/CatalogPage";
 import ProductDetail from "./Components/Home/Catalog/ProductDetail/ProductDetail";
 import ConfirmOrder from "./Components/Home/Cart/ConfirmOrder/ConfirmOrder";
 import OrderDetails from "./Components/Home/OrderDetails/OrderDetails";
-
+import OrdersHistory from "./Components/Home/Orders/OrdersHistory";
 
 function MainLayout() {
     const [isCartOpen, setIsCartOpen] = useState(false);
@@ -49,9 +49,14 @@ function App() {
             <Routes>
                 <Route element={<MainLayout/>}>
                     <Route path="/" element={<Home/>}/>
-                    <Route path="/catalog" element={<CatalogPage/>}/>                    <Route path="/producto/:id" element={<ProductDetail/>}/>                    <Route path="/confirm-order" element={<ConfirmOrder/>}/>
+                    <Route path="/catalog" element={<CatalogPage/>}/> <Route path="/producto/:id"
+                                                                             element={<ProductDetail/>}/> <Route
+                    path="/confirm-order" element={<ConfirmOrder/>}/>
                     <Route element={<PrivateRoute roles={["CLIENTE", "EMPLEADO", "ADMIN"]}/>}>
                         <Route path="/account" element={<Account/>}/>
+                    </Route>
+                    <Route element={<PrivateRoute roles={["CLIENTE"]}/>}>
+                        <Route path="/pedidos" element={<OrdersHistory/>}/>
                     </Route>
                     <Route element={<PrivateRoute roles={["EMPLEADO", "ADMIN"]}/>}>
                         <Route path="/dashboard/*" element={<DashboardRoutes/>}/>
