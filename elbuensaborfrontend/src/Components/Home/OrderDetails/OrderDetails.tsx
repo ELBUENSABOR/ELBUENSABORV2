@@ -96,8 +96,14 @@ const OrderDetails = () => {
                     <p>Número: {pedido.factura.numeroComprobante}</p>
                     <p>Total: ${pedido.factura.totalVenta}</p>
                     {pedido.factura.pdfUrl && (
-                        <a href={pedido.factura.pdfUrl} target="_blank" rel="noreferrer">
-                            Ver factura
+                        <a
+                            href={pedido.factura.pdfUrl}
+                            target="_blank"
+                            rel="noreferrer"
+                            download
+                            className="btn btn-outline-success"
+                        >
+                            Ver factura (PDF)
                         </a>
                     )}
                 </div>

@@ -126,8 +126,9 @@ export const getPedidosByCliente = async (clienteId: number) => {
         const token = sessionStorage.getItem("token");
 
         const res = await axios.get(
-            `${API_URL}/pedidos/cliente/${clienteId}`,
+            `${API_URL}/pedidos`,
             {
+                params: { clienteId },
                 headers: {
                     Authorization: `Bearer ${token}`,
                 },
