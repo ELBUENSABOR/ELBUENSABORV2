@@ -19,6 +19,7 @@ import com.utn.elbuensabor.entities.EstadoPedido;
 import com.utn.elbuensabor.entities.PedidoVenta;
 import com.utn.elbuensabor.entities.PedidoVentaDetalle;
 import com.utn.elbuensabor.entities.SucursalEmpresa;
+import com.utn.elbuensabor.entities.TipoEnvio;
 import com.utn.elbuensabor.repositories.ArticuloInsumoRepository;
 import com.utn.elbuensabor.repositories.ArticuloManufacturadoRepository;
 import com.utn.elbuensabor.repositories.ClienteRepository;
@@ -56,9 +57,23 @@ public class PedidoServiceImpl implements PedidoService {
         pedido.setFormaPago(request.formaPago());
         pedido.setEstado(EstadoPedido.A_CONFIRMAR);
         pedido.setFechaPedido(LocalDateTime.now());
-        pedido.setDescuento(request.descuento() != null ? request.descuento() : 0.0);
         pedido.setObservaciones(request.observaciones());
+        pedido.setDireccionEntrega(request.direccionEntrega());
+        pedido.setTelefonoEntrega(request.telefonoEntrega());
         pedido.setPagado(false);
+        pedido.setStockDescontado(false);
+
+        if (request.tipoEnvio() == TipoEnvio.DELIVERY) {
+            if (request.direccionEntrega() == null || request.direccionEntrega().isBlank()) {
+                throw new IllegalArgumentException("La dirección de entrega es obligatoria");
+            }
+            if (request.telefonoEntrega() == null || request.telefonoEntrega().isBlank()) {
+                throw new IllegalArgumentException("El teléfono de entrega es obligatorio");
+            }
+        } else {
+            pedido.setDireccionEntrega(null);
+            pedido.setTelefonoEntrega(null);
+        }
 
         // Generar número de pedido único
         String numeroPedido = generarNumeroPedido();
@@ -108,7 +123,8 @@ public class PedidoServiceImpl implements PedidoService {
 
         // Calcular totales
         pedido.setSubTotal(subTotal);
-        Double descuento = pedido.getDescuento() != null ? pedido.getDescuento() : 0.0;
+        Double descuento = request.tipoEnvio() == TipoEnvio.TAKE_AWAY ? subTotal * 0.1 : 0.0;
+        pedido.setDescuento(descuento);
         Double gastosEnvio = request.tipoEnvio().name().equals("DELIVERY") ? calcularGastosEnvio() : 0.0;
         pedido.setGastosEnvio(gastosEnvio);
         pedido.setTotal(subTotal - descuento + gastosEnvio);
@@ -116,6 +132,9 @@ public class PedidoServiceImpl implements PedidoService {
 
         // Calcular hora estimada de finalización
         pedido.setHoraEstimadaFinalizacion(calcularHoraEstimadaFinalizacion(pedido));
+        // Descontar stock al confirmar el pedido
+        stockService.decrementarStock(pedido);
+        pedido.setStockDescontado(true);
 
         // Guardar pedido (los detalles se guardan en cascada)
         pedido = pedidoRepository.save(pedido);
@@ -174,8 +193,21 @@ public class PedidoServiceImpl implements PedidoService {
 
         pedido.setTipoEnvio(request.tipoEnvio());
         pedido.setFormaPago(request.formaPago());
-        pedido.setDescuento(request.descuento() != null ? request.descuento() : 0.0);
         pedido.setObservaciones(request.observaciones());
+        pedido.setDireccionEntrega(request.direccionEntrega());
+        pedido.setTelefonoEntrega(request.telefonoEntrega());
+
+        if (request.tipoEnvio() == TipoEnvio.DELIVERY) {
+            if (request.direccionEntrega() == null || request.direccionEntrega().isBlank()) {
+                throw new IllegalArgumentException("La dirección de entrega es obligatoria");
+            }
+            if (request.telefonoEntrega() == null || request.telefonoEntrega().isBlank()) {
+                throw new IllegalArgumentException("El teléfono de entrega es obligatorio");
+            }
+        } else {
+            pedido.setDireccionEntrega(null);
+            pedido.setTelefonoEntrega(null);
+        }
 
         // Eliminar detalles existentes
         pedido.getDetalles().clear();
@@ -218,7 +250,8 @@ public class PedidoServiceImpl implements PedidoService {
 
         // Recalcular totales
         pedido.setSubTotal(subTotal);
-        Double descuento = pedido.getDescuento() != null ? pedido.getDescuento() : 0.0;
+        Double descuento = request.tipoEnvio() == TipoEnvio.TAKE_AWAY ? subTotal * 0.1 : 0.0;
+        pedido.setDescuento(descuento);
         Double gastosEnvio = request.tipoEnvio().name().equals("DELIVERY") ? calcularGastosEnvio() : 0.0;
         pedido.setGastosEnvio(gastosEnvio);
         pedido.setTotal(subTotal - descuento + gastosEnvio);
@@ -256,9 +289,12 @@ public class PedidoServiceImpl implements PedidoService {
         }
 
         // Si el pedido pasa a A_COCINA, decrementar el stock
-        if (nuevoEstado == EstadoPedido.A_COCINA && pedido.getEstado() != EstadoPedido.A_COCINA) {
+        if (nuevoEstado == EstadoPedido.A_COCINA
+                && pedido.getEstado() != EstadoPedido.A_COCINA
+                && !Boolean.TRUE.equals(pedido.getStockDescontado())) {
             try {
                 stockService.decrementarStock(pedido);
+                pedido.setStockDescontado(true);
             } catch (IllegalStateException ex) {
                 throw new IllegalArgumentException("No se puede procesar el pedido: " + ex.getMessage());
             }
@@ -285,14 +321,23 @@ public class PedidoServiceImpl implements PedidoService {
     }
 
     public LocalDateTime calcularHoraEstimadaFinalizacion(PedidoVenta pedido) {
-        // Calcular basado en el tiempo estimado de los artículos manufacturados
-        int tiempoTotal = pedido.getDetalles().stream()
-                .filter(d -> d.getManufacturado() != null)
-                .mapToInt(d -> (d.getManufacturado().getTiempoEstimado() != null ? d.getManufacturado().getTiempoEstimado() : 0) * d.getCantidad())
-                .sum();
+        int tiempoMaxPedido = pedido.getDetalles().stream()
+                .mapToInt(d -> d.getManufacturado() != null
+                        ? (d.getManufacturado().getTiempoEstimado() != null ? d.getManufacturado().getTiempoEstimado() : 0)
+                        : 0)
+                .max()
+                .orElse(0);
 
-        // Mínimo 30 minutos
-        tiempoTotal = Math.max(tiempoTotal, 30);
+        int tiempoMaxEnCocina = pedidoRepository.findByEstadoWithDetalles(EstadoPedido.A_COCINA).stream()
+                .flatMap(p -> p.getDetalles().stream())
+                .mapToInt(d -> d.getManufacturado() != null
+                        ? (d.getManufacturado().getTiempoEstimado() != null ? d.getManufacturado().getTiempoEstimado() : 0)
+                        : 0)
+                .max()
+                .orElse(0);
+
+        int tiempoDelivery = pedido.getTipoEnvio() == TipoEnvio.DELIVERY ? 10 : 0;
+        int tiempoTotal = tiempoMaxPedido + tiempoMaxEnCocina + tiempoDelivery;
 
         return LocalDateTime.now().plusMinutes(tiempoTotal);
     }
@@ -322,6 +367,8 @@ public class PedidoServiceImpl implements PedidoService {
                 pedido.getTotalCosto(),
                 pedido.getPagado(),
                 pedido.getObservaciones(),
+                pedido.getDireccionEntrega(),
+                pedido.getTelefonoEntrega(),
                 pedido.getEstado(),
                 pedido.getTipoEnvio(),
                 pedido.getFormaPago(),
@@ -340,6 +387,13 @@ public class PedidoServiceImpl implements PedidoService {
                         pedido.getSucursal().getId(),
                         pedido.getSucursal().getNombre()
                 ),
+                pedido.getFacturaVenta() != null ? new PedidoResponse.FacturaDTO(
+                        pedido.getFacturaVenta().getId(),
+                        pedido.getFacturaVenta().getNumeroComprobante(),
+                        pedido.getFacturaVenta().getFechaFacturacion(),
+                        pedido.getFacturaVenta().getTotalVenta(),
+                        pedido.getFacturaVenta().getPdfUrl()
+                ) : null,
                 pedido.getDetalles().stream()
                         .map(d -> new PedidoResponse.PedidoDetalleResponse(
                                 d.getId(),

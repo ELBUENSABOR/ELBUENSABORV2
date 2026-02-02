@@ -63,7 +63,9 @@ const Login = () => {
             });
 
             setTimeout(() => {
-                if (state?.from === "cart") {
+                if (state?.redirectTo) {
+                    navigate(state.redirectTo);
+                } else if (state?.from === "cart") {
                     navigate("/confirm-order");
                 } else {
                     navigate("/");

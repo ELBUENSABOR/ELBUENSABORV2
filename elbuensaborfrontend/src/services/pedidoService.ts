@@ -16,6 +16,8 @@ export interface PedidoRequest {
     detalles: PedidoDetalleDTO[];
     descuento?: number;
     observaciones?: string;
+    direccionEntrega?: string;
+    telefonoEntrega?: string;
 }
 
 export interface PedidoResponse {
@@ -30,6 +32,8 @@ export interface PedidoResponse {
     totalCosto: number;
     pagado: boolean;
     observaciones: string;
+    direccionEntrega?: string | null;
+    telefonoEntrega?: string | null;
     estado: string;
     tipoEnvio: "DELIVERY" | "TAKE_AWAY";
     formaPago: "EFECTIVO" | "MP";
@@ -48,6 +52,13 @@ export interface PedidoResponse {
         id: number;
         nombre: string;
     };
+    factura?: {
+        id: number;
+        numeroComprobante: string;
+        fechaFacturacion: string;
+        totalVenta: number;
+        pdfUrl?: string | null;
+    } | null;
     detalles: {
         id: number;
         articulo: {

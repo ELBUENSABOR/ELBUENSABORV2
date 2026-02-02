@@ -14,7 +14,9 @@ const OrderDetails = () => {
         if (!id) return;
 
         getPedidoById(Number(id))
-            .then(res => { console.log(res); setPedido(res) })
+            .then(res => {
+                setPedido(res);
+            })
             .catch(() => setError("No se pudo cargar el pedido"))
             .finally(() => setLoading(false));
     }, [id]);
@@ -57,6 +59,20 @@ const OrderDetails = () => {
                 <strong>Forma de pago:</strong>{" "}
                 {pedido.formaPago === "MP" ? "Mercado Pago" : "Efectivo"}
             </p>
+            {pedido.tipoEnvio === "DELIVERY" && (
+                <>
+                    <p>
+                        <strong>Dirección:</strong> {pedido.direccionEntrega}
+                    </p>
+                    <p>
+                        <strong>Teléfono:</strong> {pedido.telefonoEntrega}
+                    </p>
+                </>
+            )}
+            <p>
+                <strong>Pago:</strong>{" "}
+                {pedido.pagado ? "Aprobado" : "Pendiente"}
+            </p>
             <hr />
             <h5>Detalle del pedido</h5>
             {pedido.detalles.map(det => (
@@ -74,6 +90,18 @@ const OrderDetails = () => {
                 {pedido.gastosEnvio > 0 && <p>Envío: ${pedido.gastosEnvio}</p>}
                 <h5>Total: ${pedido.total}</h5>
             </div>
+            {pedido.factura && (
+                <div className="mt-3 p-3 border rounded">
+                    <h5>Factura</h5>
+                    <p>Número: {pedido.factura.numeroComprobante}</p>
+                    <p>Total: ${pedido.factura.totalVenta}</p>
+                    {pedido.factura.pdfUrl && (
+                        <a href={pedido.factura.pdfUrl} target="_blank" rel="noreferrer">
+                            Ver factura
+                        </a>
+                    )}
+                </div>
+            )}
             {pedido.formaPago === "MP" &&
                 pedido.estado === "A_CONFIRMAR" &&
                 !pedido.pagado && (
