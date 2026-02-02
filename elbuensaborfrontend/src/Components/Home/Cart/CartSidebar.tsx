@@ -1,6 +1,7 @@
 import "./cartSidebar.css";
 import {useCart} from "../../../contexts/CartContext";
 import {Package, Trash2} from "lucide-react";
+import { useNavigate } from "react-router-dom";
 import {getImageUrl} from "../../../utils/image";
 
 const formatCurrency = (value: number) =>
@@ -21,6 +22,7 @@ const CartSidebar = ({
                          isOpen = false,
                          onClose,
                      }: CartSidebarProps) => {
+    const navigate = useNavigate();
     const {items, removeItem, updateQuantity, clearCart, total} = useCart();
     const isDrawer = variant === "drawer";
 
@@ -145,6 +147,10 @@ const CartSidebar = ({
                         type="button"
                         className="btn btn-primary w-100"
                         disabled={items.length === 0}
+                        onClick={() => {
+                            navigate("/confirm-order");
+                            onClose?.();
+                        }}
                     >
                         Confirmar pedido
                     </button>

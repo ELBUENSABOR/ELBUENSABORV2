@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useState } from "react";
 import { useCart } from "../../../../contexts/CartContext";
 import { useUser } from "../../../../contexts/UsuarioContext";
 import { useSucursal } from "../../../../contexts/SucursalContext";
@@ -68,20 +68,20 @@ const ConfirmOrder = () => {
         }
     }, [tipoEnvio]);
 
-    if (!user || items.length === 0) {
-        return <p className="text-muted p-4">No hay productos en el carrito</p>;
-    }
-
     const descuento = tipoEnvio === "TAKE_AWAY" ? total * 0.1 : 0;
     const costoEnvio = tipoEnvio === "DELIVERY" ? 500 : 0;
     const totalFinal = total - descuento + costoEnvio;
-    const puedeContinuarStep1 = useMemo(() => {
+    const puedeContinuarStep1 = (() => {
         if (!tipoEnvio) return false;
         if (tipoEnvio === "DELIVERY") {
             return Boolean(direccion.trim() && telefono.trim());
         }
         return true;
-    }, [tipoEnvio, direccion, telefono]);
+    })();
+
+    if (!user || items.length === 0) {
+        return <p className="text-muted p-4">No hay productos en el carrito</p>;
+    }
 
     const confirmarPedido = async () => {
         if (!tipoEnvio) {

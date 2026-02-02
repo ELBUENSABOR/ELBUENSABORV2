@@ -16,6 +16,7 @@ import com.utn.elbuensabor.entities.ArticuloInsumo;
 import com.utn.elbuensabor.entities.ArticuloManufacturado;
 import com.utn.elbuensabor.entities.Cliente;
 import com.utn.elbuensabor.entities.EstadoPedido;
+import com.utn.elbuensabor.entities.FormaPago;
 import com.utn.elbuensabor.entities.PedidoVenta;
 import com.utn.elbuensabor.entities.PedidoVentaDetalle;
 import com.utn.elbuensabor.entities.SucursalEmpresa;
@@ -64,6 +65,9 @@ public class PedidoServiceImpl implements PedidoService {
         pedido.setStockDescontado(false);
 
         if (request.tipoEnvio() == TipoEnvio.DELIVERY) {
+            if (request.formaPago() != FormaPago.MP) {
+                throw new IllegalArgumentException("Para envíos a domicilio, la forma de pago debe ser Mercado Pago");
+            }
             if (request.direccionEntrega() == null || request.direccionEntrega().isBlank()) {
                 throw new IllegalArgumentException("La dirección de entrega es obligatoria");
             }
@@ -198,6 +202,9 @@ public class PedidoServiceImpl implements PedidoService {
         pedido.setTelefonoEntrega(request.telefonoEntrega());
 
         if (request.tipoEnvio() == TipoEnvio.DELIVERY) {
+            if (request.formaPago() != FormaPago.MP) {
+                throw new IllegalArgumentException("Para envíos a domicilio, la forma de pago debe ser Mercado Pago");
+            }
             if (request.direccionEntrega() == null || request.direccionEntrega().isBlank()) {
                 throw new IllegalArgumentException("La dirección de entrega es obligatoria");
             }
