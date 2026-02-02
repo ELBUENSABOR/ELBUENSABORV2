@@ -145,3 +145,27 @@ export const getPedidosByCliente = async (clienteId: number) => {
         throw error;
     }
 };
+export const getPedidosAll = async (estado?: string) => {
+    try {
+        const token = sessionStorage.getItem("token");
+
+        const res = await axios.get(
+            `${API_URL}/pedidos`,
+            {
+                params: estado ? { estado } : undefined,
+                headers: {
+                    Authorization: `Bearer ${token}`,
+                },
+                withCredentials: true,
+            }
+        );
+
+        return res.data;
+    } catch (error: any) {
+        console.error(
+            "Error al obtener pedidos:",
+            error.response?.data || error.message
+        );
+        throw error;
+    }
+};
