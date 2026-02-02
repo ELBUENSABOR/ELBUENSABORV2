@@ -42,6 +42,10 @@ const OrderDetails = () => {
         <div className="container mt-4">
             <h3>Pedido {pedido.numero}</h3>
             <p>
+                <strong>Fecha:</strong>{" "}
+                {new Date(pedido.fechaPedido).toLocaleString("es-AR")}
+            </p>
+            <p>
                 <strong>Estado:</strong> {pedido.estado}
             </p>
             <p>
@@ -110,7 +114,8 @@ const OrderDetails = () => {
             )}
             {pedido.formaPago === "MP" &&
                 pedido.estado === "A_CONFIRMAR" &&
-                !pedido.pagado && (
+                !pedido.pagado &&
+                !pedido.factura?.pdfUrl && (
                     <button
                         className="btn btn-primary w-100 mt-3"
                         onClick={handlePagar}
