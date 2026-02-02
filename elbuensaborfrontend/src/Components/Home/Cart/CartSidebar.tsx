@@ -45,7 +45,6 @@ const CartSidebar = ({
                         <h5>Tu pedido</h5>
                     </div>
                     <div className="cart-sidebar__actions">
-
                         {isDrawer && (
                             <button
                                 type="button"
