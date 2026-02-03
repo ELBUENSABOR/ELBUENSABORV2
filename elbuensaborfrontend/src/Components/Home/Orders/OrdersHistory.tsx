@@ -68,8 +68,8 @@ const OrdersHistory = () => {
                         <tr>
                             <th>Fecha</th>
                             <th>Número</th>
-                            <th>Total</th>
                             <th>Estado</th>
+                            <th>Total</th>
                             <th className="text-end">Acciones</th>
                         </tr>
                         </thead>
