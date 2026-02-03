@@ -5,6 +5,7 @@ import { useSucursal } from "../../../../contexts/SucursalContext";
 import { useNavigate } from "react-router-dom";
 import "./confirmOrder.css";
 import { createPedido } from "../../../../services/pedidoService";
+import { pagarConMercadoPago } from "../../../../services/pagoService";
 import { getUserService } from "../../../../services/userService";
 import type { UsuarioDTO } from "../../../../dtos/UsuarioDTO";
 
@@ -24,6 +25,7 @@ const ConfirmOrder = () => {
     const [direccion, setDireccion] = useState("");
     const [telefono, setTelefono] = useState("");
     const [usuarioInfo, setUsuarioInfo] = useState<UsuarioDTO | null>(null);
+    const [isSubmitting, setIsSubmitting] = useState(false);
 
     useEffect(() => {
         if (!user) {
@@ -84,6 +86,7 @@ const ConfirmOrder = () => {
     }
 
     const confirmarPedido = async () => {
+        if (isSubmitting) return;
         if (!tipoEnvio) {
             alert("Elegí si es retiro o delivery");
             return;
@@ -115,14 +118,36 @@ const ConfirmOrder = () => {
             })),
         };
         try {
+            setIsSubmitting(true);
             const pedidoCreado = await createPedido(payload);
+            if (formaPago === "MP") {
+                const response = await pagarConMercadoPago(pedidoCreado.id);
+                const initPoint = response?.data?.initPoint;
+                clearCart();
+                if (initPoint) {
+                    window.location.href = initPoint;
+                    return;
+                }
+                alert("No se pudo iniciar el pago en Mercado Pago");
+                navigate(`/pedido/${pedidoCreado.id}`);
+                return;
+            }
             clearCart();
             navigate(`/pedido/${pedidoCreado.id}`);
         } catch (error: any) {
+            const backendMessage = error.response?.data?.message;
+            const backendError = error.response?.data?.error;
+            const detalles =
+                typeof backendError === "string" && backendError.trim().length > 0
+                    ? ` Detalle: ${backendError}`
+                    : "";
             alert(
-                error.response?.data?.message ||
-                "No se pudo confirmar el pedido"
+                backendMessage
+                    ? `${backendMessage}${detalles}`
+                    : "No se pudo confirmar el pedido"
             );
+        } finally {
+            setIsSubmitting(false);
         }
     };
 
@@ -275,8 +300,9 @@ const ConfirmOrder = () => {
                         <button
                             className="btn btn-success"
                             onClick={confirmarPedido}
+                            disabled={isSubmitting}
                         >
-                            Confirmar pedido
+                            {isSubmitting ? "Confirmando..." : "Confirmar pedido"}
                         </button>
                     </div>
                 </>
