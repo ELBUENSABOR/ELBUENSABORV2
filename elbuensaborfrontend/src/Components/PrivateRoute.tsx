@@ -10,6 +10,7 @@ const PrivateRoute = ({ roles }: { roles: string[] }) => {
 
   const hasPermission = roles.some((role) => {
     if (user.role === role) return true;
+    if (user.role === "EMPLEADO" && user.subRole && role === user.subRole) return true;
     if (role === "EMPLEADO" && user.subRole && EMPLOYEE_ROLES.includes(user.subRole)) return true;
     return false;
   });

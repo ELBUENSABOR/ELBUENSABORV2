@@ -20,6 +20,8 @@ import ManufacturadoForm from "./Productos/ManufacturadoForm";
 import InsumoForm from "./Productos/InsumoForm";
 import ComprasTable from "./Compras/ComprasTable";
 import PedidosAdmin from "./Pedidos/PedidosAdmin";
+import PedidosCocina from "./Pedidos/PedidosCocina";
+import PedidosDelivery from "./Pedidos/PedidosDelivery";
 
 const DashboardRoutes = () => (
     <Routes>
@@ -80,6 +82,12 @@ const DashboardRoutes = () => (
             <Route path="productos-venta" element={<ProductosVenta/>}/>
             <Route element={<PrivateRoute roles={["ADMIN", "EMPLEADO"]}/>}>
                 <Route path="pedidos" element={<PedidosAdmin/>}/>
+            </Route>
+            <Route element={<PrivateRoute roles={["COCINERO", "ADMIN"]} />}>
+                <Route path="cocina" element={<PedidosCocina />} />
+            </Route>
+            <Route element={<PrivateRoute roles={["DELIVERY", "ADMIN"]} />}>
+                <Route path="delivery" element={<PedidosDelivery />} />
             </Route>
         </Route>
     </Routes>
