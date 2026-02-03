@@ -32,7 +32,7 @@ public class MercadoPagoController {
     private final EmailService emailService;
 
     @PostMapping("/mercadopago/{pedidoId}")
-    public ResponseEntity<?> crearPago(@PathVariable Long pedidoId) throws MPException, MPApiException {
+    public ResponseEntity<?> crearPago(@PathVariable Long pedidoId) {
 
         PedidoVenta pedido = pedidoRepository.findById(pedidoId)
                 .orElseThrow(() -> new RuntimeException("Pedido no encontrado"));
@@ -41,9 +41,25 @@ public class MercadoPagoController {
             return ResponseEntity.badRequest().build();
         }
 
-        String initPoint = mpService.crearPreference(pedido);
-
-        return ResponseEntity.ok(Map.of("initPoint", initPoint));
+        try {
+            String initPoint = mpService.crearPreference(pedido);
+            return ResponseEntity.ok(Map.of("initPoint", initPoint));
+        } catch (IllegalStateException ex) {
+            return ResponseEntity.badRequest().body(Map.of(
+                    "message", ex.getMessage()
+            ));
+        } catch (MPApiException ex) {
+            return ResponseEntity.status(502).body(Map.of(
+                    "message", "Error al crear la preferencia en Mercado Pago",
+                    "status", ex.getStatusCode(),
+                    "error", ex.getApiResponse() != null ? ex.getApiResponse().getContent() : null
+            ));
+        } catch (MPException ex) {
+            return ResponseEntity.status(502).body(Map.of(
+                    "message", "Error al crear la preferencia en Mercado Pago",
+                    "error", ex.getMessage()
+            ));
+        }
     }
 
     @PostMapping("/mercadopago/webhook")
