@@ -5,6 +5,7 @@ import { useState } from "react";
 import { loginUser } from "../../services/authService";
 import { useUser } from "../../contexts/UsuarioContext";
 import { useLocation } from "react-router-dom";
+import {getEmployeeDashboardRoute} from "../../utils/employeePanel";
 
 const Login = () => {
     const { state } = useLocation();
@@ -51,19 +52,25 @@ const Login = () => {
                 msg: "¡Login exitoso!",
             });
 
-            const { token, username, role, subRole, userId, mustChangePassword } = resp.data;
+            const {token, username, role, subRole, userId, mustChangePassword} = resp.data;
 
-            setUser({
+            const nextUser = {
                 token,
                 username,
                 role,
                 subRole,
                 userId,
                 mustChangePassword,
-            });
+            };
+
+            setUser(nextUser);
 
             setTimeout(() => {
-                if (state?.from === "cart") {
+                if (role === "EMPLEADO") {
+                    navigate(getEmployeeDashboardRoute(role, subRole));
+                } else if (state?.redirectTo) {
+                    navigate(state.redirectTo);
+                } else if (state?.from === "cart") {
                     navigate("/confirm-order");
                 } else {
                     navigate("/");

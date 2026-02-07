@@ -75,6 +75,12 @@ const RubrosInsumos = () => {
                 </td>
 
                 <td>
+                    <span className={`badge ${node.activo ? "bg-success" : "bg-secondary"}`}>
+                        {node.activo ? "Activo" : "Inactivo"}
+                    </span>
+                </td>
+
+                <td>
                     <button
                         onClick={() =>
                             navigate(`/dashboard/insumos/rubros/edit/${node.id}`)
@@ -215,6 +221,7 @@ const RubrosInsumos = () => {
                         <tr>
                             <th>#</th>
                             <th>Denominación</th>
+                            <th>Estado</th>
                             <th style={{width: "280px"}}>Acciones</th>
                         </tr>
                         </thead>
