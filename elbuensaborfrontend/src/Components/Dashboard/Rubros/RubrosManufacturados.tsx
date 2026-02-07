@@ -4,7 +4,10 @@ import { useNavigate } from "react-router-dom";
 import ModalConfirmAction from "../../ModalConfirmAction/ModalConfirmAction";
 import Alert from "../../Alert/Alert";
 import type { Rubro } from "../../../models/Rubro";
-import { getRubrosManufacturados } from "../../../services/rubrosService";
+import {
+  deleteRubroManufacturadoService,
+  getRubrosManufacturados,
+} from "../../../services/rubrosService";
 
 const RubrosManufacturados = () => {
   const [rubrosTree, setRubrosTree] = useState<any[]>([]);
@@ -68,6 +71,12 @@ const RubrosManufacturados = () => {
         <td style={{ paddingLeft: `${level * 20}px` }}>
           {level > 0 && "— "}
           {node.denominacion}
+        </td>
+
+        <td>
+          <span className={`badge ${node.activo ? "bg-success" : "bg-secondary"}`}>
+            {node.activo ? "Activo" : "Inactivo"}
+          </span>
         </td>
 
         <td>
@@ -152,7 +161,7 @@ const RubrosManufacturados = () => {
 
   const deleteRubro = async (id: number) => {
     try {
-      const res = await deleteRubroService(id);
+      const res = await deleteRubroManufacturadoService(id);
       if (res) {
         setRefresh(!refresh);
         setAlertMessage("Rubro eliminado con éxito!");
@@ -209,6 +218,7 @@ const RubrosManufacturados = () => {
                         <tr>
                             <th>#</th>
                             <th>Denominación</th>
+                            <th>Estado</th>
                             <th style={{ width: "280px" }}>Acciones</th>
                         </tr>
                         </thead>
