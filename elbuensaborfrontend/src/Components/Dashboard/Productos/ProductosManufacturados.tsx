@@ -9,222 +9,236 @@ import type { Rubro } from "../../../models/Rubro";
 import ModalConfirmAction from "../../ModalConfirmAction/ModalConfirmAction";
 
 const ProductosManufacturados = () => {
-  const { sucursales, sucursalId, setSucursalId, loading } = useSucursal();
-  const { user } = useUser();
-  const [rubros, setRubros] = useState<Rubro[]>();
-  const [manufacturados, setManufacturados] = useState<Manufacturado[]>();
-  const [originalManufacturados, setOriginalManufacturados] =
-    useState<Manufacturado[]>();
- 
-  const [filterValue, setFilterValue] = useState("");
-  const [filterStatusValue, setFilterStatusValue] = useState("activo");
-  const [filterRubroValue, setFilterRubroValue] = useState<number | null>(null);
+    const { sucursales, sucursalId, setSucursalId, loading } = useSucursal();
+    const { user } = useUser();
+    const [rubros, setRubros] = useState<Rubro[]>();
+    const [manufacturados, setManufacturados] = useState<Manufacturado[]>();
+    const [originalManufacturados, setOriginalManufacturados] =
+        useState<Manufacturado[]>();
 
-  const [showModal, setShowModal] = useState(false);
+    const [filterValue, setFilterValue] = useState("");
+    const [filterStatusValue, setFilterStatusValue] = useState("activo");
+    const [filterRubroValue, setFilterRubroValue] = useState<number | null>(null);
 
-  const navigate = useNavigate();
+    const [showModal, setShowModal] = useState(false);
 
-  const [currentId, setCurrentId] = useState(0);
+    const navigate = useNavigate();
+
+    const [currentId, setCurrentId] = useState(0);
 
 
-  const handleSucursalChange = (event: ChangeEvent<HTMLSelectElement>) => {
-    const value = event.target.value;
-    setSucursalId(value ? Number(value) : null);
-  };
-
-  useEffect(() => {
-    const getData = async () => {
-      try {
-        const response = await getAll(sucursalId ?? 0);
-        const rubros = await getRubrosManufacturados();
-        setRubros(rubros.data);
-        console.log(response);
-        if (response) {
-          setManufacturados(response);
-          setOriginalManufacturados(response);
-        }
-      } catch (error) {
-        console.error("Error al obtener manufacturados: ", error);
-      }
+    const handleSucursalChange = (event: ChangeEvent<HTMLSelectElement>) => {
+        const value = event.target.value;
+        setSucursalId(value ? Number(value) : null);
     };
 
-    getData();
-  }, [sucursalId]);
-
-  useEffect(() => {
-    if (!originalManufacturados) return;
-
-    let filtered = [...originalManufacturados];
-
-    if (filterValue.trim() !== "") {
-      const search = filterValue.toLowerCase();
-      filtered = filtered.filter(
-        (u) =>
-          u.denominacion.toLowerCase().includes(search) ||
-          u.categoria?.toLowerCase().includes(search)
-      );
-    }
-
-    if (filterRubroValue !== null) {
-      filtered = filtered.filter((u) => u.categoriaId === Number(filterRubroValue));
-    }
-    if (filterStatusValue !== "") {
-      filtered = filtered.filter(
-        (u) => filterStatusValue === "activo" ? u.activo : !u.activo
-      );
-    }
-
-    setManufacturados(filtered);
-  }, [filterValue, filterRubroValue, filterStatusValue, originalManufacturados]);
-
-  const filterData = (e: ChangeEvent<HTMLInputElement>) => {
-    setFilterValue(e.target.value);
-  };
-
-  const filterRubro = (e: ChangeEvent<HTMLSelectElement>) => {
-    const value = e.target.value;
-    setFilterRubroValue(value ? Number(value) : null);
-  };
-
-  const filterStatus = (e: ChangeEvent<HTMLSelectElement>) => {
-    setFilterStatusValue(e.target.value);
-  };
-
-  const handleDeleteManufacturado = (id: number) => {
-    setCurrentId(id);
-    setShowModal(true);
-  };
-
-  const deleteManufacturadoConfirm = async () => {
-    await deleteManufacturado(currentId);
-    setShowModal(false);
-  };
-
-  return (
-    <div>
-      <div>
-        <h5>Manufacturados</h5>
-        <hr />
-        <div>
-          {user?.role === "ADMIN" && (
-            <div className="d-flex flex-wrap align-items-center justify-content-between gap-3 mb-4">
-              <div>
-                <p className="text-muted mb-0">
-                  Gestioná productos y stock según la sucursal seleccionada.
-                </p>
-              </div>
-              <div className="d-flex align-items-center gap-2">
-                <label className="mb-0 text-muted" htmlFor="sucursal-select">
-                  Sucursal:
-                </label>
-                <select
-                  id="sucursal-select"
-                  className="form-select form-select-sm w-auto"
-                  value={sucursalId ?? ""}
-                  onChange={handleSucursalChange}
-                  disabled={loading || sucursales.length === 0}
-                >
-                  <option value="">Seleccione</option>
-                  {sucursales.map((sucursal) => (
-                    <option key={sucursal.id} value={sucursal.id}>
-                      {sucursal.nombre}
-                    </option>
-                  ))}
-                </select>
-                {loading && (
-                  <span className="text-muted small">cargando...</span>
-                )}
-              </div>
-            </div>
-          )}
-        </div>
-        <div className="header-dashboard">
-          <input
-            name="search"
-            type="text"
-            placeholder="Buscar manufacturados..."
-            className="form-control"
-            value={filterValue}
-            onChange={filterData}
-          />
-
-          <select
-            name="status"
-            className="form-select"
-            value={filterStatusValue}
-            onChange={filterStatus}
-          >
-            <option value="">Todos</option>
-            <option value="activo">Activos</option>
-            <option value="no-activo">No activos</option>
-          </select>
-
-          <select
-            name="rubro"
-            className="form-select"
-            value={filterRubroValue ?? ""}
-            onChange={filterRubro}
-          >
-            <option value="">Todas las categorias</option>
-            {
-              rubros?.map((rubro) => (
-                <option key={rubro.id} value={rubro.id}>
-                  {rubro.denominacion}
-                </option>
-              ))
+    useEffect(() => {
+        const getData = async () => {
+            try {
+                const response = await getAll(sucursalId ?? 0);
+                const rubros = await getRubrosManufacturados();
+                setRubros(rubros.data);
+                console.log(response);
+                if (response) {
+                    setManufacturados(response);
+                    setOriginalManufacturados(response);
+                }
+            } catch (error) {
+                console.error("Error al obtener manufacturados: ", error);
             }
-          </select>
+        };
 
-          <button
-            className="btn btn-success"
-            onClick={() => navigate("/dashboard/manufacturados/add")}
-          >
-            + Nuevo Manufacturado
-          </button>
+        getData();
+    }, [sucursalId]);
+
+    useEffect(() => {
+        if (!originalManufacturados) return;
+
+        let filtered = [...originalManufacturados];
+
+        if (filterValue.trim() !== "") {
+            const search = filterValue.toLowerCase();
+            filtered = filtered.filter(
+                (u) =>
+                    u.denominacion.toLowerCase().includes(search) ||
+                    u.categoria?.toLowerCase().includes(search)
+            );
+        }
+
+        if (filterRubroValue !== null) {
+            filtered = filtered.filter((u) => u.categoriaId === Number(filterRubroValue));
+        }
+        if (filterStatusValue !== "") {
+            filtered = filtered.filter(
+                (u) => filterStatusValue === "activo" ? u.activo : !u.activo
+            );
+        }
+
+        setManufacturados(filtered);
+    }, [filterValue, filterRubroValue, filterStatusValue, originalManufacturados]);
+
+    const filterData = (e: ChangeEvent<HTMLInputElement>) => {
+        setFilterValue(e.target.value);
+    };
+
+    const filterRubro = (e: ChangeEvent<HTMLSelectElement>) => {
+        const value = e.target.value;
+        setFilterRubroValue(value ? Number(value) : null);
+    };
+
+    const filterStatus = (e: ChangeEvent<HTMLSelectElement>) => {
+        setFilterStatusValue(e.target.value);
+    };
+
+    const handleDeleteManufacturado = (id: number) => {
+        setCurrentId(id);
+        setShowModal(true);
+    };
+
+    const deleteManufacturadoConfirm = async () => {
+        await deleteManufacturado(currentId);
+        setManufacturados((prev) =>
+            prev?.map((m) => (m.id === currentId ? { ...m, activo: false } : m))
+        );
+        setOriginalManufacturados((prev) =>
+            prev?.map((m) => (m.id === currentId ? { ...m, activo: false } : m))
+        );
+        setShowModal(false);
+    };
+
+    return (
+        <div>
+            <div>
+                <h5>Manufacturados</h5>
+                <hr />
+                <div>
+                    {user?.role === "ADMIN" && (
+                        <div className="d-flex flex-wrap align-items-center justify-content-between gap-3 mb-4">
+                            <div>
+                                <p className="text-muted mb-0">
+                                    Gestioná productos y stock según la sucursal seleccionada.
+                                </p>
+                            </div>
+                            <div className="d-flex align-items-center gap-2">
+                                <label className="mb-0 text-muted" htmlFor="sucursal-select">
+                                    Sucursal:
+                                </label>
+                                <select
+                                    id="sucursal-select"
+                                    className="form-select form-select-sm w-auto"
+                                    value={sucursalId ?? ""}
+                                    onChange={handleSucursalChange}
+                                    disabled={loading || sucursales.length === 0}
+                                >
+                                    <option value="">Seleccione</option>
+                                    {sucursales.map((sucursal) => (
+                                        <option key={sucursal.id} value={sucursal.id}>
+                                            {sucursal.nombre}
+                                        </option>
+                                    ))}
+                                </select>
+                                {loading && (
+                                    <span className="text-muted small">cargando...</span>
+                                )}
+                            </div>
+                        </div>
+                    )}
+                </div>
+                <div className="header-dashboard">
+                    <input
+                        name="search"
+                        type="text"
+                        placeholder="Buscar manufacturados..."
+                        className="form-control"
+                        value={filterValue}
+                        onChange={filterData}
+                    />
+
+                    <select
+                        name="status"
+                        className="form-select"
+                        value={filterStatusValue}
+                        onChange={filterStatus}
+                    >
+                        <option value="">Todos</option>
+                        <option value="activo">Activos</option>
+                        <option value="no-activo">No activos</option>
+                    </select>
+
+                    <select
+                        name="rubro"
+                        className="form-select"
+                        value={filterRubroValue ?? ""}
+                        onChange={filterRubro}
+                    >
+                        <option value="">Todas las categorias</option>
+                        {
+                            rubros?.map((rubro) => (
+                                <option key={rubro.id} value={rubro.id}>
+                                    {rubro.denominacion}
+                                </option>
+                            ))
+                        }
+                    </select>
+
+                    <button
+                        className="btn btn-success"
+                        onClick={() => navigate("/dashboard/manufacturados/add")}
+                    >
+                        + Nuevo Manufacturado
+                    </button>
+                </div>
+                <table className="table table-hover">
+                    <thead>
+                    <th>#</th>
+                    <th>Denominación</th>
+                    <th>Precio de costo</th>
+                    <th>Precio de venta</th>
+                    <th>Categoría</th>
+                    <th>Tiempo</th>
+                    <th>Estado</th>
+                    <th>Acciones</th>
+                    </thead>
+                    <tbody className="table-group-divider">
+                    {manufacturados?.map((m, index) => (
+                        <tr key={index} className={m.activo ? "" : "deleted-row"}>
+                            <td>{m.id}</td>
+                            <td>{m.denominacion}</td>
+                            <td>${m.precioCosto}</td>
+                            <td>${m.precioVenta}</td>
+                            <td>{m.categoria}</td>
+                            <td>{m.tiempoEstimado} min</td>
+                            <td>
+                                <span className={`badge ${m.activo ? "text-bg-success" : "text-bg-secondary"}`}>
+                                    {m.activo ? "Alta" : "Baja"}
+                                </span>
+                            </td>
+                            <td>
+                                {
+                                    m.activo && (
+                                        <>
+                                            <button className="btn btn-primary" onClick={() => navigate(`/dashboard/manufacturados/edit/${m.id}`)}>Editar</button>
+                                            <button className="btn btn-danger" onClick={() => handleDeleteManufacturado(m.id)}>Eliminar</button>
+                                        </>
+                                    )
+                                }
+                            </td>
+                        </tr>
+                    ))}
+                    </tbody>
+                </table>
+            </div>
+            {showModal && (
+                <ModalConfirmAction
+                    show={showModal}
+                    setShowModal={setShowModal}
+                    headerText="¿Deseas eliminar el manufacturado?"
+                    bodyText="Se dara de baja el manufacturado y sus datos"
+                    onClick={() => deleteManufacturadoConfirm()}
+                />
+            )}
         </div>
-        <table className="table table-hover">
-          <thead>
-            <th>#</th>
-            <th>Denominación</th>
-            <th>Precio de costo</th>
-            <th>Precio de venta</th>
-            <th>Categoría</th>
-            <th>Acciones</th>
-          </thead>
-          <tbody className="table-group-divider">
-            {manufacturados?.map((m, index) => (
-              <tr key={index} className={m.activo ? "" : "deleted-row"}>
-                <td>{m.id}</td>
-                <td>{m.denominacion}</td>
-                <td>${m.precioCosto}</td>
-                <td>${m.precioVenta}</td>
-                <td>{m.categoria}</td>
-                <td>
-                  {
-                    m.activo && (
-                      <>
-                        <button className="btn btn-primary" onClick={() => navigate(`/dashboard/manufacturados/edit/${m.id}`)}>Editar</button>
-                        <button className="btn btn-danger" onClick={() => handleDeleteManufacturado(m.id)}>Eliminar</button>
-                      </>
-                    )
-                  }
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-      </div>
-      {showModal && (
-        <ModalConfirmAction
-          show={showModal}
-          setShowModal={setShowModal}
-          headerText="¿Deseas eliminar el manufacturado?"
-          bodyText="Se dara de baja el manufacturado y sus datos"
-          onClick={() => deleteManufacturadoConfirm()}
-        />
-      )}
-    </div>
-  );
+    );
 };
 
 export default ProductosManufacturados;

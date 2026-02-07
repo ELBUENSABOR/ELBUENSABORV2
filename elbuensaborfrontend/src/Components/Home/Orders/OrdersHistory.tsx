@@ -1,0 +1,112 @@
+import { useEffect, useMemo, useState } from "react";
+import { Link, useNavigate } from "react-router-dom";
+import { useUser } from "../../../contexts/UsuarioContext";
+import { getPedidosByCliente } from "../../../services/pedidoService";
+import type { PedidoResponse } from "../../../services/pedidoService";
+
+const formatDate = (value: string) => {
+    const date = new Date(value);
+    if (Number.isNaN(date.getTime())) return value;
+    return date.toLocaleDateString("es-AR", {
+        day: "2-digit",
+        month: "2-digit",
+        year: "numeric",
+        hour: "2-digit",
+        minute: "2-digit",
+    });
+};
+
+const OrdersHistory = () => {
+    const { user } = useUser();
+    const navigate = useNavigate();
+    const [orders, setOrders] = useState<PedidoResponse[]>([]);
+    const [loading, setLoading] = useState(true);
+    const [error, setError] = useState("");
+
+    useEffect(() => {
+        if (!user) {
+            navigate("/login", {
+                state: { redirectTo: "/pedidos" },
+                replace: true,
+            });
+        }
+    }, [user, navigate]);
+
+    useEffect(() => {
+        if (!user?.userId) return;
+
+        setLoading(true);
+        setError("");
+
+        getPedidosByCliente(Number(user.userId))
+            .then(setOrders)
+            .catch(() => setError("No se pudieron cargar los pedidos."))
+            .finally(() => setLoading(false));
+    }, [user?.userId]);
+
+    const rows = useMemo(() => {
+        return orders.map((pedido) => ({
+            ...pedido,
+            fechaFormateada: formatDate(pedido.fechaPedido),
+        }));
+    }, [orders]);
+
+    if (!user) return null;
+    if (loading) return <p className="p-4">Cargando pedidos...</p>;
+    if (error) return <p className="text-danger p-4">{error}</p>;
+
+    return (
+        <div className="container py-4">
+            <h3 className="mb-4">Mis pedidos</h3>
+
+            {rows.length === 0 ? (
+                <p>No hay pedidos registrados.</p>
+            ) : (
+                <div className="table-responsive">
+                    <table className="table table-striped align-middle">
+                        <thead>
+                        <tr>
+                            <th>Fecha</th>
+                            <th>Número</th>
+                            <th>Estado</th>
+                            <th>Total</th>
+                            <th className="text-end">Acciones</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        {rows.map((pedido) => (
+                            <tr key={pedido.id}>
+                                <td>{pedido.fechaFormateada}</td>
+                                <td>{pedido.numero}</td>
+                                <td>{pedido.estado}</td>
+                                <td>${pedido.total}</td>
+                                <td className="text-end">
+                                    <Link
+                                        className="btn btn-sm btn-outline-primary me-2"
+                                        to={`/pedido/${pedido.id}`}
+                                    >
+                                        Ver detalle
+                                    </Link>
+                                    {pedido.factura?.pdfUrl && (
+                                        <a
+                                            className="btn btn-sm btn-outline-success"
+                                            href={pedido.factura.pdfUrl}
+                                            target="_blank"
+                                            rel="noreferrer"
+                                            download
+                                        >
+                                            Ver factura (PDF)
+                                        </a>
+                                    )}
+                                </td>
+                            </tr>
+                        ))}
+                        </tbody>
+                    </table>
+                </div>
+            )}
+        </div>
+    );
+};
+
+export default OrdersHistory;

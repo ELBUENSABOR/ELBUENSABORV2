@@ -17,5 +17,5 @@ public record ArticuloManufacturadoRequest(
         @NotNull List<RecetaItemRequest> ingredientes,
         List<String> imagenes,
         Boolean activo
-        ) {
+) {
 }

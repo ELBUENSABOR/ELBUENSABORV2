@@ -14,7 +14,9 @@ const OrderDetails = () => {
         if (!id) return;
 
         getPedidoById(Number(id))
-            .then(res => { console.log(res); setPedido(res) })
+            .then(res => {
+                setPedido(res);
+            })
             .catch(() => setError("No se pudo cargar el pedido"))
             .finally(() => setLoading(false));
     }, [id]);
@@ -40,6 +42,10 @@ const OrderDetails = () => {
         <div className="container mt-4">
             <h3>Pedido {pedido.numero}</h3>
             <p>
+                <strong>Fecha:</strong>{" "}
+                {new Date(pedido.fechaPedido).toLocaleString("es-AR")}
+            </p>
+            <p>
                 <strong>Estado:</strong> {pedido.estado}
             </p>
             <p>
@@ -56,6 +62,20 @@ const OrderDetails = () => {
             <p>
                 <strong>Forma de pago:</strong>{" "}
                 {pedido.formaPago === "MP" ? "Mercado Pago" : "Efectivo"}
+            </p>
+            {pedido.tipoEnvio === "DELIVERY" && (
+                <>
+                    <p>
+                        <strong>Dirección:</strong> {pedido.direccionEntrega}
+                    </p>
+                    <p>
+                        <strong>Teléfono:</strong> {pedido.telefonoEntrega}
+                    </p>
+                </>
+            )}
+            <p>
+                <strong>Pago:</strong>{" "}
+                {pedido.pagado ? "Aprobado" : "Pendiente"}
             </p>
             <hr />
             <h5>Detalle del pedido</h5>
@@ -74,9 +94,28 @@ const OrderDetails = () => {
                 {pedido.gastosEnvio > 0 && <p>Envío: ${pedido.gastosEnvio}</p>}
                 <h5>Total: ${pedido.total}</h5>
             </div>
+            {pedido.factura && (
+                <div className="mt-3 p-3 border rounded">
+                    <h5>Factura</h5>
+                    <p>Número: {pedido.factura.numeroComprobante}</p>
+                    <p>Total: ${pedido.factura.totalVenta}</p>
+                    {pedido.factura.pdfUrl && (
+                        <a
+                            href={pedido.factura.pdfUrl}
+                            target="_blank"
+                            rel="noreferrer"
+                            download
+                            className="btn btn-outline-success"
+                        >
+                            Ver factura (PDF)
+                        </a>
+                    )}
+                </div>
+            )}
             {pedido.formaPago === "MP" &&
                 pedido.estado === "A_CONFIRMAR" &&
-                !pedido.pagado && (
+                !pedido.pagado &&
+                !pedido.factura?.pdfUrl && (
                     <button
                         className="btn btn-primary w-100 mt-3"
                         onClick={handlePagar}

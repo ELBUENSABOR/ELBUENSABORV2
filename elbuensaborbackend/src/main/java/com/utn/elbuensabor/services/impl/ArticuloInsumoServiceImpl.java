@@ -171,7 +171,7 @@ public class ArticuloInsumoServiceImpl implements ArticuloInsumoService {
                 unidadMedidaDTO,
                 stocks,
                 imagenes
-                );
+        );
     }
 
     private static CategoriaResponse getCategoriaResponse(ArticuloInsumo insumo) {

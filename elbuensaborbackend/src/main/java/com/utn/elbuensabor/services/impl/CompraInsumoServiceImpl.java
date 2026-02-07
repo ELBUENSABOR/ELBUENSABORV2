@@ -89,7 +89,7 @@ public class CompraInsumoServiceImpl implements CompraInsumoService {
                 new UnidadMedidaDTO(i.getUnidadMedida().getId(), i.getUnidadMedida().getDenominacion()),
                 new ArrayList<>(),
                 new ArrayList<>() // stockSucursal - passing empty to avoid recursion or extra query, seeing as
-                                  // this is just for display in list
+                // this is just for display in list
         );
     }
 

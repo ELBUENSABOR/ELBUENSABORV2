@@ -51,7 +51,7 @@ const Login = () => {
                 msg: "¡Login exitoso!",
             });
 
-            const { token, username, role, subRole, userId, mustChangePassword } = resp.data;
+            const {token, username, role, subRole, userId, mustChangePassword} = resp.data;
 
             setUser({
                 token,
@@ -63,7 +63,9 @@ const Login = () => {
             });
 
             setTimeout(() => {
-                if (state?.from === "cart") {
+                if (state?.redirectTo) {
+                    navigate(state.redirectTo);
+                } else if (state?.from === "cart") {
                     navigate("/confirm-order");
                 } else {
                     navigate("/");

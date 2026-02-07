@@ -27,7 +27,9 @@ public record PedidoRequest(
         List<PedidoDetalleDTO> detalles,
 
         Double descuento,
-        String observaciones
+        String observaciones,
+        String direccionEntrega,
+        String telefonoEntrega
 ) {
 }
 
