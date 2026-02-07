@@ -17,7 +17,12 @@ import {
 } from "lucide-react";
 
 const links = [
-    {path: "/dashboard/home", label: "Inicio", icon: Home, rol: ["ADMIN"]},
+    {
+        path: "/dashboard/home",
+        label: "Inicio",
+        icon: Home,
+        rol: ["ADMIN", "EMPLEADO", "COCINERO", "DELIVERY", "CAJERO"]
+    },
     {path: "/dashboard/sucursales", label: "Sucursales", icon: Building2, rol: ["ADMIN"]},
     {path: "/dashboard/usuarios", label: "Usuarios", icon: Users, rol: ["ADMIN"]},
     {path: "/dashboard/rubros-insumos", label: "Rubros de insumos", icon: Tags, rol: ["ADMIN"]},
