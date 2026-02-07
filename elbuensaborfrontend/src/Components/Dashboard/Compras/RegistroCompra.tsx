@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Form, Button, Container, Row, Col, Alert, Spinner } from 'react-bootstrap';
 import { getAll, registrarCompraInsumo } from '../../../services/insumosService';
 import { useSucursal } from '../../../contexts/SucursalContext';
-import { useNavigate } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
 import type { InsumoResponse } from '../../../models/Insumo';
 
 const RegistroCompra = () => {
@@ -18,10 +18,20 @@ const RegistroCompra = () => {
 
   const { sucursalId, sucursales } = useSucursal();
   const navigate = useNavigate();
+  const location = useLocation();
+  const preselectedInsumoId = (location.state as { insumoId?: number } | null)?.insumoId;
 
   useEffect(() => {
     fetchInsumos();
   }, [sucursalId]);
+
+  useEffect(() => {
+    if (!preselectedInsumoId || insumos.length === 0) return;
+    const selected = insumos.find(i => i.id === preselectedInsumoId);
+    if (!selected) return;
+    setSelectedInsumoId(preselectedInsumoId);
+    setPrecioCompra(selected.precioCompra || 0);
+  }, [preselectedInsumoId, insumos]);
 
   const fetchInsumos = async () => {
     setLoadingInsumos(true);
