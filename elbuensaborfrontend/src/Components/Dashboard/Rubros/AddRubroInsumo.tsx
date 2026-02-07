@@ -12,6 +12,7 @@ const initialState: Rubro = {
   id: 0,
   denominacion: "",
   categoriaPadreId: null,
+  activo: true,
 };
 
 const AddRubroInsumo = () => {
@@ -60,8 +61,11 @@ const AddRubroInsumo = () => {
   }, [id, token, isEdit]);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const { name, value } = e.target;
-    setForm((prev) => ({ ...prev, [name]: value }));
+    const { name, value, type, checked } = e.target;
+    setForm((prev) => ({
+      ...prev,
+      [name]: type === "checkbox" ? checked : value,
+    }));
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -100,6 +104,20 @@ const AddRubroInsumo = () => {
         />
       </div>
 
+      <div className="form-check form-switch mb-3">
+        <input
+          className="form-check-input"
+          type="checkbox"
+          name="activo"
+          id="rubro-activo-insumo"
+          checked={Boolean(form.activo)}
+          onChange={handleChange}
+        />
+        <label className="form-check-label" htmlFor="rubro-activo-insumo">
+          Rubro activo
+        </label>
+      </div>
+
       {isSubrubro && (
         <div className="alert alert-info">
           Este subrubro pertenece al rubro{" "}
@@ -107,9 +125,18 @@ const AddRubroInsumo = () => {
         </div>
       )}
 
-      <button className="btn btn-primary mt-3" type="submit">
-        {isEdit ? "Guardar Cambios" : "Crear"}
-      </button>
+      <div className="mt-3 d-flex gap-2">
+        <button className="btn btn-primary" type="submit">
+          {isEdit ? "Guardar Cambios" : "Crear"}
+        </button>
+        <button
+          className="btn btn-outline-secondary"
+          type="button"
+          onClick={() => navigate("/dashboard/rubros-insumos")}
+        >
+          Cancelar
+        </button>
+      </div>
     </form>
   );
 };
