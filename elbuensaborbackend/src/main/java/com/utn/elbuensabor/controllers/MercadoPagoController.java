@@ -49,10 +49,16 @@ public class MercadoPagoController {
                     "message", ex.getMessage()
             ));
         } catch (MPApiException ex) {
+            String apiContent = ex.getApiResponse() != null ? ex.getApiResponse().getContent() : null;
+            boolean unauthorized = ex.getStatusCode() == 401
+                    || ex.getStatusCode() == 403
+                    || (apiContent != null && apiContent.contains("MP-UNAUTHORIZED"));
             return ResponseEntity.status(502).body(Map.of(
-                    "message", "Error al crear la preferencia en Mercado Pago",
+                    "message", unauthorized
+                            ? "Credenciales de Mercado Pago inválidas. Verificá MERCADOPAGO_ACCESS_TOKEN."
+                            : "Error al crear la preferencia en Mercado Pago",
                     "status", ex.getStatusCode(),
-                    "error", ex.getApiResponse() != null ? ex.getApiResponse().getContent() : null
+                    "error", apiContent
             ));
         } catch (MPException ex) {
             return ResponseEntity.status(502).body(Map.of(

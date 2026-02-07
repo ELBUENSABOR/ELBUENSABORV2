@@ -13,11 +13,12 @@ public class MercadoPagoConfiguration {
 
     @PostConstruct
     public void init() {
+        if (accessToken == null || accessToken.trim().isEmpty()) {
+            throw new IllegalStateException(
+                    "Falta configurar mercadopago.access-token. Definí MERCADOPAGO_ACCESS_TOKEN con un token válido."
+            );
+        }
         MercadoPagoConfig.setAccessToken(accessToken);
-
-        System.out.println(
-                "MercadoPago token cargado: " +
-                        accessToken.substring(0, Math.min(10, accessToken.length())) + "..."
-        );
+        System.out.println("MercadoPago token configurado.");
     }
 }

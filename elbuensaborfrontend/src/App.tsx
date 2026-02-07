@@ -1,5 +1,12 @@
 import {useState} from "react";
-import {BrowserRouter, Routes, Route, Outlet, useLocation} from "react-router-dom";
+import {
+    BrowserRouter,
+    Routes,
+    Route,
+    Outlet,
+    useLocation,
+    Navigate
+} from "react-router-dom";
 import Navbar from "./Components/Navbar/Navbar";
 import Home from "./Components/Home/Home";
 import Register from "./Components/Auth/Register";
@@ -13,11 +20,19 @@ import ProductDetail from "./Components/Home/Catalog/ProductDetail/ProductDetail
 import ConfirmOrder from "./Components/Home/Cart/ConfirmOrder/ConfirmOrder";
 import OrderDetails from "./Components/Home/OrderDetails/OrderDetails";
 import OrdersHistory from "./Components/Home/Orders/OrdersHistory";
+import {useUser} from "./contexts/UsuarioContext";
+import {getEmployeeDashboardRoute} from "./utils/employeePanel";
 
 function MainLayout() {
     const [isCartOpen, setIsCartOpen] = useState(false);
     const location = useLocation();
+    const {user} = useUser();
     const isDashboardRoute = location.pathname.startsWith("/dashboard");
+    const isAccountRoute = location.pathname === "/account";
+
+    if (user?.role === "EMPLEADO" && !isDashboardRoute && !isAccountRoute) {
+        return <Navigate to={getEmployeeDashboardRoute(user.role, user.subRole)} replace/>;
+    }
 
     return (
         <>

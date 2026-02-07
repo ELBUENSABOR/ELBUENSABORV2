@@ -1,6 +1,7 @@
 import {Route, Routes} from "react-router-dom";
 import DashboardLayout from "./DashboardLayout";
 import DashboardHome from "./DashboardHome";
+import EmployeeDashboardHome from "./EmployeeDashboardHome";
 import RubrosInsumos from "./Rubros/RubrosInsumos";
 import RubrosManufacturados from "./Rubros/RubrosManufacturados";
 import ProductosInsumos from "./Productos/ProductosInsumos";
@@ -22,12 +23,23 @@ import ComprasTable from "./Compras/ComprasTable";
 import PedidosAdmin from "./Pedidos/PedidosAdmin";
 import PedidosCocina from "./Pedidos/PedidosCocina";
 import PedidosDelivery from "./Pedidos/PedidosDelivery";
+import {useUser} from "../../contexts/UsuarioContext";
+
+const DashboardIndex = () => {
+    const {user} = useUser();
+
+    if (user?.role === "EMPLEADO") {
+        return <EmployeeDashboardHome subRole={user.subRole} />;
+    }
+
+    return <DashboardHome/>;
+};
 
 const DashboardRoutes = () => (
     <Routes>
         <Route element={<DashboardLayout/>}>
-            <Route index element={<DashboardHome/>}/>
-            <Route path="home" element={<DashboardHome/>}/>
+            <Route index element={<DashboardIndex/>}/>
+            <Route path="home" element={<DashboardIndex/>}/>
             <Route element={<PrivateRoute roles={["ADMIN"]}/>}>
                 <Route path="usuarios" element={<Users/>}/>
                 <Route path="usuarios/add" element={<AddUser/>}/>

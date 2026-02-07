@@ -1,6 +1,7 @@
 import {NavLink} from "react-router-dom";
 import {useUser} from "../../../contexts/UsuarioContext";
 import "./sidebar.css";
+import {getEmployeePanelLabel} from "../../../utils/employeePanel";
 
 import {
     Home,
@@ -16,7 +17,12 @@ import {
 } from "lucide-react";
 
 const links = [
-    {path: "/dashboard/home", label: "Inicio", icon: Home, rol: ["COCINERO", "ADMIN"]},
+    {
+        path: "/dashboard/home",
+        label: "Inicio",
+        icon: Home,
+        rol: ["ADMIN", "EMPLEADO", "COCINERO", "DELIVERY", "CAJERO"]
+    },
     {path: "/dashboard/sucursales", label: "Sucursales", icon: Building2, rol: ["ADMIN"]},
     {path: "/dashboard/usuarios", label: "Usuarios", icon: Users, rol: ["ADMIN"]},
     {path: "/dashboard/rubros-insumos", label: "Rubros de insumos", icon: Tags, rol: ["ADMIN"]},
@@ -38,6 +44,11 @@ const links = [
 
 const Sidebar = ({open, close}: { open: boolean; close: () => void }) => {
     const user = useUser();
+    const isEmployee = user.user?.role === "EMPLEADO";
+    const panelTitle = isEmployee
+        ? getEmployeePanelLabel(user.user?.subRole)
+        : "Admin Panel";
+    const panelSubtitle = isEmployee ? "Área de trabajo" : "Gestión del sistema";
 
     return (
         <nav
@@ -52,35 +63,37 @@ const Sidebar = ({open, close}: { open: boolean; close: () => void }) => {
             <div className="sidebar-brand">
                 <div className="brand-logo"><BarChart3/></div>
                 <div>
-                    <span className="brand-title">Admin Panel</span>
-                    <span className="brand-subtitle">Gestión del sistema</span>
+                    <span className="brand-title">{panelTitle}</span>
+                    <span className="brand-subtitle">{panelSubtitle}</span>
                 </div>
             </div>
 
             <div className="sidebar-section">Navegación</div>
 
             <ul className="nav nav-pills flex-column mb-auto">
-                {links.map(
-                    (link) =>
-                        user?.user?.role &&
-                        link.rol.includes(
-                            user.user.role === "EMPLEADO"
-                                ? (user.user.subRole || user.user.role)
-                                : user.user.role
-                        ) && (
-                            <li className="nav-item" key={link.path} onClick={close}>
-                                <NavLink
-                                    to={link.path}
-                                    className={({isActive}) =>
-                                        `nav-link ${isActive ? "active" : ""}`
-                                    }
-                                >
-                                    <link.icon size={18} className="nav-icon"/>
-                                    <span>{link.label}</span>
-                                </NavLink>
-                            </li>
-                        )
-                )}
+                {links.map((link) => {
+                    if (!user?.user?.role) return null;
+                    const matchesRole = link.rol.includes(user.user.role);
+                    const matchesSubRole = user.user.subRole
+                        ? link.rol.includes(user.user.subRole)
+                        : false;
+
+                    if (!matchesRole && !matchesSubRole) return null;
+
+                    return (
+                        <li className="nav-item" key={link.path} onClick={close}>
+                            <NavLink
+                                to={link.path}
+                                className={({isActive}) =>
+                                    `nav-link ${isActive ? "active" : ""}`
+                                }
+                            >
+                                <link.icon size={18} className="nav-icon"/>
+                                <span>{link.label}</span>
+                            </NavLink>
+                        </li>
+                    );
+                })}
             </ul>
         </nav>
     );
