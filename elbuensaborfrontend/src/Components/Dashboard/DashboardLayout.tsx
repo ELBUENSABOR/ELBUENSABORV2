@@ -7,6 +7,7 @@ import Sidebar from "./Sidebar/Sidebar";
 import "./dashboard.css";
 import {useUser} from "../../contexts/UsuarioContext";
 import {getEmployeePanelLabel} from "../../utils/employeePanel";
+import {ChangePasswordPopup} from "../Home/ChangePasswordPopup";
 
 const DashboardLayout = () => {
     const [open, setOpen] = useState(false);
@@ -19,6 +20,7 @@ const DashboardLayout = () => {
 
     return (
         <div className="d-flex layout-dashboard">
+            <ChangePasswordPopup/>
             <button className="menu-toggle" onClick={() => setOpen(true)}>
                 <FaRegArrowAltCircleRight/>
             </button>
