@@ -1,5 +1,6 @@
 import { Navigate, Outlet } from "react-router-dom";
 import { useUser } from "../contexts/UsuarioContext";
+import {getEmployeeDashboardRoute} from "../utils/employeePanel";
 
 const EMPLOYEE_ROLES = ["CAJERO", "DELIVERY", "COCINERO", "ADMINISTRADOR"];
 
@@ -15,7 +16,15 @@ const PrivateRoute = ({ roles }: { roles: string[] }) => {
     return false;
   });
 
-  if (!hasPermission) return <Navigate to="/" />;
+    if (!hasPermission) {
+        if (user.role === "EMPLEADO") {
+            return (
+                <Navigate to={getEmployeeDashboardRoute(user.role, user.subRole)} replace />
+            );
+        }
+
+        return <Navigate to="/" />;
+    }
 
   return <Outlet />;
 };
