@@ -1,6 +1,7 @@
-import {Navigate, Route, Routes} from "react-router-dom";
+import {Route, Routes} from "react-router-dom";
 import DashboardLayout from "./DashboardLayout";
 import DashboardHome from "./DashboardHome";
+import EmployeeDashboardHome from "./EmployeeDashboardHome";
 import RubrosInsumos from "./Rubros/RubrosInsumos";
 import RubrosManufacturados from "./Rubros/RubrosManufacturados";
 import ProductosInsumos from "./Productos/ProductosInsumos";
@@ -23,13 +24,12 @@ import PedidosAdmin from "./Pedidos/PedidosAdmin";
 import PedidosCocina from "./Pedidos/PedidosCocina";
 import PedidosDelivery from "./Pedidos/PedidosDelivery";
 import {useUser} from "../../contexts/UsuarioContext";
-import {getEmployeeDashboardRoute} from "../../utils/employeePanel";
 
 const DashboardIndex = () => {
     const {user} = useUser();
 
     if (user?.role === "EMPLEADO") {
-        return <Navigate to={getEmployeeDashboardRoute(user.role, user.subRole)} replace/>;
+        return <EmployeeDashboardHome subRole={user.subRole} />;
     }
 
     return <DashboardHome/>;
