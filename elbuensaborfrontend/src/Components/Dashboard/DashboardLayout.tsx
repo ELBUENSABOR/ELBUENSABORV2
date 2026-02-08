@@ -9,8 +9,14 @@ import {useUser} from "../../contexts/UsuarioContext";
 import {getEmployeePanelLabel} from "../../utils/employeePanel";
 import {ChangePasswordPopup} from "../Home/ChangePasswordPopup";
 
+
 const DashboardLayout = () => {
     const [open, setOpen] = useState(false);
+    const {user, logout} = useUser();
+    const isEmployee = user?.role === "EMPLEADO";
+    const panelTitle = isEmployee
+        ? getEmployeePanelLabel(user?.subRole)
+        : "Panel de Administración";
 
     const {user, logout} = useUser();
     const isEmployee = user?.role === "EMPLEADO";

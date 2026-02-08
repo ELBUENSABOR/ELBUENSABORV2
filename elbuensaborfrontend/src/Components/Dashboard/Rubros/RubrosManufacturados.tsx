@@ -3,10 +3,10 @@ import "./rubros.css";
 import {useNavigate} from "react-router-dom";
 import ModalConfirmAction from "../../ModalConfirmAction/ModalConfirmAction";
 import Alert from "../../Alert/Alert";
-import type {Rubro} from "../../../models/Rubro";
+import type { Rubro } from "../../../models/Rubro";
 import {
-    deleteRubroManufacturadoService,
-    getRubrosManufacturados,
+  deleteRubroManufacturadoService,
+  getRubrosManufacturados,
 } from "../../../services/rubrosService";
 
 const RubrosManufacturados = () => {
@@ -46,17 +46,25 @@ const RubrosManufacturados = () => {
         return roots;
     };
 
-    useEffect(() => {
-        const getData = async () => {
-            try {
-                const res = await getRubrosManufacturados();
-                setOriginalRubros(res.data);
+        <td>
+          <span className={`badge ${node.activo ? "bg-success" : "bg-secondary"}`}>
+            {node.activo ? "Activo" : "Inactivo"}
+          </span>
+        </td>
 
-                const tree = buildTree(res.data);
-                setRubrosTree(tree);
-                console.log("tree", tree);
-            } catch (error) {
-                console.error("Error al obtener rubros", error);
+        <td>
+          <button
+            onClick={() =>
+              navigate(`/dashboard/manufacturados/rubros/edit/${node.id}`)
+            }
+            className="btn btn-primary btn-sm me-2"
+          >
+            Editar
+          </button>
+
+          <button
+            onClick={() =>
+              navigate(`/dashboard/manufacturados/rubros/${node.id}/add`)
             }
         };
 
@@ -156,25 +164,25 @@ const RubrosManufacturados = () => {
             (r) => !r.categoriaPadreId || r.categoriaPadreId === 0
         );
 
-        return roots.map(recursiveFilter).filter(Boolean) as Rubro[];
-    };
+    return roots.map(recursiveFilter).filter(Boolean) as Rubro[];
+  };
 
-    const deleteRubro = async (id: number) => {
-        try {
-            const res = await deleteRubroManufacturadoService(id);
-            if (res) {
-                setRefresh(!refresh);
-                setAlertMessage("Rubro eliminado con éxito!");
-                setAlertStatus("success");
-                setShowAlert(true);
-            }
-        } catch (error) {
-            console.error("Error", error);
-            setAlertMessage("Error al eliminar el rubro");
-            setAlertStatus("error");
-            setShowAlert(true);
-        }
-    };
+  const deleteRubro = async (id: number) => {
+    try {
+      const res = await deleteRubroManufacturadoService(id);
+      if (res) {
+        setRefresh(!refresh);
+        setAlertMessage("Rubro eliminado con éxito!");
+        setAlertStatus("success");
+        setShowAlert(true);
+      }
+    } catch (error) {
+      console.error("Error", error);
+      setAlertMessage("Error al eliminar el rubro");
+      setAlertStatus("error");
+      setShowAlert(true);
+    }
+  };
 
     return (
         <div className="users-container">
@@ -219,7 +227,7 @@ const RubrosManufacturados = () => {
                             <th>#</th>
                             <th>Denominación</th>
                             <th>Estado</th>
-                            <th style={{width: "280px"}}>Acciones</th>
+                            <th style={{ width: "280px" }}>Acciones</th>
                         </tr>
                         </thead>
 

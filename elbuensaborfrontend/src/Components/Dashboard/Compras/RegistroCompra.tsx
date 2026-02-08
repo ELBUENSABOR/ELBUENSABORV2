@@ -1,49 +1,94 @@
-import React, {useState, useEffect} from 'react';
-import {Form, Button, Container, Row, Col, Alert, Spinner} from 'react-bootstrap';
-import {getAll, registrarCompraInsumo} from '../../../services/insumosService';
-import {useSucursal} from '../../../contexts/SucursalContext';
-import {useLocation, useNavigate} from 'react-router-dom';
-import type {InsumoResponse} from '../../../models/Insumo';
+import React, { useState, useEffect } from 'react';
+import { Form, Button, Container, Row, Col, Alert, Spinner } from 'react-bootstrap';
+import { getAll, registrarCompraInsumo } from '../../../services/insumosService';
+import { useSucursal } from '../../../contexts/SucursalContext';
+import { useLocation, useNavigate } from 'react-router-dom';
+import type { InsumoResponse } from '../../../models/Insumo';
 
 const RegistroCompra = () => {
-    const [insumos, setInsumos] = useState<InsumoResponse[]>([]);
-    const [selectedInsumoId, setSelectedInsumoId] = useState<number>(0);
-    const [selectedSucursalId, setSelectedSucursalId] = useState<number>(0);
-    const [cantidad, setCantidad] = useState<number>(0);
-    const [precioCompra, setPrecioCompra] = useState<number>(0);
-    const [totalCompra, setTotalCompra] = useState<number>(0);
-    const [loading, setLoading] = useState(false);
-    const [loadingInsumos, setLoadingInsumos] = useState(true);
-    const [message, setMessage] = useState<{ type: 'success' | 'danger', text: string } | null>(null);
+  const [insumos, setInsumos] = useState<InsumoResponse[]>([]);
+  const [selectedInsumoId, setSelectedInsumoId] = useState<number>(0);
+  const [selectedSucursalId, setSelectedSucursalId] = useState<number>(0);
+  const [cantidad, setCantidad] = useState<number>(0);
+  const [precioCompra, setPrecioCompra] = useState<number>(0);
+  const [totalCompra, setTotalCompra] = useState<number>(0);
+  const [loading, setLoading] = useState(false);
+  const [loadingInsumos, setLoadingInsumos] = useState(true);
+  const [message, setMessage] = useState<{ type: 'success' | 'danger', text: string } | null>(null);
 
-    const {sucursalId, sucursales} = useSucursal();
-    const navigate = useNavigate();
-    const location = useLocation();
-    const preselectedInsumoId = (location.state as { insumoId?: number } | null)?.insumoId;
+  const { sucursalId, sucursales } = useSucursal();
+  const navigate = useNavigate();
+  const location = useLocation();
+  const preselectedInsumoId = (location.state as { insumoId?: number } | null)?.insumoId;
 
-    useEffect(() => {
-        fetchInsumos();
-    }, [sucursalId]);
+  useEffect(() => {
+    fetchInsumos();
+  }, [sucursalId]);
 
-    useEffect(() => {
-        if (!preselectedInsumoId || insumos.length === 0) return;
-        const selected = insumos.find(i => i.id === preselectedInsumoId);
-        if (!selected) return;
-        setSelectedInsumoId(preselectedInsumoId);
-        setPrecioCompra(selected.precioCompra || 0);
-    }, [preselectedInsumoId, insumos]);
+  useEffect(() => {
+    if (!preselectedInsumoId || insumos.length === 0) return;
+    const selected = insumos.find(i => i.id === preselectedInsumoId);
+    if (!selected) return;
+    setSelectedInsumoId(preselectedInsumoId);
+    setPrecioCompra(selected.precioCompra || 0);
+  }, [preselectedInsumoId, insumos]);
 
-    const fetchInsumos = async () => {
-        setLoadingInsumos(true);
-        try {
-            const data = await getAll();
-            setInsumos(data);
-        } catch (error) {
-            console.error("Error al cargar insumos", error);
-            setMessage({type: 'danger', text: 'Error al cargar los insumos.'});
-        } finally {
-            setLoadingInsumos(false);
-        }
+  const fetchInsumos = async () => {
+    setLoadingInsumos(true);
+    try {
+      const data = await getAll();
+      setInsumos(data);
+    } catch (error) {
+      console.error("Error al cargar insumos", error);
+      setMessage({ type: 'danger', text: 'Error al cargar los insumos.' });
+    } finally {
+      setLoadingInsumos(false);
+    }
+  };
+
+  const handleInsumoChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    const id = Number(e.target.value);
+    setSelectedInsumoId(id);
+
+    // Auto-fill price if available
+    const selected = insumos.find(i => i.id === id);
+    if (selected) {
+      setPrecioCompra(selected.precioCompra || 0);
+    }
+  };
+
+  const handleCantidadChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+    const value = e.target.value;
+    setCantidad(Number(value));
+    setTotalCompra(Number(value) * Number(precioCompra));
+  };
+
+  const handlePrecioCompraChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+    const value = e.target.value;
+    setPrecioCompra(Number(value));
+    setTotalCompra(Number(cantidad) * Number(value));
+  };
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!sucursalId) {
+      setMessage({ type: 'danger', text: 'Seleccione una sucursal primero.' });
+      return;
+    }
+    if (!selectedInsumoId || !cantidad) {
+      setMessage({ type: 'danger', text: 'Complete los campos obligatorios.' });
+      return;
+    }
+
+    setLoading(true);
+    setMessage(null);
+
+    const payload = {
+      insumoId: selectedInsumoId,
+      sucursalId,
+      cantidad: Number(cantidad),
+      precioCompra: precioCompra ? Number(precioCompra) : undefined,
+      totalCompra: Number(totalCompra)
     };
 
     const handleInsumoChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
