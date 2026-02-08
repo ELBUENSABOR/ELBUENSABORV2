@@ -9,10 +9,10 @@ import {
 } from "../../../services/rubrosService";
 
 const initialState: Rubro = {
-  id: 0,
-  denominacion: "",
-  categoriaPadreId: null,
-  activo: true,
+    id: 0,
+    denominacion: "",
+    categoriaPadreId: null,
+    activo: true,
 };
 
 const AddRubroInsumo = () => {
@@ -83,88 +83,62 @@ const AddRubroInsumo = () => {
         }
     };
 
-    getData();
-  }, [id, token, isEdit]);
+    return (
+        <form onSubmit={handleSubmit} className="p-4 border rounded mt-4">
+            <h2 className="mb-4">
+                {isEdit
+                    ? "Editar Rubro"
+                    : isSubrubro
+                        ? "Crear Subrubro"
+                        : "Crear Nuevo Rubro"}
+            </h2>
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const { name, value, type, checked } = e.target;
-    setForm((prev) => ({
-      ...prev,
-      [name]: type === "checkbox" ? checked : value,
-    }));
-  };
+            <div className="mb-3">
+                <label className="form-label">Denominación</label>
+                <input
+                    name="denominacion"
+                    className="form-control"
+                    value={form.denominacion}
+                    onChange={handleChange}
+                    required
+                />
+            </div>
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
+            <div className="form-check form-switch mb-3">
+                <input
+                    className="form-check-input"
+                    type="checkbox"
+                    name="activo"
+                    id="rubro-activo-insumo"
+                    checked={Boolean(form.activo)}
+                    onChange={handleChange}
+                />
+                <label className="form-check-label" htmlFor="rubro-activo-insumo">
+                    Rubro activo
+                </label>
+            </div>
 
-    try {
-      if (isEdit) {
-        await updateRubro(Number(id), form);
-      } else {
-        await createRubro(form);
-      }
-      navigate("/dashboard/rubros-insumos");
-    } catch (error) {
-      console.error("Error al guardar rubro", error);
-    }
-  };
+            {isSubrubro && (
+                <div className="alert alert-info">
+                    Este subrubro pertenece al rubro{" "}
+                    <strong>{parentData.denominacion}</strong>
+                </div>
+            )}
 
-  return (
-    <form onSubmit={handleSubmit} className="p-4 border rounded mt-4">
-      <h2 className="mb-4">
-        {isEdit
-          ? "Editar Rubro"
-          : isSubrubro
-          ? "Crear Subrubro"
-          : "Crear Nuevo Rubro"}
-      </h2>
-
-      <div className="mb-3">
-        <label className="form-label">Denominación</label>
-        <input
-          name="denominacion"
-          className="form-control"
-          value={form.denominacion}
-          onChange={handleChange}
-          required
-        />
-      </div>
-
-      <div className="form-check form-switch mb-3">
-        <input
-          className="form-check-input"
-          type="checkbox"
-          name="activo"
-          id="rubro-activo-insumo"
-          checked={Boolean(form.activo)}
-          onChange={handleChange}
-        />
-        <label className="form-check-label" htmlFor="rubro-activo-insumo">
-          Rubro activo
-        </label>
-      </div>
-
-      {isSubrubro && (
-        <div className="alert alert-info">
-          Este subrubro pertenece al rubro{" "}
-          <strong>{parentData.denominacion}</strong>
-        </div>
-      )}
-
-      <div className="mt-3 d-flex gap-2">
-        <button className="btn btn-primary" type="submit">
-          {isEdit ? "Guardar Cambios" : "Crear"}
-        </button>
-        <button
-          className="btn btn-outline-secondary"
-          type="button"
-          onClick={() => navigate("/dashboard/rubros-insumos")}
-        >
-          Cancelar
-        </button>
-      </div>
-    </form>
-  );
+            <div className="mt-3 d-flex gap-2">
+                <button className="btn btn-primary" type="submit">
+                    {isEdit ? "Guardar Cambios" : "Crear"}
+                </button>
+                <button
+                    className="btn btn-outline-secondary"
+                    type="button"
+                    onClick={() => navigate("/dashboard/rubros-insumos")}
+                >
+                    Cancelar
+                </button>
+            </div>
+        </form>
+    );
 };
 
 export default AddRubroInsumo;
