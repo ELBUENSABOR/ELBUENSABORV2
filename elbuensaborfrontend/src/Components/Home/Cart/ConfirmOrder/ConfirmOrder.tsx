@@ -15,7 +15,7 @@ type FormaPago = "EFECTIVO" | "MP";
 const ConfirmOrder = () => {
     const { items, total, clearCart } = useCart();
     const { user } = useUser();
-    const { sucursalId } = useSucursal();
+    const { sucursalId, sucursales, setSucursalId, loading } = useSucursal();
     const navigate = useNavigate();
 
     const [step, setStep] = useState<1 | 2 | 3>(1);
@@ -75,11 +75,13 @@ const ConfirmOrder = () => {
     const totalFinal = total - descuento + costoEnvio;
     const puedeContinuarStep1 = (() => {
         if (!tipoEnvio) return false;
+        if (!sucursalId) return false;
         if (tipoEnvio === "DELIVERY") {
             return Boolean(direccion.trim() && telefono.trim());
         }
         return true;
     })();
+    const sucursalSeleccionada = sucursales.find((s) => s.id === sucursalId);
 
     if (!user || items.length === 0) {
         return <p className="text-muted p-4">No hay productos en el carrito</p>;
@@ -158,6 +160,34 @@ const ConfirmOrder = () => {
             {step === 1 && (
                 <>
                     <h5>Forma de entrega</h5>
+
+                    <div className="mb-3">
+                        <label className="form-label">Sucursal</label>
+                        <select
+                            className="form-select"
+                            value={sucursalId ?? ""}
+                            onChange={(event) =>
+                                setSucursalId(
+                                    event.target.value
+                                        ? Number(event.target.value)
+                                        : null
+                                )
+                            }
+                            disabled={loading || sucursales.length === 0}
+                        >
+                            <option value="">Seleccioná una sucursal...</option>
+                            {sucursales.map((sucursal) => (
+                                <option key={sucursal.id} value={sucursal.id}>
+                                    {sucursal.nombre}
+                                </option>
+                            ))}
+                        </select>
+                        {!sucursalId && (
+                            <small className="text-danger">
+                                Elegí una sucursal para continuar con el pedido.
+                            </small>
+                        )}
+                    </div>
 
                     <div className="d-flex gap-2 mb-3">
                         <button
@@ -286,6 +316,9 @@ const ConfirmOrder = () => {
                     <p>
                         Forma de pago:{" "}
                         {formaPago === "MP" ? "Mercado Pago" : "Efectivo"}
+                    </p>
+                    <p>
+                        Sucursal: {sucursalSeleccionada?.nombre ?? "Sin selección"}
                     </p>
                     <strong>Total: ${totalFinal}</strong>
 

@@ -9,6 +9,8 @@ import com.utn.elbuensabor.entities.ImagenInsumo;
 import com.utn.elbuensabor.entities.SucursalInsumo;
 import com.utn.elbuensabor.entities.UnidadMedida;
 import com.utn.elbuensabor.services.ArticuloInsumoService;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -100,7 +102,7 @@ public class ArticuloInsumoServiceImpl implements ArticuloInsumoService {
                         .orElse(null);
 
                 if (existing != null) {
-                    existing.setStockActual(stockReq.stockActual());
+                    existing.setStockActual(resolveStockActual(existing.getStockActual(), stockReq.stockActual()));
                     existing.setStockMinimo(stockReq.stockMinimo());
                     existing.setStockMaximo(stockReq.stockMaximo());
                 } else {
@@ -109,7 +111,7 @@ public class ArticuloInsumoServiceImpl implements ArticuloInsumoService {
                     var newStock = new SucursalInsumo();
                     newStock.setSucursal(sucursal);
                     newStock.setInsumo(insumo);
-                    newStock.setStockActual(stockReq.stockActual());
+                    newStock.setStockActual(resolveStockActual(null, stockReq.stockActual()));
                     newStock.setStockMinimo(stockReq.stockMinimo());
                     newStock.setStockMaximo(stockReq.stockMaximo());
                     insumo.getStockSucursal().add(newStock);
@@ -189,5 +191,21 @@ public class ArticuloInsumoServiceImpl implements ArticuloInsumoService {
             );
         }
         return categoriaDto;
+    }
+    
+    private Double resolveStockActual(Double existingStock, Double requestedStock) {
+        if (isAdmin()) {
+            return requestedStock != null ? requestedStock : 0.0;
+        }
+        return existingStock != null ? existingStock : 0.0;
+    }
+
+    private boolean isAdmin() {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        if (authentication == null || authentication.getAuthorities() == null) {
+            return false;
+        }
+        return authentication.getAuthorities().stream()
+                .anyMatch(authority -> "ROLE_ADMIN".equals(authority.getAuthority()));
     }
 }

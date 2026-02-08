@@ -52,8 +52,7 @@ const Login = () => {
                 msg: "¡Login exitoso!",
             });
 
-            const {token, username, role, subRole, userId, mustChangePassword} = resp.data;
-
+            const {token, username, role, subRole, userId, mustChangePassword, sucursalId} = resp.data;
             const nextUser = {
                 token,
                 username,
@@ -61,6 +60,7 @@ const Login = () => {
                 subRole,
                 userId,
                 mustChangePassword,
+                sucursalId: sucursalId ? Number(sucursalId) : null,
             };
 
             setUser(nextUser);

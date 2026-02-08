@@ -1,15 +1,22 @@
-import { useEffect, useState } from "react";
-import type { InsumoRequest } from "../../../models/Insumo";
-import type { Sucursal } from "../../../models/Sucursal";
-import type { Rubro } from "../../../models/Rubro";
-import type { Imagen } from "../../../models/Imagen";
-import type { UnidadMedida } from "../../../models/UnidadMedida";
-import { fetchSucursales } from "../../../services/dashboardService";
-import { getRubrosInsumos } from "../../../services/rubrosService";
-import { createInsumo, getAllUnidadesMedida, getInsumoById, updateInsumo, uploadImagenesInsumo } from "../../../services/insumosService";
-import { useSucursal } from "../../../contexts/SucursalContext";
-import { useParams } from "react-router-dom";
-import { useNavigate } from "react-router-dom";
+import {useEffect, useState} from "react";
+import type {InsumoRequest} from "../../../models/Insumo";
+import type {Sucursal} from "../../../models/Sucursal";
+import type {Rubro} from "../../../models/Rubro";
+import type {Imagen} from "../../../models/Imagen";
+import type {UnidadMedida} from "../../../models/UnidadMedida";
+import {fetchSucursales} from "../../../services/dashboardService";
+import {getRubrosInsumos} from "../../../services/rubrosService";
+import {
+    createInsumo,
+    getAllUnidadesMedida,
+    getInsumoById,
+    updateInsumo,
+    uploadImagenesInsumo
+} from "../../../services/insumosService";
+import {useSucursal} from "../../../contexts/SucursalContext";
+import {useUser} from "../../../contexts/UsuarioContext";
+import {useParams} from "react-router-dom";
+import {useNavigate} from "react-router-dom";
 
 const initialState: InsumoRequest = {
     id: 0,
@@ -29,6 +36,7 @@ const BACKEND_URL = "http://localhost:8080";
 
 const InsumoForm = () => {
     const {sucursalId, sucursales: sucursalesContext} = useSucursal();
+    const {user} = useUser();
     const [form, setForm] = useState<InsumoRequest>(initialState);
     const [sucursales, setSucursales] = useState<Sucursal[]>([]);
     const [categorias, setCategorias] = useState<Rubro[]>([]);
@@ -40,11 +48,7 @@ const InsumoForm = () => {
     const navigate = useNavigate();
 
     const isEdit = Boolean(id);
-
-    const normalizeImagenes = (imagenes: Array<Imagen | string> | undefined) =>
-        (imagenes ?? [])
-            .map((imagen) => (typeof imagen === "string" ? imagen : imagen.url))
-            .filter(Boolean);
+    const isAdmin = user?.role === "ADMIN";
 
     const readFileAsDataUrl = (file: File) =>
         new Promise<string>((resolve, reject) => {
@@ -201,79 +205,82 @@ const InsumoForm = () => {
                 />
             </div>
 
-            <div className="mb-3">
-                <label className="form-label">Stock por Sucursal</label>
-                {sucursales.map((sucursal) => {
-                    const stock = form.stockSucursal.find((s) => s.sucursalId === sucursal.id) || {
-                        sucursalId: sucursal.id,
-                        id: 0,
-                        stockActual: 0,
-                        stockMinimo: 0,
-                        stockMaximo: 0,
-                        activo: true,
-                    };
+            {isAdmin && (
+                <div className="mb-3">
+                    <label className="form-label">Stock por Sucursal</label>
+                    {sucursales.map((sucursal) => {
+                        const stock = form.stockSucursal.find((s) => s.sucursalId === sucursal.id) || {
+                            sucursalId: sucursal.id,
+                            id: 0,
+                            stockActual: 0,
+                            stockMinimo: 0,
+                            stockMaximo: 0,
+                            activo: true,
+                        };
 
-                    const handleStockChange = (field: string, value: number) => {
-                        setForm((prev) => {
-                            const newStocks = [...prev.stockSucursal];
-                            const index = newStocks.findIndex((s) => s.sucursalId === sucursal.id);
+                        const handleStockChange = (field: string, value: number) => {
+                            setForm((prev) => {
+                                const newStocks = [...prev.stockSucursal];
+                                const index = newStocks.findIndex((s) => s.sucursalId === sucursal.id);
 
-                            const newStockEntry = {
-                                ...stock,
-                                [field]: value,
-                                sucursalId: sucursal.id ?? 0,
-                                id: stock.id || 0
-                            };
+                                const newStockEntry = {
+                                    ...stock,
+                                    [field]: value,
+                                    sucursalId: sucursal.id ?? 0,
+                                    id: stock.id || 0
+                                };
 
-                            if (index >= 0) {
-                                newStocks[index] = newStockEntry;
-                            } else {
-                                newStocks.push(newStockEntry);
-                            }
+                                if (index >= 0) {
+                                    newStocks[index] = newStockEntry;
+                                } else {
+                                    newStocks.push(newStockEntry);
+                                }
 
-                            return {...prev, stockSucursal: newStocks};
-                        });
-                    };
+                                return {...prev, stockSucursal: newStocks};
+                            });
+                        };
 
-                    return (
-                        <div key={sucursal.id} className="card mb-3 p-3 bg-light">
-                            <h6 className="mb-2">{sucursal.nombre}</h6>
-                            <div className="row">
-                                <div className="col-md-4">
-                                    <label className="form-label small">Stock Actual</label>
-                                    <input
-                                        type="number"
-                                        className="form-control form-control-sm"
-                                        value={stock.stockActual}
-                                        onChange={(e) => handleStockChange("stockActual", Number(e.target.value))}
-                                        min="0"
-                                    />
-                                </div>
-                                <div className="col-md-4">
-                                    <label className="form-label small">Mínimo</label>
-                                    <input
-                                        type="number"
-                                        className="form-control form-control-sm"
-                                        value={stock.stockMinimo}
-                                        onChange={(e) => handleStockChange("stockMinimo", Number(e.target.value))}
-                                        min="0"
-                                    />
-                                </div>
-                                <div className="col-md-4">
-                                    <label className="form-label small">Máximo</label>
-                                    <input
-                                        type="number"
-                                        className="form-control form-control-sm"
-                                        value={stock.stockMaximo}
-                                        onChange={(e) => handleStockChange("stockMaximo", Number(e.target.value))}
-                                        min="0"
-                                    />
+                        return (
+                            <div key={sucursal.id} className="card mb-3 p-3 bg-light">
+                                <h6 className="mb-2">{sucursal.nombre}</h6>
+                                <div className="row">
+                                    <div className="col-md-4">
+                                        <label className="form-label small">Stock Actual</label>
+                                        <input
+                                            type="number"
+                                            className="form-control form-control-sm"
+                                            value={stock.stockActual}
+                                            onChange={(e) => handleStockChange("stockActual", Number(e.target.value))}
+                                            min="0"
+                                        />
+                                    </div>
+                                    <div className="col-md-4">
+                                        <label className="form-label small">Mínimo</label>
+                                        <input
+                                            type="number"
+                                            className="form-control form-control-sm"
+                                            value={stock.stockMinimo}
+                                            onChange={(e) => handleStockChange("stockMinimo", Number(e.target.value))}
+                                            min="0"
+                                        />
+                                    </div>
+                                    <div className="col-md-4">
+                                        <label className="form-label small">Máximo</label>
+                                        <input
+                                            type="number"
+                                            className="form-control form-control-sm"
+                                            value={stock.stockMaximo}
+                                            onChange={(e) => handleStockChange("stockMaximo", Number(e.target.value))}
+                                            min="0"
+                                        />
+                                    </div>
+
                                 </div>
                             </div>
-                        </div>
-                    );
-                })}
-            </div>
+                        );
+                    })}
+                </div>
+            )}
 
             <div className="mb-3">
                 <label htmlFor="categoria" className="form-label">Categoría</label>
@@ -373,7 +380,7 @@ const InsumoForm = () => {
                     <img
                         key={i}
                         src={URL.createObjectURL(file)}
-                        style={{ width: 120, marginTop: 10 }}
+                        style={{width: 120, marginTop: 10}}
                     />
                 ))}
                 {imagenesActuales.length > 0 && (
