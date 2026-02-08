@@ -3,6 +3,7 @@ package com.utn.elbuensabor.controllers;
 import java.util.Map;
 
 import com.utn.elbuensabor.dtos.ChangePasswordRequest;
+import com.utn.elbuensabor.dtos.GoogleAuthRequest;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -43,6 +44,18 @@ public class AuthController {
     public ResponseEntity<?> login(@RequestBody @Valid LoginRequest req) {
         try {
             AuthResponse response = authService.login(req);
+            return ResponseEntity.ok(response);
+        } catch (IllegalArgumentException ex) {
+            return ResponseEntity
+                    .badRequest()
+                    .body(Map.of("message", ex.getMessage()));
+        }
+    }
+
+    @PostMapping("/google")
+    public ResponseEntity<?> loginWithGoogle(@RequestBody @Valid GoogleAuthRequest req) {
+        try {
+            AuthResponse response = authService.loginWithGoogle(req);
             return ResponseEntity.ok(response);
         } catch (IllegalArgumentException ex) {
             return ResponseEntity

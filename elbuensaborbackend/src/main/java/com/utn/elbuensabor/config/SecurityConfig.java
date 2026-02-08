@@ -76,6 +76,7 @@ public class SecurityConfig {
                 .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll() // preflight
                 .requestMatchers("/api/auth/register").permitAll()
                 .requestMatchers("/api/auth/login").permitAll()
+                .requestMatchers("/api/auth/google").permitAll()
                 .requestMatchers("/api/localidad/**").permitAll()
                 .requestMatchers(HttpMethod.GET, "/api/sucursales/**").permitAll()
                 .requestMatchers("/uploads/**").permitAll()
