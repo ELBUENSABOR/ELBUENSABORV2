@@ -1,28 +1,32 @@
 import React, {useState, useEffect} from 'react';
-import {Form, Button, Container, Row, Col, Alert, Spinner} from 'react-bootstrap';
-import {getAll, registrarCompraInsumo} from '../../../services/insumosService';
+import {Form, Button, Row, Col, Alert, Spinner, Table} from 'react-bootstrap';
+import {getAll, getAllComprasInsumos, registrarCompraInsumo} from '../../../services/insumosService';
 import {useSucursal} from '../../../contexts/SucursalContext';
 import {useLocation, useNavigate} from 'react-router-dom';
 import type {InsumoResponse} from '../../../models/Insumo';
+import type {CompraInsumo} from '../../../models/CompraInsumo';
+import './RegistroCompra.css';
 
 const RegistroCompra = () => {
     const [insumos, setInsumos] = useState<InsumoResponse[]>([]);
     const [selectedInsumoId, setSelectedInsumoId] = useState<number>(0);
-    const [selectedSucursalId, setSelectedSucursalId] = useState<number>(0);
     const [cantidad, setCantidad] = useState<number>(0);
     const [precioCompra, setPrecioCompra] = useState<number>(0);
     const [totalCompra, setTotalCompra] = useState<number>(0);
     const [loading, setLoading] = useState(false);
     const [loadingInsumos, setLoadingInsumos] = useState(true);
+    const [loadingCompras, setLoadingCompras] = useState(true);
+    const [compras, setCompras] = useState<CompraInsumo[]>([]);
     const [message, setMessage] = useState<{ type: 'success' | 'danger', text: string } | null>(null);
 
-    const {sucursalId, sucursales} = useSucursal();
+    const {sucursalId, sucursales, setSucursalId} = useSucursal();
     const navigate = useNavigate();
     const location = useLocation();
     const preselectedInsumoId = (location.state as { insumoId?: number } | null)?.insumoId;
 
     useEffect(() => {
         fetchInsumos();
+        fetchCompras();
     }, [sucursalId]);
 
     useEffect(() => {
@@ -43,6 +47,18 @@ const RegistroCompra = () => {
             setMessage({type: 'danger', text: 'Error al cargar los insumos.'});
         } finally {
             setLoadingInsumos(false);
+        }
+    };
+
+    const fetchCompras = async () => {
+        setLoadingCompras(true);
+        try {
+            const data = await getAllComprasInsumos();
+            setCompras(data);
+        } catch (error) {
+            console.error('Error al cargar compras', error);
+        } finally {
+            setLoadingCompras(false);
         }
     };
 
@@ -99,6 +115,7 @@ const RegistroCompra = () => {
             setSelectedInsumoId(0);
             setTotalCompra(0);
             fetchInsumos(); // Refresh to ensure latest data if needed
+            fetchCompras();
         } catch (error) {
             console.error(error);
             setMessage({type: 'danger', text: 'Error al registrar la compra.'});
@@ -107,136 +124,199 @@ const RegistroCompra = () => {
         }
     };
 
-    const selectedInsumo = insumos.find(i => i.id === Number(selectedInsumoId));
-
     if (!sucursalId) return <Alert variant="warning">Seleccione una sucursal para continuar.</Alert>;
 
     return (
-        <div>
-            <div>
-                <h4 className="mb-3">Registrar Compra de Insumos</h4>
-                <hr/>
+        <div className="registro-compra">
+            <header className="registro-compra__header">
                 <div>
-                    {message && <Alert variant={message.type} onClose={() => setMessage(null)}
-                                       dismissible>{message.text}</Alert>}
-
-                    {loadingInsumos ? (
-                        <div className="text-center p-3">
-                            <Spinner animation="border" variant="primary"/>
-                            <p className="mt-2">Cargando insumos...</p>
-                        </div>
-                    ) : (
-                        <Form onSubmit={handleSubmit}>
-                            <Row className="mb-3">
-                                <Col>
-                                    <Form.Group>
-                                        <Form.Label>Sucursal</Form.Label>
-                                        <Form.Select
-                                            value={selectedSucursalId}
-                                            onChange={(e) => setSelectedSucursalId(Number(e.target.value))}
-                                            required
-                                        >
-                                            <option value="">Seleccione una sucursal...</option>
-                                            {sucursales.map((sucursal) => (
-                                                <option key={sucursal.id} value={sucursal.id}>
-                                                    {sucursal.nombre}
-                                                </option>
-                                            ))}
-                                        </Form.Select>
-                                    </Form.Group>
-                                </Col>
-                                <Col className="d-flex gap-2 flex-column">
-                                    <Form.Group>
-                                        <Form.Label>Insumo</Form.Label>
-                                        <div className="d-flex gap-2">
-                                            <Form.Select
-                                                value={selectedInsumoId}
-                                                onChange={handleInsumoChange}
-                                                required
-                                            >
-                                                <option value="">Seleccione un insumo...</option>
-                                                {insumos.map((insumo) => (
-                                                    <option key={insumo.id} value={insumo.id}>
-                                                        {insumo.denominacion} ({insumo.unidadMedida.denominacion})
-                                                    </option>
-                                                ))}
-                                            </Form.Select>
-                                        </div>
-                                    </Form.Group>
-                                    <Button variant="success" onClick={() => navigate('/dashboard/insumos/add')}>
-                                        + Nuevo insumo
-                                    </Button>
-                                </Col>
-                            </Row>
-
-                            <Row className="mb-3">
-                                <Col>
-                                    <Form.Group>
-                                        <Form.Label>Precio Costo</Form.Label>
-                                        <Form.Control
-                                            type="number"
-                                            step="0.01"
-                                            placeholder="Ingrese el precio de costo"
-                                            value={precioCompra}
-                                            onChange={(e) => handlePrecioCompraChange(e)}
-                                        />
-                                        <Form.Text className="text-muted">
-                                            Si no se modifica, se mantiene el precio actual.
-                                        </Form.Text>
-                                    </Form.Group>
-                                </Col>
-                                <Col>
-                                    <Form.Group>
-                                        <Form.Label>Cantidad a comprar</Form.Label>
-                                        <div className="d-flex align-items-center gap-2">
-                                            <Form.Control
-                                                type="number"
-                                                step="0.01"
-                                                min="0.01"
-                                                placeholder="Cantidad"
-                                                value={cantidad}
-                                                onChange={(e) => handleCantidadChange(e)}
-                                                required
-                                            />
-                                            {selectedInsumo && (
-                                                <span className="text-muted text-nowrap">
-                          {selectedInsumo.unidadMedida.denominacion}
-                        </span>
-                                            )}
-                                        </div>
-                                    </Form.Group>
-                                </Col>
-                            </Row>
-
-                            <Row className="mb-3">
-                                <Col>
-                                    <Form.Group>
-                                        <Form.Label>Total</Form.Label>
-                                        <Form.Control
-                                            type="number"
-                                            step="0.01"
-                                            placeholder="Total"
-                                            value={totalCompra}
-                                            readOnly
-                                        />
-                                    </Form.Group>
-                                </Col>
-                            </Row>
-
-                            <div className="d-flex justify-content-end">
-                                <Button variant="primary" type="submit" disabled={loading || !selectedInsumoId}>
-                                    {loading ? <Spinner as="span" animation="border" size="sm"/> : 'Registrar Compra'}
-                                </Button>
-                            </div>
-                        </Form>
-                    )}
+                    <p className="registro-compra__kicker">Registro de Compra</p>
+                    <h4>Registrar compras de ingredientes y actualizar stock</h4>
                 </div>
-            </div>
-            <div>
-                <button className='btn btn-primary' onClick={() => navigate('/dashboard/compras/list')}>Ver todas las
-                    compras
-                </button>
-            </div>
+            </header>
+
+            <section className="registro-compra__card">
+                <div className="registro-compra__card-header">
+                    <div>
+                        <h5>Nueva Compra</h5>
+                        <p>Seleccione un ingrediente y registre la cantidad comprada. El stock se actualizará
+                            automáticamente.</p>
+                    </div>
+                </div>
+
+                {message && (
+                    <Alert variant={message.type} onClose={() => setMessage(null)} dismissible>
+                        {message.text}
+                    </Alert>
+                )}
+
+                {loadingInsumos ? (
+                    <div className="text-center p-3">
+                        <Spinner animation="border" variant="primary"/>
+                        <p className="mt-2">Cargando insumos...</p>
+                    </div>
+                ) : (
+                    <Form onSubmit={handleSubmit}>
+                        <Row className="mb-3">
+                            <Col>
+                                <Form.Group>
+                                    <Form.Label>Sucursal *</Form.Label>
+                                    <Form.Select
+                                        value={sucursalId ?? ''}
+                                        onChange={(e) => setSucursalId(Number(e.target.value) || null)}
+                                        required
+                                    >
+                                        <option value="">Seleccione una sucursal...</option>
+                                        {sucursales.map((sucursal) => (
+                                            <option key={sucursal.id} value={sucursal.id}>
+                                                {sucursal.nombre}
+                                            </option>
+                                        ))}
+                                    </Form.Select>
+                                </Form.Group>
+                            </Col>
+                        </Row>
+
+                        <Row className="mb-3 align-items-end">
+                            <Col md={9}>
+                                <Form.Group>
+                                    <Form.Label>Ingrediente *</Form.Label>
+                                    <Form.Select
+                                        value={selectedInsumoId}
+                                        onChange={handleInsumoChange}
+                                        required
+                                    >
+                                        <option value="">Seleccione un insumo...</option>
+                                        {insumos.map((insumo) => (
+                                            <option key={insumo.id} value={insumo.id}>
+                                                {insumo.denominacion} ({insumo.unidadMedida.denominacion})
+                                            </option>
+                                        ))}
+                                    </Form.Select>
+                                </Form.Group>
+                            </Col>
+                            <Col md={3} className="d-flex justify-content-end">
+                                <Button className="registro-compra__new" variant="outline-success"
+                                        onClick={() => navigate('/dashboard/insumos/add')}>
+                                    + Nuevo ingrediente
+                                </Button>
+                            </Col>
+                        </Row>
+
+                        <Row className="mb-3">
+                            <Col>
+                                <Form.Group>
+                                    <Form.Label>Cantidad Comprada *</Form.Label>
+                                    <Form.Control
+                                        type="number"
+                                        step="0.01"
+                                        min="0.01"
+                                        placeholder="Ej: 10"
+                                        value={cantidad}
+                                        onChange={(e) => handleCantidadChange(e)}
+                                        required
+                                    />
+                                </Form.Group>
+                            </Col>
+                            <Col>
+                                <Form.Group>
+                                    <Form.Label>Precio de Costo (por unidad) *</Form.Label>
+                                    <Form.Control
+                                        type="number"
+                                        step="0.01"
+                                        placeholder="Ej: 15.50"
+                                        value={precioCompra}
+                                        onChange={(e) => handlePrecioCompraChange(e)}
+                                    />
+                                </Form.Group>
+                            </Col>
+                            <Col>
+                                <Form.Group>
+                                    <Form.Label>Precio Total</Form.Label>
+                                    <Form.Control
+                                        className="registro-compra__total"
+                                        type="text"
+                                        value={`$${totalCompra.toFixed(2)}`}
+                                        readOnly
+                                    />
+                                </Form.Group>
+                            </Col>
+                        </Row>
+
+                        <div className="registro-compra__actions">
+                            <Button
+                                className="registro-compra__clear"
+                                variant="outline-secondary"
+                                type="button"
+                                onClick={() => {
+                                    setCantidad(0);
+                                    setPrecioCompra(0);
+                                    setSelectedInsumoId(0);
+                                    setTotalCompra(0);
+                                }}
+                            >
+                                Limpiar
+                            </Button>
+                            <Button variant="primary" type="submit" disabled={loading || !selectedInsumoId}>
+                                {loading ? <Spinner as="span" animation="border" size="sm"/> : 'Registrar Compra'}
+                            </Button>
+                        </div>
+                    </Form>
+                )}
+            </section>
+
+            <section className="registro-compra__card">
+                <div className="registro-compra__card-header">
+                    <div>
+                        <h5>Últimas Compras Registradas</h5>
+                        <p>Revisa rápidamente los últimos movimientos ingresados.</p>
+                    </div>
+                    <Button variant="outline-primary" onClick={() => navigate('/dashboard/compras/list')}>
+                        Ver todas las compras
+                    </Button>
+                </div>
+
+                {loadingCompras ? (
+                    <div className="text-center p-3">
+                        <Spinner animation="border" variant="primary"/>
+                        <p className="mt-2">Cargando compras...</p>
+                    </div>
+                ) : (
+                    <Table responsive className="registro-compra__table" borderless>
+                        <thead>
+                        <tr>
+                            <th>Fecha</th>
+                            <th>Sucursal</th>
+                            <th>Ingrediente</th>
+                            <th>Cantidad</th>
+                            <th>Precio Total</th>
+                            <th>Proveedor</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        {compras.length === 0 && (
+                            <tr>
+                                <td colSpan={6} className="text-center text-muted py-4">
+                                    No hay compras registradas
+                                </td>
+                            </tr>
+                        )}
+                        {compras.slice(0, 5).map((compra) => (
+                            <tr key={compra.id}>
+                                <td>{new Date(compra.fechaCompra).toLocaleDateString('es-AR')}</td>
+                                <td>{compra.sucursal.nombre}</td>
+                                <td>{compra.insumo.denominacion}</td>
+                                <td>
+                                    {compra.cantidad} {compra.insumo.unidadMedida.denominacion}
+                                </td>
+                                <td>${compra.totalCompra.toFixed(2)}</td>
+                                <td>—</td>
+                            </tr>
+                        ))}
+                        </tbody>
+                    </Table>
+                )}
+            </section>
         </div>
     );
 };
