@@ -2,10 +2,11 @@ import {Link, useNavigate} from "react-router-dom";
 import "./auth.css";
 import type { LoginRequest } from "../../dtos/LoginRequest";
 import { useState } from "react";
-import { loginUser } from "../../services/authService";
+import { loginUser, loginWithGoogle } from "../../services/authService";
 import { useUser } from "../../contexts/UsuarioContext";
 import { useLocation } from "react-router-dom";
 import {getEmployeeDashboardRoute} from "../../utils/employeePanel";
+import GoogleAuthButton from "./GoogleAuthButton";
 
 const Login = () => {
     const { state } = useLocation();
@@ -89,6 +90,44 @@ const Login = () => {
         setLoading(false);
     };
 
+    const handleGoogleLogin = async (credential: string) => {
+        setLoading(true);
+        setMsg({state: "", msg: ""});
+        try {
+            const resp = await loginWithGoogle(credential);
+            const {token, username, role, subRole, userId, mustChangePassword, sucursalId} = resp.data;
+            const nextUser = {
+                token,
+                username,
+                role,
+                subRole,
+                userId,
+                mustChangePassword,
+                sucursalId: sucursalId ? Number(sucursalId) : null,
+            };
+
+            setUser(nextUser);
+
+            if (role === "EMPLEADO") {
+                navigate(getEmployeeDashboardRoute(role, subRole));
+            } else if (state?.redirectTo) {
+                navigate(state.redirectTo);
+            } else if (state?.from === "cart") {
+                navigate("/confirm-order");
+            } else {
+                navigate("/");
+            }
+        } catch (err: any) {
+            setMsg({
+                state: "error",
+                msg:
+                    err.response?.data?.message ||
+                    "Error al iniciar sesión con Google.",
+            });
+        }
+        setLoading(false);
+    };
+
     return (
         <div className="auth-container">
             <form onSubmit={handleSubmit} className="form-container-auth">
@@ -121,6 +160,11 @@ const Login = () => {
                 <button type="submit" disabled={loading}>
                     {loading ? "Iniciando sesión..." : "Iniciar sesión"}
                 </button>
+
+                <div className="auth-divider">
+                    <span>o</span>
+                </div>
+                <GoogleAuthButton onSuccess={handleGoogleLogin} text="signin_with" />
 
                 {msg.msg && (
                     <p

@@ -1,9 +1,10 @@
 import {useEffect, useState} from "react";
-import {registerUser, getLocalidades} from "../../services/authService";
+import {registerUser, getLocalidades, loginWithGoogle} from "../../services/authService";
 import "./auth.css";
 import type {RegisterRequest} from "../../dtos/RegisterRequest";
 import {Link, useNavigate} from "react-router-dom";
 import {useUser} from "../../contexts/UsuarioContext";
+import GoogleAuthButton from "./GoogleAuthButton";
 
 interface Localidad {
     id: number;
@@ -141,8 +142,10 @@ const Register = () => {
                 token: resp.data.token,
                 username: resp.data.username,
                 role: resp.data.role,
+                subRole: resp.data.subRole ?? null,
                 userId: resp.data.userId,
                 mustChangePassword: resp.data.mustChangePassword,
+                sucursalId: resp.data.sucursalId ? Number(resp.data.sucursalId) : null,
             });
 
             setTimeout(() => {
@@ -157,6 +160,34 @@ const Register = () => {
             });
         }
 
+        setLoading(false);
+    };
+
+    const handleGoogleRegister = async (credential: string) => {
+        setLoading(true);
+        setMsg({state: "", msg: ""});
+        try {
+            const resp = await loginWithGoogle(credential);
+
+            setUser({
+                token: resp.data.token,
+                username: resp.data.username,
+                role: resp.data.role,
+                subRole: resp.data.subRole ?? null,
+                userId: resp.data.userId,
+                mustChangePassword: resp.data.mustChangePassword,
+                sucursalId: resp.data.sucursalId ? Number(resp.data.sucursalId) : null,
+            });
+
+            navigate("/");
+        } catch (err: any) {
+            setMsg({
+                state: "error",
+                msg:
+                    err.response?.data?.message ||
+                    "Error al registrarse con Google.",
+            });
+        }
         setLoading(false);
     };
 
@@ -286,6 +317,11 @@ const Register = () => {
                 <button type="submit" disabled={loading}>
                     {loading ? "Registrando..." : "Registrarse"}
                 </button>
+
+                <div className="auth-divider">
+                    <span>o</span>
+                </div>
+                <GoogleAuthButton onSuccess={handleGoogleRegister} text="signup_with" />
 
                 {msg.msg && (
                     <p
