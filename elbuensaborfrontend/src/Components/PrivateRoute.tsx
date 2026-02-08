@@ -16,15 +16,15 @@ const PrivateRoute = ({ roles }: { roles: string[] }) => {
     return false;
   });
 
-    if (!hasPermission) {
-        if (user.role === "EMPLEADO") {
-            return (
-                <Navigate to={getEmployeeDashboardRoute(user.role, user.subRole)} replace />
-            );
-        }
-
-        return <Navigate to="/" />;
+  if (!hasPermission) {
+    if (user.role === "EMPLEADO") {
+      return (
+        <Navigate to={getEmployeeDashboardRoute(user.role, user.subRole)} replace />
+      );
     }
+
+    return <Navigate to="/" />;
+  }
 
   return <Outlet />;
 };
