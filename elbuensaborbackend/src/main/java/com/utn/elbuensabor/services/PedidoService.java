@@ -21,6 +21,8 @@ public interface PedidoService {
 
     List<PedidoResponse> getByEstado(EstadoPedido estado);
 
+    List<PedidoResponse> getByEstadoAndSucursalId(EstadoPedido estado, Long sucursalId);
+
     List<PedidoResponse> getBySucursalId(Long sucursalId);
 
     PedidoResponse update(Long id, PedidoRequest request);

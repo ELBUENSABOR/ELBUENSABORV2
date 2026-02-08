@@ -145,14 +145,24 @@ export const getPedidosByCliente = async (clienteId: number) => {
         throw error;
     }
 };
-export const getPedidosAll = async (estado?: string) => {
+export const getPedidosAll = async (
+    estado?: string,
+    sucursalId?: number | null
+) => {
     try {
         const token = sessionStorage.getItem("token");
+        const params: Record<string, string | number> = {};
+        if (estado) {
+            params.estado = estado;
+        }
+        if (sucursalId !== null && sucursalId !== undefined) {
+            params.sucursalId = sucursalId;
+        }
 
         const res = await axios.get(
             `${API_URL}/pedidos`,
             {
-                params: estado ? { estado } : undefined,
+                params: Object.keys(params).length ? params : undefined,
                 headers: {
                     Authorization: `Bearer ${token}`,
                 },

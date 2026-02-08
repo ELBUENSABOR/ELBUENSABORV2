@@ -187,6 +187,19 @@ public class PedidoServiceImpl implements PedidoService {
                 .collect(Collectors.toList());
     }
 
+    public List<PedidoResponse> getByEstadoAndSucursalId(EstadoPedido estado, Long sucursalId) {
+        Long sucursalEmpleado = resolveSucursalIdForEmpleado();
+        Long sucursalFinal = sucursalEmpleado != null ? sucursalEmpleado : sucursalId;
+        if (sucursalFinal == null) {
+            return pedidoRepository.findByEstadoWithDetalles(estado).stream()
+                    .map(this::mapToResponse)
+                    .collect(Collectors.toList());
+        }
+        return pedidoRepository.findByEstadoAndSucursalIdWithDetalles(estado, sucursalFinal).stream()
+                .map(this::mapToResponse)
+                .collect(Collectors.toList());
+    }
+
     public List<PedidoResponse> getBySucursalId(Long sucursalId) {
         Long sucursalEmpleado = resolveSucursalIdForEmpleado();
         Long sucursalFinal = sucursalEmpleado != null ? sucursalEmpleado : sucursalId;
