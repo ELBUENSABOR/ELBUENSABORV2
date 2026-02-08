@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { cambiarEstadoPedido, getPedidoById, getPedidosAll } from "../../../services/pedidoService";
 import type { PedidoResponse } from "../../../services/pedidoService";
+import OrderDetailModal from "../../Common/OrderDetailModal/OrderDetailModal.tsx";
 
 const ESTADOS = [
     { label: "A confirmar", value: "A_CONFIRMAR" },
@@ -27,6 +28,7 @@ const PedidosAdmin = () => {
     const [estado, setEstado] = useState("");
     const [busquedaId, setBusquedaId] = useState("");
     const [estadoSeleccionado, setEstadoSeleccionado] = useState<Record<number, string>>({});
+    const [selectedPedido, setSelectedPedido] = useState<PedidoResponse | null>(null);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState("");
 
@@ -36,6 +38,9 @@ const PedidosAdmin = () => {
         try {
             const data = await getPedidosAll(estadoFiltro || undefined);
             setPedidos(data);
+            setSelectedPedido((prev) =>
+                prev ? data.find((pedido) => pedido.id === prev.id) ?? null : null
+            );
         } catch (err) {
             setError("No se pudieron cargar los pedidos.");
         } finally {
@@ -64,8 +69,10 @@ const PedidosAdmin = () => {
         try {
             const pedido = await getPedidoById(id);
             setPedidos([pedido]);
+            setSelectedPedido(pedido);
         } catch (err) {
             setPedidos([]);
+            setSelectedPedido(null);
             setError("No se encontró el pedido.");
         } finally {
             setLoading(false);
@@ -183,6 +190,12 @@ const PedidosAdmin = () => {
                                     <td>{pedido.estado}</td>
                                     <td className="text-end">
                                         <div className="d-flex justify-content-end gap-2 flex-wrap">
+                                            <button
+                                                className="btn btn-sm btn-outline-secondary"
+                                                onClick={() => setSelectedPedido(pedido)}
+                                            >
+                                                Ver detalle
+                                            </button>
                                             <select
                                                 className="form-select form-select-sm"
                                                 style={{ width: "180px" }}
@@ -221,6 +234,10 @@ const PedidosAdmin = () => {
                     </table>
                 </div>
             )}
+            <OrderDetailModal
+                pedido={selectedPedido}
+                onClose={() => setSelectedPedido(null)}
+            />
         </div>
     );
 };

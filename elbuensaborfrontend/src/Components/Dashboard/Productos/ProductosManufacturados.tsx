@@ -6,7 +6,7 @@ import type { Manufacturado } from "../../../models/Manufacturado";
 import { useNavigate } from "react-router-dom";
 import { getRubrosManufacturados } from "../../../services/rubrosService";
 import type { Rubro } from "../../../models/Rubro";
-import ModalConfirmAction from "../../ModalConfirmAction/ModalConfirmAction";
+import ModalConfirmAction from "../../Common/ModalConfirmAction/ModalConfirmAction";
 
 const ProductosManufacturados = () => {
     const { sucursales, sucursalId, setSucursalId, loading } = useSucursal();
