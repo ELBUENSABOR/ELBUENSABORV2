@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useState } from "react";
 import type { PedidoResponse } from "../../../services/pedidoService";
 import { cambiarEstadoPedido, getPedidosAll } from "../../../services/pedidoService";
+import OrderDetailModal from "../../Common/OrderDetailModal/OrderDetailModal.tsx";
 
 const formatDate = (value: string) => {
     const date = new Date(value);
@@ -128,35 +129,10 @@ const PedidosDelivery = () => {
                     </table>
                 </div>
             )}
-
-            {selectedPedido && (
-                <div className="border rounded p-3 bg-white">
-                    <h5 className="mb-3">Detalle del pedido {selectedPedido.numero}</h5>
-                    <p>
-                        <strong>Cliente:</strong> {selectedPedido.cliente.nombre}{" "}
-                        {selectedPedido.cliente.apellido}
-                    </p>
-                    <p>
-                        <strong>Teléfono:</strong> {selectedPedido.telefonoEntrega || "-"}
-                    </p>
-                    <p>
-                        <strong>Dirección:</strong> {selectedPedido.direccionEntrega || "-"}
-                    </p>
-                    <p>
-                        <strong>Estado:</strong> {selectedPedido.estado}
-                    </p>
-                    <hr />
-                    <h6>Ítems del pedido</h6>
-                    {selectedPedido.detalles.map((detalle) => (
-                        <div key={detalle.id} className="d-flex justify-content-between border-bottom py-2">
-              <span>
-                {detalle.articulo.denominacion} x {detalle.cantidad}
-              </span>
-                            <span>${detalle.subTotal}</span>
-                        </div>
-                    ))}
-                </div>
-            )}
+            <OrderDetailModal
+                pedido={selectedPedido}
+                onClose={() => setSelectedPedido(null)}
+            />
         </div>
     );
 };

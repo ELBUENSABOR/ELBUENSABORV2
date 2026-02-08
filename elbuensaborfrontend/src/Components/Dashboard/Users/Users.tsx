@@ -3,7 +3,7 @@ import { getAllUsers, deleteUserService } from "../../../services/userService";
 import type { UsuarioDTO } from "../../../dtos/UsuarioDTO";
 import "./users.css";
 import { useNavigate } from "react-router-dom";
-import ModalConfirmAction from "../../ModalConfirmAction/ModalConfirmAction";
+import ModalConfirmAction from "../../Common/ModalConfirmAction/ModalConfirmAction";
 import Alert from "../../Alert/Alert";
 import { Users as UsersIcon } from "lucide-react";
 

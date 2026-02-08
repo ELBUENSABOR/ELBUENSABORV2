@@ -1,8 +1,9 @@
 import { useEffect, useMemo, useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import { useUser } from "../../../contexts/UsuarioContext";
 import { getPedidosByCliente } from "../../../services/pedidoService";
 import type { PedidoResponse } from "../../../services/pedidoService";
+import OrderDetailModal from "../../Common/OrderDetailModal/OrderDetailModal.tsx";
 
 const formatDate = (value: string) => {
     const date = new Date(value);
@@ -20,6 +21,7 @@ const OrdersHistory = () => {
     const { user } = useUser();
     const navigate = useNavigate();
     const [orders, setOrders] = useState<PedidoResponse[]>([]);
+    const [selectedPedido, setSelectedPedido] = useState<PedidoResponse | null>(null);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState("");
 
@@ -89,12 +91,13 @@ const OrdersHistory = () => {
                                 </td>
                                 <td>${pedido.total}</td>
                                 <td className="text-end">
-                                    <Link
+                                    <button
                                         className="btn btn-sm btn-outline-primary me-2"
-                                        to={`/pedido/${pedido.id}`}
+                                        type="button"
+                                        onClick={() => setSelectedPedido(pedido)}
                                     >
                                         Ver detalle
-                                    </Link>
+                                    </button>
                                     {pedido.factura?.pdfUrl && (
                                         <a
                                             className="btn btn-sm btn-outline-success"
@@ -113,6 +116,10 @@ const OrdersHistory = () => {
                     </table>
                 </div>
             )}
+            <OrderDetailModal
+                pedido={selectedPedido}
+                onClose={() => setSelectedPedido(null)}
+            />
         </div>
     );
 };

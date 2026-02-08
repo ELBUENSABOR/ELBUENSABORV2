@@ -7,7 +7,7 @@ import {getAll, deleteInsumo} from '../../../services/insumosService';
 import UnidadMedidaModal from './UnidadesMedidaModal/UnidadMedidaModal';
 import {getRubrosInsumos} from '../../../services/rubrosService';
 import type {Rubro} from '../../../models/Rubro';
-import ModalConfirmAction from '../../ModalConfirmAction/ModalConfirmAction';
+import ModalConfirmAction from '../../Common/ModalConfirmAction/ModalConfirmAction';
 
 const ProductosInsumos = () => {
     const {sucursales, sucursalId, setSucursalId, loading} = useSucursal();
