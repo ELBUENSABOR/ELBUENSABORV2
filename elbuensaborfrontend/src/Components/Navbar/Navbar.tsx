@@ -3,6 +3,7 @@ import {Link} from "react-router-dom";
 import "./navbar.css";
 import {useUser} from "../../contexts/UsuarioContext";
 import {useCatalogFilters} from "../../contexts/CatalogFiltersContext";
+import {useSucursal} from "../../contexts/SucursalContext";
 import {LogIn, ShoppingCart} from 'lucide-react';
 
 interface MyNavbarProps {
@@ -12,12 +13,14 @@ interface MyNavbarProps {
 
 export default function MyNavbar({onCartOpen, isCartOpen}: MyNavbarProps) {
     const {user, logout} = useUser();
+    const {sucursales, sucursalId, setSucursalId, loading: loadingSucursales} = useSucursal();
     const {
         searchTerm,
         setSearchTerm,
     } = useCatalogFilters();
 
     const dropdownTitle = user ? user.username : "Cuenta";
+    const showSucursalSelector = user?.role !== "EMPLEADO";
 
     return (
         <Navbar expand="lg" className="navbar-container" sticky="top">
@@ -55,6 +58,32 @@ export default function MyNavbar({onCartOpen, isCartOpen}: MyNavbarProps) {
                         <Nav.Link as={Link} to="/catalog">
                             Catalogo
                         </Nav.Link>
+                        {showSucursalSelector && (
+                            <Form className="navbar-sucursal">
+                                <Form.Label className="navbar-sucursal-label">
+                                    Sucursal
+                                </Form.Label>
+                                <Form.Select
+                                    value={sucursalId ?? ""}
+                                    onChange={(event) =>
+                                        setSucursalId(
+                                            event.target.value
+                                                ? Number(event.target.value)
+                                                : null
+                                        )
+                                    }
+                                    disabled={loadingSucursales || sucursales.length === 0}
+                                    aria-label="Seleccionar sucursal"
+                                >
+                                    <option value="">Seleccioná una sucursal...</option>
+                                    {sucursales.map((sucursal) => (
+                                        <option key={sucursal.id} value={sucursal.id}>
+                                            {sucursal.nombre}
+                                        </option>
+                                    ))}
+                                </Form.Select>
+                            </Form>
+                        )}
                         {(user?.role === "ADMIN") && (
                             <Nav.Link as={Link} to="/dashboard/home" className="navbar-admin-link">
                                 Panel de administración
