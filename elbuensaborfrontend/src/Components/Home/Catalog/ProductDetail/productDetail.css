@@ -1,32 +1,38 @@
 .product-detail {
-  padding: 24px;
-  display: flex;
-  flex-direction: column;
-  gap: 16px;
+    padding: 32px 24px 48px;
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+    max-width: 1200px;
+    margin: 0 auto;
 }
 
 .product-detail__back {
-  color: hsl(var(--foreground));
-  text-decoration: none;
-  font-weight: 600;
+    color: hsl(var(--foreground));
+    text-decoration: none;
+    font-weight: 600;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 0.95rem;
 }
 
 .product-detail__content {
-  display: grid;
-  grid-template-columns: minmax(0, 1fr) 1.2fr;
-  gap: 24px;
-  align-items: start;
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) 1.2fr;
+    gap: 40px;
+    align-items: start;
 }
 
 .product-detail__image {
-  border-radius: calc(var(--radius) * 1.25);
-  overflow: hidden;
-  background: hsl(var(--secondary));
-  min-height: 260px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  box-shadow: var(--shadow-md);
+    border-radius: 20px;
+    overflow: hidden;
+    background: hsl(var(--secondary));
+    min-height: 360px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 18px 40px hsl(var(--foreground) / 0.12);
 }
 
 .product-detail__image img {
@@ -40,21 +46,36 @@
 }
 
 .product-detail__info {
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+}
+
+.product-detail__title {
+    margin: 0;
+    font-size: 2rem;
+    font-weight: 700;
+    color: hsl(var(--foreground));
 }
 
 .product-detail__category {
-  color: hsl(var(--muted-foreground));
-  margin: 0;
+    color: hsl(var(--muted-foreground));
+    margin: 0;
+    font-size: 0.95rem;
+}
+
+.product-detail__description {
+    margin: 0;
+    color: hsl(var(--muted-foreground));
+    line-height: 1.6;
+    max-width: 520px;
 }
 
 .product-detail__price {
-  font-size: 1.4rem;
-  font-weight: 700;
-  margin: 0;
-  color: hsl(var(--primary));
+    font-size: 1.6rem;
+    font-weight: 700;
+    margin: 0;
+    color: #ff7a00;
 }
 
 .product-detail__badge {
@@ -68,9 +89,21 @@
 }
 
 .product-detail__actions .btn {
-  border-radius: 999px;
-  background: hsl(var(--primary));
-  border-color: hsl(var(--primary));
+    border-radius: 999px;
+    background: #ff7a00;
+    border-color: #ff7a00;
+    padding: 12px 20px;
+    font-weight: 600;
+    text-transform: none;
+}
+
+.product-detail__cta {
+    width: 100%;
+    max-width: 360px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
 }
 
 .product-detail__extra {

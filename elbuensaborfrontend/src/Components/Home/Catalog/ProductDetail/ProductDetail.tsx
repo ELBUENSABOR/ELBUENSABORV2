@@ -60,10 +60,15 @@ const ProductDetail = () => {
                     )}
                 </div>
                 <div className="product-detail__info">
-                    <h3>{product.denominacion}</h3>
+                    <h3 className="product-detail__title">{product.denominacion}</h3>
                     <p className="product-detail__category">
                         {product.categoria ?? "Sin categoría"}
                     </p>
+                    {product.descripcion && (
+                        <p className="product-detail__description">
+                            {product.descripcion}
+                        </p>
+                    )}
                     <p className="product-detail__price">
                         {formatCurrency(product.precioVenta)}
                     </p>
@@ -75,7 +80,7 @@ const ProductDetail = () => {
                     <div className="product-detail__actions">
                         <button
                             type="button"
-                            className="btn btn-primary"
+                            className="btn btn-primary product-detail__cta"
                             disabled={!isAvailable}
                             onClick={() =>
                                 addItem({
@@ -87,7 +92,7 @@ const ProductDetail = () => {
                                 })
                             }
                         >
-                            Agregar al carrito
+                            + Agregar al pedido
                         </button>
                     </div>
                     <div className="product-detail__extra">
