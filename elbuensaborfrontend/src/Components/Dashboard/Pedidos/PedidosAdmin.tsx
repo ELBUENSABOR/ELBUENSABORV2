@@ -155,6 +155,7 @@ const PedidosAdmin = () => {
                             <th>ID</th>
                             <th>Fecha</th>
                             <th>Número</th>
+                            <th>Pago</th>
                             <th>Total</th>
                             <th>Estado</th>
                             <th className="text-end">Acción</th>
@@ -163,7 +164,7 @@ const PedidosAdmin = () => {
                         <tbody>
                         {pedidos.length === 0 ? (
                             <tr>
-                                <td colSpan={6}>No hay pedidos para mostrar.</td>
+                                <td colSpan={7}>No hay pedidos para mostrar.</td>
                             </tr>
                         ) : (
                             pedidos.map((pedido) => (
@@ -171,6 +172,13 @@ const PedidosAdmin = () => {
                                     <td>{pedido.id}</td>
                                     <td>{formatDate(pedido.fechaPedido)}</td>
                                     <td>{pedido.numero}</td>
+                                    <td>
+                                        <span
+                                            className={`badge ${pedido.pagado ? "bg-success" : "bg-warning text-dark"}`}
+                                        >
+                                            {pedido.pagado ? "Pagado" : "Pendiente"}
+                                        </span>
+                                    </td>
                                     <td>${pedido.total}</td>
                                     <td>{pedido.estado}</td>
                                     <td className="text-end">
