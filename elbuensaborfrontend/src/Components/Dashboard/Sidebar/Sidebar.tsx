@@ -56,6 +56,12 @@ const links = [
         icon: BarChart3,
         rol: ["ADMIN"],
     },
+    {
+        path: "/dashboard/reportes/clientes-por-pedidos",
+        label: "Clientes por pedidos",
+        icon: BarChart3,
+        rol: ["ADMIN"],
+    },
 ];
 
 const Sidebar = ({open, close}: { open: boolean; close: () => void }) => {
