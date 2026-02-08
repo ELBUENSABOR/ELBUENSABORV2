@@ -23,6 +23,7 @@ import ComprasTable from "./Compras/ComprasTable";
 import PedidosAdmin from "./Pedidos/PedidosAdmin";
 import PedidosCocina from "./Pedidos/PedidosCocina";
 import PedidosDelivery from "./Pedidos/PedidosDelivery";
+import ProductosMasVendidos from "./Reportes/ProductosMasVendidos";
 import {useUser} from "../../contexts/UsuarioContext";
 
 const DashboardIndex = () => {
@@ -92,6 +93,12 @@ const DashboardRoutes = () => (
             <Route path="compras" element={<RegistroCompra/>}/>
             <Route path="compras/list" element={<ComprasTable/>}/>
             <Route path="productos-venta" element={<ProductosVenta/>}/>
+            <Route element={<PrivateRoute roles={["ADMIN"]}/>}>
+                <Route
+                    path="reportes/productos-mas-vendidos"
+                    element={<ProductosMasVendidos/>}
+                />
+            </Route>
             <Route element={<PrivateRoute roles={["ADMIN", "EMPLEADO"]}/>}>
                 <Route path="pedidos" element={<PedidosAdmin/>}/>
             </Route>
