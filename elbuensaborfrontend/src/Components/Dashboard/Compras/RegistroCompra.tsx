@@ -124,7 +124,7 @@ const RegistroCompra = () => {
         }
     };
 
-    if (!sucursalId) return <Alert variant="warning">Seleccione una sucursal para continuar.</Alert>;
+    const hasSucursal = Boolean(sucursalId);
 
     return (
         <div className="registro-compra">
@@ -143,6 +143,10 @@ const RegistroCompra = () => {
                             automáticamente.</p>
                     </div>
                 </div>
+
+                {!hasSucursal && (
+                    <Alert variant="warning">Seleccione una sucursal para continuar.</Alert>
+                )}
 
                 {message && (
                     <Alert variant={message.type} onClose={() => setMessage(null)} dismissible>
