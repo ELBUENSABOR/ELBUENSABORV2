@@ -27,6 +27,7 @@ export const UserProvider = ({children}: { children: ReactNode }) => {
         const role = getStoredItem("role");
         const subRole = getStoredItem("subRole");
         const userId = getStoredItem("userId");
+        const sucursalIdRaw = getStoredItem("sucursalId");
         const mustChangePasswordStr = getStoredItem("mustChangePassword");
         const lastActivityStr = getStoredItem("lastActivity");
         // si no hay datos básicos, no hay sesión
@@ -60,6 +61,7 @@ export const UserProvider = ({children}: { children: ReactNode }) => {
             subRole,
             userId,
             mustChangePassword: mustChangePasswordStr === "true",
+            sucursalId: sucursalIdRaw ? Number(sucursalIdRaw) : null,
         };
     });
 
@@ -77,6 +79,11 @@ export const UserProvider = ({children}: { children: ReactNode }) => {
             "mustChangePassword",
             user.mustChangePassword ? "true" : "false"
         );
+        if (user.sucursalId !== undefined && user.sucursalId !== null) {
+            sessionStorage.setItem("sucursalId", user.sucursalId.toString());
+        } else {
+            sessionStorage.removeItem("sucursalId");
+        }
         sessionStorage.setItem("lastActivity", Date.now().toString());
         setUserState(user);
     };
@@ -88,6 +95,7 @@ export const UserProvider = ({children}: { children: ReactNode }) => {
         sessionStorage.removeItem("subRole");
         sessionStorage.removeItem("userId");
         sessionStorage.removeItem("mustChangePassword");
+        sessionStorage.removeItem("sucursalId");
         sessionStorage.removeItem("lastActivity");
         setUserState(null);
     };

@@ -1,8 +1,10 @@
-import { useEffect, useMemo, useState } from "react";
-import type { PedidoResponse } from "../../../services/pedidoService";
-import { cambiarEstadoPedido, getPedidosAll } from "../../../services/pedidoService";
-import { getManufacturadoById } from "../../../services/manufacturadosService";
-import { useSucursal } from "../../../contexts/SucursalContext";
+import {useEffect, useMemo, useState} from "react";
+import type {PedidoResponse} from "../../../services/pedidoService";
+import {cambiarEstadoPedido, getPedidosAll} from "../../../services/pedidoService";
+import {getManufacturadoById} from "../../../services/manufacturadosService";
+import {useSucursal} from "../../../contexts/SucursalContext";
+import OrderDetailModal from "../../Common/OrderDetailModal/OrderDetailModal.tsx";
+import {useUser} from "../../../contexts/UsuarioContext";
 
 const formatDate = (value: string) => {
     const date = new Date(value);
@@ -17,7 +19,8 @@ const formatDate = (value: string) => {
 };
 
 const PedidosCocina = () => {
-    const { sucursalId } = useSucursal();
+    const {sucursales, sucursalId, setSucursalId} = useSucursal();
+    const {user} = useUser();
     const [pedidos, setPedidos] = useState<PedidoResponse[]>([]);
     const [selectedPedido, setSelectedPedido] = useState<PedidoResponse | null>(null);
     const [recetas, setRecetas] = useState<Record<number, string>>({});
@@ -29,7 +32,10 @@ const PedidosCocina = () => {
         setLoading(true);
         setError("");
         try {
-            const data = await getPedidosAll("A_COCINA");
+            const data = await getPedidosAll(
+                "A_COCINA",
+                user?.role === "ADMIN" ? sucursalId : null
+            );
             const filtrados = data.filter((pedido: PedidoResponse) =>
                 pedido.detalles.some((detalle) => detalle.articulo.tipo === "MANUFACTURADO")
             );
@@ -43,7 +49,7 @@ const PedidosCocina = () => {
 
     useEffect(() => {
         cargarPedidos();
-    }, []);
+    }, [sucursalId, user?.role]);
 
     const pedidosRows = useMemo(
         () =>
@@ -68,11 +74,11 @@ const PedidosCocina = () => {
             const resultados = await Promise.all(
                 pendientes.map(async (id) => {
                     const manufacturado = await getManufacturadoById(String(id), sucursalId);
-                    return { id, receta: manufacturado.receta || "Sin receta" };
+                    return {id, receta: manufacturado.receta || "Sin receta"};
                 })
             );
             setRecetas((prev) => {
-                const next = { ...prev };
+                const next = {...prev};
                 resultados.forEach((item) => {
                     next[item.id] = item.receta;
                 });
@@ -108,7 +114,29 @@ const PedidosCocina = () => {
 
     return (
         <div>
-            <h3 className="mb-3">Pedidos en cocina</h3>
+            <div className="d-flex flex-wrap justify-content-between align-items-center mb-3 gap-3">
+                <h3 className="mb-0">Pedidos en cocina</h3>
+                {user?.role === "ADMIN" && (
+                    <div>
+                        <label className="form-label">Sucursal</label>
+                        <select
+                            className="form-select"
+                            value={sucursalId ?? ""}
+                            onChange={(event) => {
+                                const value = event.target.value;
+                                setSucursalId(value ? Number(value) : null);
+                            }}
+                        >
+                            <option value="">Todas</option>
+                            {sucursales.map((sucursal) => (
+                                <option key={sucursal.id} value={sucursal.id}>
+                                    {sucursal.nombre}
+                                </option>
+                            ))}
+                        </select>
+                    </div>
+                )}
+            </div>
 
             {loading && <p>Cargando pedidos...</p>}
             {error && <p className="text-danger">{error}</p>}
@@ -164,37 +192,37 @@ const PedidosCocina = () => {
                     </table>
                 </div>
             )}
-
-            {selectedPedido && (
-                <div className="border rounded p-3 bg-white">
-                    <h5 className="mb-3">Detalle del pedido {selectedPedido.numero}</h5>
-                    <p>
-                        <strong>Cliente:</strong> {selectedPedido.cliente.nombre}{" "}
-                        {selectedPedido.cliente.apellido}
-                    </p>
-                    <p>
-                        <strong>Estado:</strong> {selectedPedido.estado}
-                    </p>
-                    <hr />
-                    {selectedPedido.detalles.map((detalle) => (
-                        <div key={detalle.id} className="mb-3">
-                            <div className="fw-semibold">
-                                {detalle.articulo.denominacion} x {detalle.cantidad}
-                            </div>
-                            {detalle.articulo.tipo === "MANUFACTURADO" && (
-                                <div className="mt-2">
-                                    <p className="mb-1 text-muted">Receta:</p>
-                                    <div className="border rounded p-2 bg-light">
-                                        {detalleLoading
-                                            ? "Cargando receta..."
-                                            : recetas[detalle.articulo.id] || "Sin receta"}
+            <OrderDetailModal
+                pedido={selectedPedido}
+                onClose={() => setSelectedPedido(null)}
+            >
+                {selectedPedido?.detalles.some(
+                    (detalle) => detalle.articulo.tipo === "MANUFACTURADO"
+                ) && (
+                    <>
+                        <hr/>
+                        <h6>Recetas</h6>
+                        {selectedPedido.detalles.map((detalle) => {
+                            if (detalle.articulo.tipo !== "MANUFACTURADO") return null;
+                            return (
+                                <div key={detalle.id} className="mb-3">
+                                    <div className="fw-semibold">
+                                        {detalle.articulo.denominacion} x {detalle.cantidad}
+                                    </div>
+                                    <div className="mt-2">
+                                        <p className="mb-1 text-muted">Receta:</p>
+                                        <div className="border rounded p-2 bg-light">
+                                            {detalleLoading
+                                                ? "Cargando receta..."
+                                                : recetas[detalle.articulo.id] || "Sin receta"}
+                                        </div>
                                     </div>
                                 </div>
-                            )}
-                        </div>
-                    ))}
-                </div>
-            )}
+                            );
+                        })}
+                    </>
+                )}
+            </OrderDetailModal>
         </div>
     );
 };

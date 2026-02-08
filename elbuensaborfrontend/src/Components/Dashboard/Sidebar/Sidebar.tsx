@@ -25,6 +25,18 @@ const links = [
     },
     {path: "/dashboard/sucursales", label: "Sucursales", icon: Building2, rol: ["ADMIN"]},
     {path: "/dashboard/usuarios", label: "Usuarios", icon: Users, rol: ["ADMIN"]},
+    {path: "/dashboard/pedidos", label: "Pedidos Caja", icon: ClipboardList, rol: ["CAJERO", "ADMIN"]},
+    {path: "/dashboard/cocina", label: "Pedidos Cocina", icon: ClipboardList, rol: ["COCINERO", "ADMIN"]},
+    {path: "/dashboard/delivery", label: "Pedidos Delivery", icon: ClipboardList, rol: ["DELIVERY", "ADMIN"]},
+    {path: "/dashboard/productos-insumos", label: "Insumos", icon: Package, rol: ["COCINERO", "ADMIN"]},
+    {
+        path: "/dashboard/productos-manufacturados",
+        label: "Productos manufacturados",
+        icon: Factory,
+        rol: ["COCINERO", "ADMIN"]
+    },
+    {path: "/dashboard/stock", label: "Stock", icon: Boxes, rol: ["COCINERO", "ADMIN"]},
+    {path: "/dashboard/compras", label: "Registro de compras", icon: ClipboardList, rol: ["COCINERO", "ADMIN"]},
     {
         path: "/dashboard/rubros-insumos",
         label: "Rubros de insumos",
@@ -37,19 +49,20 @@ const links = [
         icon: Tags,
         rol: ["COCINERO", "ADMIN"]
     },
-    {path: "/dashboard/productos-insumos", label: "Insumos", icon: Package, rol: ["COCINERO", "ADMIN"]},
-    {
-        path: "/dashboard/productos-manufacturados",
-        label: "Productos manufacturados",
-        icon: Factory,
-        rol: ["COCINERO", "ADMIN"]
-    },
-    {path: "/dashboard/stock", label: "Stock", icon: Boxes, rol: ["COCINERO", "ADMIN"]},
-    {path: "/dashboard/compras", label: "Registro de compras", icon: ClipboardList, rol: ["COCINERO", "ADMIN"]},
-    {path: "/dashboard/pedidos", label: "Pedidos", icon: ClipboardList, rol: ["CAJERO", "ADMIN"]},
-    {path: "/dashboard/cocina", label: "Cocina", icon: ClipboardList, rol: ["COCINERO", "ADMIN"]},
-    {path: "/dashboard/delivery", label: "Delivery", icon: ClipboardList, rol: ["DELIVERY", "ADMIN"]},
+
     {path: "/dashboard/productos-venta", label: "Productos a la venta", icon: ShoppingBag, rol: ["ADMIN"]},
+    {
+        path: "/dashboard/reportes/productos-mas-vendidos",
+        label: "Productos más vendidos",
+        icon: BarChart3,
+        rol: ["ADMIN"],
+    },
+    {
+        path: "/dashboard/reportes/clientes-por-pedidos",
+        label: "Clientes por pedidos",
+        icon: BarChart3,
+        rol: ["ADMIN"],
+    },
 ];
 
 const Sidebar = ({open, close}: { open: boolean; close: () => void }) => {

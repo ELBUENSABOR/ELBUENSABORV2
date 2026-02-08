@@ -46,14 +46,29 @@ export const SucursalProvider = ({ children }: { children: ReactNode }) => {
         setLoading(true);
 
         const storedId = readStoredSucursal();
+        const assignedSucursalId =
+            user?.role === "EMPLEADO" && user.sucursalId
+                ? Number(user.sucursalId)
+                : null;
 
         fetchSucursales()
             .then((lista) => {
                 if (!isMounted) return;
+                if (assignedSucursalId) {
+                    const assignedSucursal = lista.find(
+                        (s) => s.id === assignedSucursalId
+                    );
+                    setSucursales(assignedSucursal ? [assignedSucursal] : []);
+                    setSucursalIdState(assignedSucursal?.id ?? null);
+                    return;
+                }
+
+                const isCliente = !user || user?.role === "CLIENTE";
                 setSucursales(lista);
                 setSucursalIdState((prev) => {
                     if (prev && lista.some((s) => s.id === prev)) return prev;
                     if (storedId && lista.some((s) => s.id === storedId)) return storedId;
+                    if (isCliente) return null;
                     return lista[0]?.id ?? null;
                 });
             })
@@ -69,7 +84,7 @@ export const SucursalProvider = ({ children }: { children: ReactNode }) => {
         return () => {
             isMounted = false;
         };
-    }, []); // ✅ ya no depende de user.token
+    }, [user?.role, user?.sucursalId]);
 
 
     useEffect(() => {

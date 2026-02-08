@@ -73,6 +73,30 @@
     margin-left: auto;
 }
 
+.navbar-sucursal {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.navbar-sucursal-label {
+    margin-bottom: 0;
+    color: hsl(var(--muted-foreground));
+    font-size: 0.85rem;
+}
+
+.navbar-sucursal select {
+    min-width: 200px;
+    border-radius: 12px;
+    border: 1px solid hsl(var(--border));
+    background: hsl(var(--secondary));
+}
+
+.navbar-sucursal select:focus {
+    border-color: hsl(var(--primary));
+    box-shadow: none;
+}
+
 .navbar-admin-link {
     white-space: nowrap;
 }
@@ -188,6 +212,15 @@
 
     .navbar-search--desktop {
         display: none;
+    }
+
+    .navbar-sucursal {
+        width: 100%;
+        margin-bottom: 8px;
+    }
+
+    .navbar-sucursal select {
+        width: 100%;
     }
 
     .navbar-auth-buttons {

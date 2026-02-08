@@ -18,12 +18,6 @@ const DashboardLayout = () => {
         ? getEmployeePanelLabel(user?.subRole)
         : "Panel de Administración";
 
-    const {user, logout} = useUser();
-    const isEmployee = user?.role === "EMPLEADO";
-    const panelTitle = isEmployee
-        ? getEmployeePanelLabel(user?.subRole)
-        : "Panel de Administración";
-
     return (
         <div className="d-flex layout-dashboard">
             <ChangePasswordPopup/>

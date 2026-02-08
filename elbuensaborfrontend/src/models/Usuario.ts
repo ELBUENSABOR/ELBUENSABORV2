@@ -5,6 +5,7 @@ export interface User {
     subRole: string | null;
     token: string;
     mustChangePassword: boolean;
+    sucursalId?: number | null;
 }
 
 export type RolSistema = "CLIENTE" | "EMPLEADO" | "ADMIN";

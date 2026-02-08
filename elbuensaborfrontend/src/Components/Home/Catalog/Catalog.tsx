@@ -3,6 +3,7 @@ import {Link} from "react-router-dom";
 import {useCatalogData} from "../../../contexts/CatalogDataContext";
 import {useCatalogFilters} from "../../../contexts/CatalogFiltersContext";
 import {useCart} from "../../../contexts/CartContext";
+import {useSucursal} from "../../../contexts/SucursalContext";
 import type {Manufacturado} from "../../../models/Manufacturado";
 import {getImageUrl} from "../../../utils/image";
 
@@ -36,6 +37,7 @@ const Catalog = () => {
     const {searchTerm, selectedCategoryId, setSelectedCategoryId} =
         useCatalogFilters();
     const {addItem} = useCart();
+    const {sucursalId} = useSucursal();
 
     const normalizedSearch = searchTerm.trim().toLowerCase();
     const activeProducts = products.filter((product) => product.activo);
@@ -91,7 +93,14 @@ const Catalog = () => {
                 {isLoading && <p>Cargando productos...</p>}
                 {error && <p className="catalog-error">{error}</p>}
 
-                {!isLoading && !error && groupedProducts.length === 0 && (
+                {!isLoading && !error && !sucursalId && (
+                    <div className="catalog-empty">
+                        <h6>Seleccioná una sucursal para ver el catálogo.</h6>
+                        <p>Podés hacerlo desde el selector en la barra superior.</p>
+                    </div>
+                )}
+
+                {!isLoading && !error && sucursalId && groupedProducts.length === 0 && (
                     <div className="catalog-empty">
                         <h6>No encontramos resultados.</h6>
                         <p>Probá con otro nombre o seleccioná otra categoría.</p>

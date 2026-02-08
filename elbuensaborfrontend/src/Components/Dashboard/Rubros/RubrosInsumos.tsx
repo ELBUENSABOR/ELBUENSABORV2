@@ -1,7 +1,7 @@
 import {useEffect, useState, type ChangeEvent, type JSX} from "react";
 import "./rubros.css";
 import {useNavigate} from "react-router-dom";
-import ModalConfirmAction from "../../ModalConfirmAction/ModalConfirmAction";
+import ModalConfirmAction from "../../Common/ModalConfirmAction/ModalConfirmAction";
 import Alert from "../../Alert/Alert";
 import type {Rubro} from "../../../models/Rubro";
 import {getRubrosInsumos, deleteRubroInsumoService} from "../../../services/rubrosService";
