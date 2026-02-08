@@ -69,6 +69,7 @@ const OrdersHistory = () => {
                             <th>Fecha</th>
                             <th>Número</th>
                             <th>Estado</th>
+                            <th>Pago</th>
                             <th>Total</th>
                             <th className="text-end">Acciones</th>
                         </tr>
@@ -79,6 +80,13 @@ const OrdersHistory = () => {
                                 <td>{pedido.fechaFormateada}</td>
                                 <td>{pedido.numero}</td>
                                 <td>{pedido.estado}</td>
+                                <td>
+                                    <span
+                                        className={`badge ${pedido.pagado ? "bg-success" : "bg-warning text-dark"}`}
+                                    >
+                                        {pedido.pagado ? "Pagado" : "Pendiente"}
+                                    </span>
+                                </td>
                                 <td>${pedido.total}</td>
                                 <td className="text-end">
                                     <Link
