@@ -6,6 +6,8 @@ import java.util.stream.Collectors;
 
 import com.utn.elbuensabor.services.PedidoService;
 import com.utn.elbuensabor.services.StockService;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -19,13 +21,16 @@ import com.utn.elbuensabor.entities.EstadoPedido;
 import com.utn.elbuensabor.entities.FormaPago;
 import com.utn.elbuensabor.entities.PedidoVenta;
 import com.utn.elbuensabor.entities.PedidoVentaDetalle;
+import com.utn.elbuensabor.entities.RolSistema;
 import com.utn.elbuensabor.entities.SucursalEmpresa;
 import com.utn.elbuensabor.entities.TipoEnvio;
+import com.utn.elbuensabor.entities.Usuario;
 import com.utn.elbuensabor.repositories.ArticuloInsumoRepository;
 import com.utn.elbuensabor.repositories.ArticuloManufacturadoRepository;
 import com.utn.elbuensabor.repositories.ClienteRepository;
 import com.utn.elbuensabor.repositories.PedidoVentaRepository;
 import com.utn.elbuensabor.repositories.SucursalEmpresaRepository;
+import com.utn.elbuensabor.repositories.UsuarioRepository;
 
 import lombok.RequiredArgsConstructor;
 
@@ -39,6 +44,7 @@ public class PedidoServiceImpl implements PedidoService {
     private final ArticuloInsumoRepository insumoRepository;
     private final ArticuloManufacturadoRepository manufacturadoRepository;
     private final StockService stockService;
+    private final UsuarioRepository usuarioRepository;
 
     @Transactional
     public PedidoResponse create(PedidoRequest request) {
@@ -149,10 +155,17 @@ public class PedidoServiceImpl implements PedidoService {
     public PedidoResponse getById(Long id) {
         PedidoVenta pedido = pedidoRepository.findByIdWithDetalles(id)
                 .orElseThrow(() -> new RuntimeException("Pedido no encontrado"));
+        validarAccesoSucursal(pedido.getSucursal());
         return mapToResponse(pedido);
     }
 
     public List<PedidoResponse> getAll() {
+        Long sucursalId = resolveSucursalIdForEmpleado();
+        if (sucursalId != null) {
+            return pedidoRepository.findBySucursalIdWithDetalles(sucursalId).stream()
+                    .map(this::mapToResponse)
+                    .collect(Collectors.toList());
+        }
         return pedidoRepository.findAll().stream()
                 .map(this::mapToResponse)
                 .collect(Collectors.toList());
@@ -165,13 +178,37 @@ public class PedidoServiceImpl implements PedidoService {
     }
 
     public List<PedidoResponse> getByEstado(EstadoPedido estado) {
-        return pedidoRepository.findByEstadoWithDetalles(estado).stream()
+        Long sucursalId = resolveSucursalIdForEmpleado();
+        List<PedidoVenta> pedidos = sucursalId != null
+                ? pedidoRepository.findByEstadoAndSucursalIdWithDetalles(estado, sucursalId)
+                : pedidoRepository.findByEstadoWithDetalles(estado);
+        return pedidos.stream()
+                .map(this::mapToResponse)
+                .collect(Collectors.toList());
+    }
+
+    public List<PedidoResponse> getByEstadoAndSucursalId(EstadoPedido estado, Long sucursalId) {
+        Long sucursalEmpleado = resolveSucursalIdForEmpleado();
+        Long sucursalFinal = sucursalEmpleado != null ? sucursalEmpleado : sucursalId;
+        if (sucursalFinal == null) {
+            return pedidoRepository.findByEstadoWithDetalles(estado).stream()
+                    .map(this::mapToResponse)
+                    .collect(Collectors.toList());
+        }
+        return pedidoRepository.findByEstadoAndSucursalIdWithDetalles(estado, sucursalFinal).stream()
                 .map(this::mapToResponse)
                 .collect(Collectors.toList());
     }
 
     public List<PedidoResponse> getBySucursalId(Long sucursalId) {
-        return pedidoRepository.findBySucursalIdWithDetalles(sucursalId).stream()
+        Long sucursalEmpleado = resolveSucursalIdForEmpleado();
+        Long sucursalFinal = sucursalEmpleado != null ? sucursalEmpleado : sucursalId;
+        if (sucursalFinal == null) {
+            return pedidoRepository.findAll().stream()
+                    .map(this::mapToResponse)
+                    .collect(Collectors.toList());
+        }
+        return pedidoRepository.findBySucursalIdWithDetalles(sucursalFinal).stream()
                 .map(this::mapToResponse)
                 .collect(Collectors.toList());
     }
@@ -289,6 +326,7 @@ public class PedidoServiceImpl implements PedidoService {
     public PedidoResponse cambiarEstado(Long id, EstadoPedido nuevoEstado) {
         PedidoVenta pedido = pedidoRepository.findByIdWithDetalles(id)
                 .orElseThrow(() -> new RuntimeException("Pedido no encontrado"));
+        validarAccesoSucursal(pedido.getSucursal());
 
         // Validar transición de estado
         if (!esTransicionValida(pedido.getEstado(), nuevoEstado)) {
@@ -340,6 +378,32 @@ public class PedidoServiceImpl implements PedidoService {
         pedido = pedidoRepository.save(pedido);
 
         return mapToResponse(pedido);
+    }
+
+    private void validarAccesoSucursal(SucursalEmpresa sucursalPedido) {
+        Long sucursalId = resolveSucursalIdForEmpleado();
+        if (sucursalId == null) {
+            return;
+        }
+        if (sucursalPedido == null || !sucursalPedido.getId().equals(sucursalId)) {
+            throw new RuntimeException("Pedido no encontrado");
+        }
+    }
+
+    private Long resolveSucursalIdForEmpleado() {
+        Usuario usuario = resolveUsuarioAutenticado();
+        if (usuario == null || usuario.getRolSistema() != RolSistema.EMPLEADO) {
+            return null;
+        }
+        return usuario.getSucursal() != null ? usuario.getSucursal().getId() : null;
+    }
+
+    private Usuario resolveUsuarioAutenticado() {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        if (authentication == null || authentication.getName() == null) {
+            return null;
+        }
+        return usuarioRepository.findByUsername(authentication.getName()).orElse(null);
     }
 
     public String generarNumeroPedido() {
@@ -452,4 +516,3 @@ public class PedidoServiceImpl implements PedidoService {
         );
     }
 }
-

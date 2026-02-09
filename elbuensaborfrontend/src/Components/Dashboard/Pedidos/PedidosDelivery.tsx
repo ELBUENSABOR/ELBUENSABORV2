@@ -2,6 +2,8 @@ import { useEffect, useMemo, useState } from "react";
 import type { PedidoResponse } from "../../../services/pedidoService";
 import { cambiarEstadoPedido, getPedidosAll } from "../../../services/pedidoService";
 import OrderDetailModal from "../../Common/OrderDetailModal/OrderDetailModal.tsx";
+import { useSucursal } from "../../../contexts/SucursalContext";
+import { useUser } from "../../../contexts/UsuarioContext";
 
 const formatDate = (value: string) => {
     const date = new Date(value);
@@ -16,6 +18,8 @@ const formatDate = (value: string) => {
 };
 
 const PedidosDelivery = () => {
+    const { sucursales, sucursalId, setSucursalId } = useSucursal();
+    const { user } = useUser();
     const [pedidos, setPedidos] = useState<PedidoResponse[]>([]);
     const [selectedPedido, setSelectedPedido] = useState<PedidoResponse | null>(null);
     const [loading, setLoading] = useState(true);
@@ -25,7 +29,10 @@ const PedidosDelivery = () => {
         setLoading(true);
         setError("");
         try {
-            const data = await getPedidosAll("EN_DELIVERY");
+            const data = await getPedidosAll(
+                "EN_DELIVERY",
+                user?.role === "ADMIN" ? sucursalId : null
+            );
             setPedidos(data);
         } catch (err) {
             setError("No se pudieron cargar los pedidos en delivery.");
@@ -36,7 +43,7 @@ const PedidosDelivery = () => {
 
     useEffect(() => {
         cargarPedidos();
-    }, []);
+    }, [sucursalId, user?.role]);
 
     const pedidosRows = useMemo(
         () =>
@@ -65,7 +72,29 @@ const PedidosDelivery = () => {
 
     return (
         <div>
-            <h3 className="mb-3">Pedidos en delivery</h3>
+            <div className="d-flex flex-wrap justify-content-between align-items-center mb-3 gap-3">
+                <h3 className="mb-0">Pedidos en delivery</h3>
+                {user?.role === "ADMIN" && (
+                    <div>
+                        <label className="form-label">Sucursal</label>
+                        <select
+                            className="form-select"
+                            value={sucursalId ?? ""}
+                            onChange={(event) => {
+                                const value = event.target.value;
+                                setSucursalId(value ? Number(value) : null);
+                            }}
+                        >
+                            <option value="">Todas</option>
+                            {sucursales.map((sucursal) => (
+                                <option key={sucursal.id} value={sucursal.id}>
+                                    {sucursal.nombre}
+                                </option>
+                            ))}
+                        </select>
+                    </div>
+                )}
+            </div>
 
             {loading && <p>Cargando pedidos...</p>}
             {error && <p className="text-danger">{error}</p>}

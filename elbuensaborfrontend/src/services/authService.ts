@@ -29,6 +29,20 @@ export const loginUser = async (data: LoginRequest) => {
   }
 };
 
+export const loginWithGoogle = async (credential: string) => {
+  try {
+    const res = await axios.post(
+      `${API_URL}/auth/google`,
+      { credential },
+      { withCredentials: true }
+    );
+    return res;
+  } catch (error) {
+    console.error("Error al iniciar sesión con Google", error);
+    throw error;
+  }
+};
+
 export const getLocalidades = async () => {
   try {
     const res = await axios.get(`${API_URL}/localidad`, {

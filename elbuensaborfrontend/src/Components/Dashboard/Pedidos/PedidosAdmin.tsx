@@ -2,6 +2,8 @@ import { useEffect, useState } from "react";
 import { cambiarEstadoPedido, getPedidoById, getPedidosAll } from "../../../services/pedidoService";
 import type { PedidoResponse } from "../../../services/pedidoService";
 import OrderDetailModal from "../../Common/OrderDetailModal/OrderDetailModal.tsx";
+import { useSucursal } from "../../../contexts/SucursalContext";
+import { useUser } from "../../../contexts/UsuarioContext";
 
 const ESTADOS = [
     { label: "A confirmar", value: "A_CONFIRMAR" },
@@ -24,6 +26,8 @@ const formatDate = (value: string) => {
 };
 
 const PedidosAdmin = () => {
+    const { sucursales, sucursalId, setSucursalId } = useSucursal();
+    const { user } = useUser();
     const [pedidos, setPedidos] = useState<PedidoResponse[]>([]);
     const [estado, setEstado] = useState("");
     const [busquedaId, setBusquedaId] = useState("");
@@ -36,7 +40,10 @@ const PedidosAdmin = () => {
         setLoading(true);
         setError("");
         try {
-            const data = await getPedidosAll(estadoFiltro || undefined);
+            const data = await getPedidosAll(
+                estadoFiltro || undefined,
+                user?.role === "ADMIN" ? sucursalId : null
+            );
             setPedidos(data);
             setSelectedPedido((prev) =>
                 prev ? data.find((pedido) => pedido.id === prev.id) ?? null : null
@@ -52,7 +59,7 @@ const PedidosAdmin = () => {
         if (!busquedaId.trim()) {
             cargarPedidos(estado);
         }
-    }, [estado, busquedaId]);
+    }, [estado, busquedaId, sucursalId, user?.role]);
 
     const handleBuscar = async () => {
         if (!busquedaId.trim()) {
@@ -137,6 +144,26 @@ const PedidosAdmin = () => {
                         ))}
                     </select>
                 </div>
+                {user?.role === "ADMIN" && (
+                    <div>
+                        <label className="form-label">Sucursal</label>
+                        <select
+                            className="form-select"
+                            value={sucursalId ?? ""}
+                            onChange={(event) => {
+                                const value = event.target.value;
+                                setSucursalId(value ? Number(value) : null);
+                            }}
+                        >
+                            <option value="">Todas</option>
+                            {sucursales.map((sucursal) => (
+                                <option key={sucursal.id} value={sucursal.id}>
+                                    {sucursal.nombre}
+                                </option>
+                            ))}
+                        </select>
+                    </div>
+                )}
                 <div>
                     <label className="form-label">Buscar por ID</label>
                     <input

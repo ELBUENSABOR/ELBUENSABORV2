@@ -60,7 +60,11 @@ public class PedidoController {
         if (clienteId != null) {
             return ResponseEntity.ok(pedidoService.getByClienteId(clienteId));
         }
-        
+
+        if (estado != null && sucursalId != null) {
+            return ResponseEntity.ok(pedidoService.getByEstadoAndSucursalId(estado, sucursalId));
+        }
+
         if (estado != null) {
             return ResponseEntity.ok(pedidoService.getByEstado(estado));
         }
