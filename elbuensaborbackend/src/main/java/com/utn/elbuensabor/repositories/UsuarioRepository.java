@@ -15,6 +15,8 @@ public interface UsuarioRepository extends JpaRepository<Usuario, Long> {
 
     Optional<Usuario> findByUsername(String username); 
 
+    Optional<Usuario> findByAuth0Id(String auth0Id);
+
     boolean existsByUsername(String username);
 
     @Query("SELECT u FROM Usuario u LEFT JOIN FETCH u.cliente c LEFT JOIN FETCH c.domicilio d LEFT JOIN FETCH d.localidad WHERE u.id = :id")
