@@ -12,8 +12,7 @@ import {
     Boxes,
     Factory,
     BarChart3,
-    ClipboardList,
-    ShoppingBag
+    ClipboardList
 } from "lucide-react";
 
 const links = [
@@ -49,8 +48,6 @@ const links = [
         icon: Tags,
         rol: ["COCINERO", "ADMIN"]
     },
-
-    {path: "/dashboard/productos-venta", label: "Productos a la venta", icon: ShoppingBag, rol: ["ADMIN"]},
     {
         path: "/dashboard/reportes/productos-mas-vendidos",
         label: "Productos más vendidos",
