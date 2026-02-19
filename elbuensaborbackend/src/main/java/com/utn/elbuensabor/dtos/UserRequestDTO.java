@@ -30,21 +30,29 @@ public record UserRequestDTO(
         @Valid
         DomicilioDTO domicilio,
         PerfilEmpleado perfilEmpleado,
-        @NotNull(message = "La sucursal es obligatoria")
         Long sucursalId
 ) {
-    public record DomicilioDTO(
-            @NotBlank(message = "La calle es obligatoria")
-            String calle,
+        public boolean isSucursalValidaParaRol() {
+                return rolSistema != RolSistema.EMPLEADO || sucursalId != null;
+        }
 
-            @NotBlank(message = "El número es obligatorio")
-            String numero,
+        public boolean isDomicilioValidoParaRol() {
+                return rolSistema != RolSistema.CLIENTE || domicilio != null;
+        }
 
-            @NotNull(message = "El código postal es obligatorio")
-            Integer codigoPostal,
+        public record DomicilioDTO(
+                @NotBlank(message = "La calle es obligatoria")
+                String calle,
 
-            @NotNull(message = "La localidad es obligatoria")
-            Long localidadId
-    ) {}
+                @NotBlank(message = "El número es obligatorio")
+                String numero,
+
+                @NotNull(message = "El código postal es obligatorio")
+                Integer codigoPostal,
+
+                @NotNull(message = "La localidad es obligatoria")
+                Long localidadId
+        ) {
+        }
 }
 
