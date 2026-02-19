@@ -201,11 +201,16 @@ public class UserServiceImpl implements UserService {
             empleado.setPerfilEmpleado(userDTO.perfilEmpleado());
         }
 
-        if (userDTO.sucursalId() != null) {
+        if (usuario.getRolSistema() == RolSistema.EMPLEADO) {
+            if (userDTO.sucursalId() == null) {
+                throw new RuntimeException("Debe asignar una sucursal al empleado");
+            }
             SucursalEmpresa sucursal = sucursalEmpresaRepository.findById(userDTO.sucursalId())
                     .orElseThrow(() -> new RuntimeException("Sucursal no encontrada"));
 
             usuario.setSucursal(sucursal);
+        } else {
+            usuario.setSucursal(null);
         }
 
         usuarioRepository.save(usuario);

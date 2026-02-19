@@ -12,7 +12,6 @@ import axios from "axios";
 
 const initialState: UserRequestDTO = {
   username: "",
-  password: "",
   nombre: "",
   apellido: "",
   email: "",
@@ -78,7 +77,7 @@ export const EditUser: React.FC = () => {
           });
         }
       } catch (error) {
-        console.error("Error al obtener las localidades");
+        console.error("Error al obtener las localidades: " + error);
       }
     };
     getData();
@@ -121,7 +120,8 @@ export const EditUser: React.FC = () => {
     // Si no es empleado, quitamos perfilEmpleado
     const payload: UserEditRequestDTO = {
       ...form,
-      sucursalId: form.sucursalId ?? 0,
+      password: undefined,
+      sucursalId: isEmpleado ? (form.sucursalId ?? 0) : undefined,
       domicilio: isCliente ? form.domicilio : undefined,
       perfilEmpleado: isEmpleado ? form.perfilEmpleado : undefined,
     };
@@ -159,7 +159,7 @@ export const EditUser: React.FC = () => {
 
   return (
     <form onSubmit={handleSubmit} className="p-4 border rounded">
-      <h2 className="mb-4">Crear Usuario</h2>
+      <h2 className="mb-4">Editar Usuario</h2>
 
       {/* ROL */}
       <div className="mb-3">
@@ -193,18 +193,6 @@ export const EditUser: React.FC = () => {
         )
       }
 
-      <div className="mb-3">
-        <label>Rol del Sistema</label>
-        <input
-          type="text"
-          name="rolSistema"
-          className="form-control"
-          value={form.rolSistema}
-          onChange={handleChange}
-          required
-        />
-      </div>
-
       {/* USERNAME */}
       <div className="mb-3">
         <label>Usuario</label>
@@ -216,23 +204,6 @@ export const EditUser: React.FC = () => {
           required
         />
       </div>
-
-      {
-        form.rolSistema !== "EMPLEADO" && (
-          <div className="mb-3">
-            <label>Contraseña</label>
-            <input
-              type="password"
-              name="password"
-              className="form-control"
-              value={form.password}
-              onChange={handleChange}
-            />
-          </div>
-        )
-      }
-
-
 
       {/* NOMBRE */}
       <div className="mb-3">
@@ -283,25 +254,26 @@ export const EditUser: React.FC = () => {
         />
       </div>
 
-      <div className="mb-3">
-        <label>Sucursal</label>
-        <select
-          name="sucursalId"
-          className="form-select"
-          value={form.sucursalId || 0}
-          onChange={handleChange}
-          required
-        >
-          <option value="">Seleccionar sucursal...</option>
+      {isEmpleado && (
+          <div className="mb-3">
+            <label>Sucursal</label>
+            <select
+                name="sucursalId"
+                className="form-select"
+                value={form.sucursalId || 0}
+                onChange={handleChange}
+                required={isEmpleado}
+            >
+              <option value="">Seleccionar sucursal...</option>
 
-          {sucursales.map((s) => (
-            <option key={s.id} value={s.id}>
-              {s.nombre}
-            </option>
-          ))}
-        </select>
-      </div>
-
+              {sucursales.map((s) => (
+                  <option key={s.id} value={s.id}>
+                    {s.nombre}
+                  </option>
+              ))}
+            </select>
+          </div>
+      )}
       {/* CAMPOS SOLO PARA CLIENTE */}
       {isCliente && (
         <>
