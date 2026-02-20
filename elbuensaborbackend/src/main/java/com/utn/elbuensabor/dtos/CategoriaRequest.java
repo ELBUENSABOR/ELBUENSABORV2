@@ -7,7 +7,7 @@ public record CategoriaRequest(
         String denominacion,
         Long categoriaPadreId,
         boolean activo
-        ) {
+) {
 
 }
 

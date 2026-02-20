@@ -7,5 +7,7 @@ public record AuthResponse(
         String subRole,
         String userId,
         boolean mustChangePassword,
-        String sucursalId
-) {}
+        String sucursalId,
+        String fotoPerfil
+) {
+}

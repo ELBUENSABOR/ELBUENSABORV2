@@ -1,7 +1,7 @@
-import type { Insumo } from "./Insumo";
+import type {Insumo} from "./Insumo";
 
 export interface ManufacturadoDetalles {
-  id: number;
-  insumo: Insumo;
-  cantidad: number;
+    id: number;
+    insumo: Insumo;
+    cantidad: number;
 }

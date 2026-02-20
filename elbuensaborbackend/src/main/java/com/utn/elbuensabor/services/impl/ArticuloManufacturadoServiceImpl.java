@@ -1,26 +1,28 @@
 package com.utn.elbuensabor.services.impl;
 
-import java.util.List;
-
-import com.utn.elbuensabor.dtos.*;
+import com.utn.elbuensabor.dtos.ArticuloManufacturadoRequest;
+import com.utn.elbuensabor.dtos.ArticuloManufacturadoResponse;
+import com.utn.elbuensabor.dtos.RecetaItemRequest;
+import com.utn.elbuensabor.dtos.RecetaItemResponse;
 import com.utn.elbuensabor.entities.*;
-import com.utn.elbuensabor.services.ArticuloManufacturadoService;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
-
 import com.utn.elbuensabor.repositories.ArticuloInsumoRepository;
 import com.utn.elbuensabor.repositories.ArticuloManufacturadoRepository;
 import com.utn.elbuensabor.repositories.CategoriaArticuloManufacturadoRepository;
-
+import com.utn.elbuensabor.services.ArticuloManufacturadoService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import java.util.List;
 
 @Service
 @RequiredArgsConstructor
 public class ArticuloManufacturadoServiceImpl implements ArticuloManufacturadoService {
 
-        private final ArticuloManufacturadoRepository manufacturadoRepo;
-        private final CategoriaArticuloManufacturadoRepository categoriaRepo;
-        private final ArticuloInsumoRepository insumoRepo;
+    private final ArticuloManufacturadoRepository manufacturadoRepo;
+    private final CategoriaArticuloManufacturadoRepository categoriaRepo;
+    private final ArticuloInsumoRepository insumoRepo;
+
 
     public List<ArticuloManufacturadoResponse> getAllBySucursal(Long sucursalId) {
         return manufacturadoRepo.findAll().stream()
@@ -51,14 +53,12 @@ public class ArticuloManufacturadoServiceImpl implements ArticuloManufacturadoSe
         return toResponseBase(manufacturado);
     }
 
-
-
     public void delete(Long id) {
-                ArticuloManufacturado manufacturado = manufacturadoRepo.findById(id)
-                                .orElseThrow(() -> new RuntimeException("Producto no encontrado"));
-                manufacturado.setActivo(false);
-                manufacturadoRepo.save(manufacturado);
-        }
+        ArticuloManufacturado manufacturado = manufacturadoRepo.findById(id)
+                .orElseThrow(() -> new RuntimeException("Producto no encontrado"));
+        manufacturado.setActivo(false);
+        manufacturadoRepo.save(manufacturado);
+    }
 
     public void fillFromRequest(ArticuloManufacturado manufacturado, ArticuloManufacturadoRequest request) {
 
@@ -100,17 +100,17 @@ public class ArticuloManufacturadoServiceImpl implements ArticuloManufacturadoSe
                 manufacturado.getImagenes().add(imagen);
             }
         }
+
     }
 
-
     public ArticuloManufacturadoDetalle toDetalle(RecetaItemRequest item) {
-                ArticuloInsumo insumo = insumoRepo.findById(item.insumoId())
-                                .orElseThrow(() -> new RuntimeException("Insumo de la receta no encontrado"));
-                ArticuloManufacturadoDetalle detalle = new ArticuloManufacturadoDetalle();
-                detalle.setArticuloInsumo(insumo);
-                detalle.setCantidad(item.cantidad());
-                return detalle;
-        }
+        ArticuloInsumo insumo = insumoRepo.findById(item.insumoId())
+                .orElseThrow(() -> new RuntimeException("Insumo de la receta no encontrado"));
+        ArticuloManufacturadoDetalle detalle = new ArticuloManufacturadoDetalle();
+        detalle.setArticuloInsumo(insumo);
+        detalle.setCantidad(item.cantidad());
+        return detalle;
+    }
 
     public ArticuloManufacturadoResponse toResponseBase(ArticuloManufacturado manufacturado) {
 

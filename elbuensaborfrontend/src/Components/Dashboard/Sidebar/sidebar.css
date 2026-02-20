@@ -1,72 +1,148 @@
 /* Sidebar general */
 .sidebar-dashboard {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 240px;
-  min-height: 100vh;
-  background: #212529;
-  padding: 1rem;
-  z-index: 1600;
-  transition: transform 0.3s ease-in-out;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 240px;
+    min-height: 100vh;
+    background: hsl(var(--sidebar-background));
+    padding: 1.5rem 1rem;
+    z-index: 1600;
+    transition: transform 0.3s ease-in-out;
+    border-right: 1px solid hsl(var(--sidebar-border));
+    color: hsl(var(--sidebar-foreground));
+}
+
+.sidebar-brand {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    margin-bottom: 1.5rem;
+}
+
+.brand-logo {
+    width: 42px;
+    height: 42px;
+    border-radius: 12px;
+    background: hsl(var(--sidebar-primary));
+    color: hsl(var(--sidebar-primary-foreground));
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 700;
+}
+
+.brand-title {
+    display: block;
+    font-weight: 600;
+    font-size: 0.95rem;
+}
+
+.brand-subtitle {
+    display: block;
+    font-size: 0.75rem;
+    color: hsl(var(--muted-foreground));
+}
+
+.sidebar-section {
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    color: hsl(var(--muted-foreground));
+    margin-bottom: 0.75rem;
+    letter-spacing: 0.05em;
+}
+
+.sidebar-dashboard .nav {
+    gap: 0.35rem;
+}
+
+.sidebar-dashboard .nav-link {
+    color: hsl(var(--sidebar-foreground));
+    border-radius: 12px;
+    padding: 0.5rem 0.75rem;
+    font-size: 0.9rem;
+}
+
+.sidebar-dashboard .nav-link:hover {
+    background: hsl(var(--sidebar-accent));
+    color: hsl(var(--sidebar-primary));
+}
+
+.sidebar-dashboard .nav-link.active {
+    background: hsl(var(--sidebar-accent));
+    color: hsl(var(--sidebar-primary));
+    font-weight: 600;
+}
+
+.nav-link {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.nav-icon {
+    min-width: 18px;
 }
 
 /* Mobile oculto */
 @media (max-width: 1000px) {
-  .sidebar-dashboard {
-    transform: translateX(-100%);
-  }
+    .sidebar-dashboard {
+        transform: translateX(-100%);
+    }
 
-  .sidebar-dashboard.open {
-    transform: translateX(0);
-  }
+    .sidebar-dashboard.open {
+        transform: translateX(0);
+    }
 
-  .menu-toggle {
-    position: absolute;
-    top: 50%;
-    left: 0;
-    z-index: 1500;
-    background: #212529;
-    border: none;
-    border-radius: 0px 5px 5px 0px;
-    color: #fff;
-    font-size: 15px;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    min-height: 60px;
-    min-width: 25px;
-  }
+    .menu-toggle {
+        position: absolute;
+        top: 50%;
+        left: 0;
+        z-index: 1500;
+        background: hsl(var(--sidebar-primary));
+        border: none;
+        border-radius: 0px 5px 5px 0px;
+        color: hsl(var(--sidebar-primary-foreground));
+        font-size: 15px;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        min-height: 60px;
+        min-width: 25px;
+    }
 
-  .close-btn {
-    background: none;
-    border: none;
-    color: #fff;
-    font-size: 26px;
-    margin-bottom: 1rem;
-  }
+    .close-btn {
+        background: none;
+        border: none;
+        color: hsl(var(--sidebar-foreground));
+        font-size: 26px;
+        margin-bottom: 1rem;
+    }
 
-  .overlay {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100vw;
-    height: 100vh;
-    background: rgba(0, 0, 0, 0.4);
-    z-index: 900;
-  }
+    .overlay {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100vw;
+        height: 100vh;
+        background: hsl(var(--foreground) / 0.4);
+        z-index: 900;
+    }
 }
 
 /* Desktop siempre visible */
 @media (min-width: 1000px) {
-  .sidebar-dashboard {
-    transform: translateX(0);
-    position: relative;
-  }
+    .sidebar-dashboard {
+        transform: translateX(0);
+        position: sticky;
+        top: 0;
+        height: 100vh;
+        align-self: flex-start;
+    }
 
-  .menu-toggle,
-  .close-btn,
-  .overlay {
-    display: none;
-  }
+    .menu-toggle,
+    .close-btn,
+    .overlay {
+        display: none;
+    }
 }

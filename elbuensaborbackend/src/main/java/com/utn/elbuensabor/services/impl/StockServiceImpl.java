@@ -1,26 +1,19 @@
 package com.utn.elbuensabor.services.impl;
 
+import com.utn.elbuensabor.dtos.StockAlertaDTO;
+import com.utn.elbuensabor.entities.*;
+import com.utn.elbuensabor.repositories.ArticuloManufacturadoDetalleRepository;
+import com.utn.elbuensabor.repositories.SucursalInsumoRepository;
+import com.utn.elbuensabor.services.StockService;
+import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Stream;
-
-import com.utn.elbuensabor.services.StockService;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
-
-import com.utn.elbuensabor.dtos.StockAlertaDTO;
-import com.utn.elbuensabor.entities.ArticuloInsumo;
-import com.utn.elbuensabor.entities.ArticuloManufacturado;
-import com.utn.elbuensabor.entities.ArticuloManufacturadoDetalle;
-import com.utn.elbuensabor.entities.PedidoVenta;
-import com.utn.elbuensabor.entities.PedidoVentaDetalle;
-import com.utn.elbuensabor.entities.SucursalInsumo;
-import com.utn.elbuensabor.repositories.ArticuloManufacturadoDetalleRepository;
-import com.utn.elbuensabor.repositories.SucursalInsumoRepository;
-
-import lombok.RequiredArgsConstructor;
 
 @Service
 @RequiredArgsConstructor
@@ -31,6 +24,7 @@ public class StockServiceImpl implements StockService {
 
     /**
      * Verifica si hay stock suficiente para un pedido antes de crearlo
+     *
      * @param pedido El pedido a verificar
      * @return Lista de mensajes de error si hay problemas de stock, lista vacía si todo está bien
      */
@@ -91,6 +85,7 @@ public class StockServiceImpl implements StockService {
 
     /**
      * Decrementa el stock cuando un pedido pasa a cocina
+     *
      * @param pedido El pedido que se está procesando
      * @throws IllegalStateException Si no hay stock suficiente
      */
@@ -152,9 +147,10 @@ public class StockServiceImpl implements StockService {
 
     /**
      * Verifica si un artículo manufacturado tiene stock suficiente
+     *
      * @param manufacturadoId ID del artículo manufacturado
-     * @param cantidad Cantidad requerida
-     * @param sucursalId ID de la sucursal
+     * @param cantidad        Cantidad requerida
+     * @param sucursalId      ID de la sucursal
      * @return true si hay stock suficiente, false en caso contrario
      */
     public boolean verificarStockArticuloManufacturado(Long manufacturadoId, Integer cantidad, Long sucursalId) {
@@ -179,8 +175,9 @@ public class StockServiceImpl implements StockService {
 
     /**
      * Verifica si un insumo tiene stock suficiente
-     * @param insumoId ID del insumo
-     * @param cantidad Cantidad requerida
+     *
+     * @param insumoId   ID del insumo
+     * @param cantidad   Cantidad requerida
      * @param sucursalId ID de la sucursal
      * @return true si hay stock suficiente, false en caso contrario
      */
@@ -194,7 +191,8 @@ public class StockServiceImpl implements StockService {
 
     /**
      * Obtiene el stock actual de un insumo en una sucursal
-     * @param insumoId ID del insumo
+     *
+     * @param insumoId   ID del insumo
      * @param sucursalId ID de la sucursal
      * @return Stock actual o 0.0 si no existe registro
      */

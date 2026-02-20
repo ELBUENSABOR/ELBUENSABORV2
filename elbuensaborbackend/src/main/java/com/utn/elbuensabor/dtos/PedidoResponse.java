@@ -1,11 +1,11 @@
 package com.utn.elbuensabor.dtos;
 
-import java.time.LocalDateTime;
-import java.util.List;
-
 import com.utn.elbuensabor.entities.EstadoPedido;
 import com.utn.elbuensabor.entities.FormaPago;
 import com.utn.elbuensabor.entities.TipoEnvio;
+
+import java.time.LocalDateTime;
+import java.util.List;
 
 public record PedidoResponse(
         Long id,
@@ -19,17 +19,35 @@ public record PedidoResponse(
         Double totalCosto,
         Boolean pagado,
         String observaciones,
+        String direccionEntrega,
+        String telefonoEntrega,
         EstadoPedido estado,
         TipoEnvio tipoEnvio,
         FormaPago formaPago,
         ClienteDTO cliente,
         EmpleadoDTO empleado,
         SucursalDTO sucursal,
+        FacturaDTO factura,
         List<PedidoDetalleResponse> detalles
 ) {
-    public record ClienteDTO(Long id, String nombre, String apellido, String email) {}
-    public record EmpleadoDTO(Long id, String nombre, String apellido) {}
-    public record SucursalDTO(Long id, String nombre) {}
+    public record ClienteDTO(Long id, String nombre, String apellido, String email) {
+    }
+
+    public record EmpleadoDTO(Long id, String nombre, String apellido) {
+    }
+
+    public record SucursalDTO(Long id, String nombre) {
+    }
+
+    public record FacturaDTO(
+            Long id,
+            String numeroComprobante,
+            LocalDateTime fechaFacturacion,
+            Double totalVenta,
+            String pdfUrl
+    ) {
+    }
+
     public record PedidoDetalleResponse(
             Long id,
             ArticuloDTO articulo,
@@ -37,7 +55,8 @@ public record PedidoResponse(
             Double precioUnit,
             Double subTotal
     ) {
-        public record ArticuloDTO(Long id, String denominacion, String tipo) {}
+        public record ArticuloDTO(Long id, String denominacion, String tipo) {
+        }
     }
 }
 

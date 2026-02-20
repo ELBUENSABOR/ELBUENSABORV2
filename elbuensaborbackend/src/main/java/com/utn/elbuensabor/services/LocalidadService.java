@@ -1,8 +1,8 @@
 package com.utn.elbuensabor.services;
 
-import java.util.List;
-
 import com.utn.elbuensabor.dtos.LocalidadDTO;
+
+import java.util.List;
 
 public interface LocalidadService {
 

@@ -1,11 +1,11 @@
-import React, { useEffect, useState } from "react";
-import type { UserRequestDTO } from "../../../models/Usuario";
-import type { LocalidadDTO } from "../../../dtos/LocalidadDTO";
-import { getLocalidades } from "../../../services/authService";
-import { createUser } from "../../../services/userService";
-import { useNavigate } from "react-router-dom";
-import { fetchSucursales } from "../../../services/dashboardService";
-import type { Sucursal } from "../../../models/Sucursal";
+import React, {useEffect, useState} from "react";
+import type {UserRequestDTO} from "../../../models/Usuario";
+import type {LocalidadDTO} from "../../../dtos/LocalidadDTO";
+import {getLocalidades} from "../../../services/authService";
+import {createUser} from "../../../services/userService";
+import {useNavigate} from "react-router-dom";
+import {fetchSucursales} from "../../../services/dashboardService";
+import type {Sucursal} from "../../../models/Sucursal";
 import axios from "axios";
 
 const initialState: UserRequestDTO = {
@@ -73,7 +73,7 @@ export const AddUser: React.FC = () => {
     const handleChange = (
         e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
     ) => {
-        const { name, value } = e.target;
+        const {name, value} = e.target;
 
         setForm((prev) => ({
             ...prev,
@@ -85,7 +85,7 @@ export const AddUser: React.FC = () => {
     const handleDomicilioChange = (
         e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
     ) => {
-        const { name, value } = e.target;
+        const {name, value} = e.target;
 
         setForm((prev) => ({
             ...prev,
@@ -376,13 +376,13 @@ export const AddUser: React.FC = () => {
             {/* Mensajes de error */}
             {
                 errorMsg && (
-                    <p className="text-danger mt-2" style={{ whiteSpace: "pre-line" }}>
+                    <p className="text-danger mt-2" style={{whiteSpace: "pre-line"}}>
                         {errorMsg}
                     </p>
                 )
             }
 
             <button className="btn btn-primary mt-3">Crear Usuario</button>
-        </form >
+        </form>
     );
 };

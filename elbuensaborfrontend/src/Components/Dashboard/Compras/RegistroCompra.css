@@ -1,0 +1,94 @@
+.registro-compra {
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+}
+
+.registro-compra__header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 16px;
+}
+
+.registro-compra__kicker {
+    font-weight: 600;
+    color: #ff7a00;
+    margin-bottom: 4px;
+}
+
+.registro-compra__card {
+    background: #fff;
+    border-radius: 12px;
+    border: 1px solid #f0e6dc;
+    box-shadow: 0 6px 18px rgba(44, 24, 12, 0.08);
+    padding: 20px 24px;
+}
+
+.registro-compra__card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 16px;
+    margin-bottom: 16px;
+}
+
+.registro-compra__card-header h5 {
+    margin-bottom: 4px;
+}
+
+.registro-compra__card-header p {
+    margin: 0;
+    color: #7d6c5c;
+    font-size: 0.9rem;
+}
+
+.registro-compra__new {
+    align-self: flex-start;
+    border-radius: 18px;
+    padding: 6px 16px;
+}
+
+.registro-compra__total {
+    background: #f3efe9;
+    border: 1px solid #e6dacd;
+    font-weight: 600;
+}
+
+.registro-compra__actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 12px;
+}
+
+.registro-compra__clear {
+    border-radius: 18px;
+    padding: 6px 16px;
+    border-color: #ff7a00;
+    color: #ff7a00;
+}
+
+.registro-compra__table {
+    margin: 0;
+}
+
+.registro-compra__table thead th {
+    font-size: 0.8rem;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    color: #9b8a7a;
+    border-bottom: 1px solid #efe6dc;
+}
+
+.registro-compra__table tbody tr {
+    border-bottom: 1px solid #f3ede5;
+}
+
+.registro-compra__table tbody tr:last-child {
+    border-bottom: none;
+}
+
+.registro-compra__table tbody td {
+    padding: 12px 0;
+    color: #4c3b2f;
+}

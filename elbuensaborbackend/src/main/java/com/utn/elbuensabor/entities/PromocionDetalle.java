@@ -11,7 +11,7 @@ import lombok.Setter;
 @Table(name = "promocion_detalle")
 @Getter
 @Setter
-public class PromocionDetalle extends BaseEntity{
+public class PromocionDetalle extends BaseEntity {
 
     private Integer cantidad;
 

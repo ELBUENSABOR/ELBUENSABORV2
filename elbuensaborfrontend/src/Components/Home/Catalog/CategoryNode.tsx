@@ -1,10 +1,10 @@
-import type { Rubro } from "../../../models/Rubro";
+import type {Rubro} from "../../../models/Rubro";
 
 const CategoryNode = ({
-    node,
-    selectedId,
-    onSelect,
-}: {
+                          node,
+                          selectedId,
+                          onSelect,
+                      }: {
     node: Rubro;
     selectedId: number | null;
     onSelect: (id: number) => void;
@@ -34,4 +34,3 @@ const CategoryNode = ({
 
 
 export default CategoryNode;
-

@@ -11,7 +11,7 @@ import lombok.Setter;
 @Table(name = "sucursal_manufacturado")
 @Getter
 @Setter
-public class SucursalManufacturado extends BaseEntity{
+public class SucursalManufacturado extends BaseEntity {
 
     @ManyToOne
     @JoinColumn(name = "sucursal_id", nullable = false)

@@ -4,7 +4,7 @@
     padding: 20px;
 }
 
-.account-container>div>form {
+.account-container > div > form {
     display: flex;
     flex-direction: column;
     gap: 10px;
@@ -12,7 +12,7 @@
     margin-top: 10px;
 }
 
-.account-container>div>form>button {
+.account-container > div > form > button {
     max-width: 320px;
     margin-top: 10px;
 }
@@ -26,7 +26,7 @@
     margin-bottom: 8px;
 }
 
-.row-account>label {
+.row-account > label {
     width: 150px;
     font-weight: 500;
     font-size: 0.9rem;
@@ -34,8 +34,8 @@
 }
 
 
-.row-account>input,
-.row-account>select {
+.row-account > input,
+.row-account > select {
     flex: 1;
     max-width: 280px;
     min-width: 180px;
@@ -65,7 +65,7 @@
     gap: 10px;
 }
 
-.header-account>h4 {
+.header-account > h4 {
     margin: 0;
 }
 
@@ -80,13 +80,40 @@
         align-items: flex-start;
     }
 
-    .row-account>label {
+    .row-account > label {
         width: 100%;
     }
 
-    .row-account>input,
-    .row-account>select {
+    .row-account > input,
+    .row-account > select {
         width: 100%;
         max-width: 100%;
     }
+}
+
+.account-photo-section {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    margin-bottom: 14px;
+}
+
+.account-photo-preview {
+    width: 84px;
+    height: 84px;
+    border-radius: 50%;
+    border: 2px solid hsl(var(--primary));
+    object-fit: cover;
+    background: hsl(var(--secondary));
+}
+
+.account-photo-preview--fallback {
+    padding: 8px;
+    color: hsl(var(--primary));
+}
+
+.account-photo-actions {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
 }

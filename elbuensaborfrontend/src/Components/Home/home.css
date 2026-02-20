@@ -1,26 +1,306 @@
-.home-container {
-  display: flex;
-  flex-direction: column;
-  width: 100%;
-  padding: 20px;
-}
-
-.header-home {
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: flex-start;
-  width: 100%;
-}
-
-.header-home > hr{
+.home-page {
+    display: flex;
+    flex-direction: column;
+    gap: 72px;
+    padding: 32px 48px 56px;
+    color: #2d2a26;
+    max-width: 1300px;
     width: 100%;
+    margin: 0 auto;
+}
+
+.home-hero {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 16px;
+    text-align: center;
+    padding: 48px 16px 16px;
+}
+
+.home-hero__eyebrow {
+    font-size: 0.95rem;
+    color: #6f655c;
+}
+
+.home-hero h1 {
+    font-size: clamp(2rem, 4vw, 3rem);
+    font-weight: 700;
+}
+
+.home-hero h1 span {
+    color: #f97316;
+}
+
+.home-hero__subtitle {
+    max-width: 560px;
+    font-size: 1.05rem;
+    color: #6f655c;
+}
+
+.home-hero__button {
+    padding: 12px 28px;
+    border-radius: 999px;
+    background: #f97316;
+    color: #fff;
+    border: none;
+    font-weight: 600;
+    box-shadow: 0 12px 20px rgba(249, 115, 22, 0.3);
+}
+
+.home-section-title {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    font-size: 1.4rem;
+    font-weight: 700;
+}
+
+.home-section-title span {
+    width: 38px;
+    height: 38px;
+    border-radius: 12px;
+    display: grid;
+    place-items: center;
+    background: #fff1e6;
+    color: #f97316;
+    font-weight: 700;
+}
+
+.home-offers {
+    display: flex;
+    flex-direction: column;
+    gap: 28px;
+}
+
+.home-offers__grid {
+    display: grid;
+    gap: 24px;
+    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+}
+
+.home-offer-card {
+    background: #ffffff;
+    border-radius: 16px;
+    overflow: hidden;
+    box-shadow: 0 12px 24px rgba(15, 23, 42, 0.08);
+    display: flex;
+    flex-direction: column;
+}
+
+.home-offer-card__image {
+    position: relative;
+    height: 180px;
+    overflow: hidden;
+}
+
+.home-offer-card__image img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.25s ease;
+}
+
+.home-offer-card:hover .home-offer-card__image img {
+    transform: scale(1.08);
+}
+
+.home-offer-card__badge {
+    position: absolute;
+    top: 12px;
+    right: 12px;
+    background: #f97316;
+    color: #fff;
+    padding: 4px 10px;
+    border-radius: 999px;
+    font-size: 0.75rem;
+    font-weight: 600;
+}
+
+.home-offer-card__content {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    padding: 16px;
+}
+
+.home-offer-card__content h3 {
+    font-size: 1.1rem;
+    font-weight: 600;
+}
+
+.home-offer-card__content p {
+    font-size: 0.9rem;
+    color: #6f655c;
+    margin: 0;
+}
+
+.home-offer-card__price {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.home-offer-card__old {
+    color: #b6ada4;
+    text-decoration: line-through;
+    font-size: 0.85rem;
+}
+
+.home-offer-card__price strong {
+    color: #f97316;
+    font-size: 1rem;
+}
+
+.home-offer-card__button {
+    align-self: flex-end;
+    padding: 6px 16px;
+    border-radius: 12px;
+    background: #f6efe7;
+    color: #2d2a26;
+    font-size: 0.85rem;
+    font-weight: 600;
+    border: none;
+}
+
+.home-offers__button {
+    align-self: center;
+    padding: 10px 24px;
+    border-radius: 12px;
+    border: 1px solid #f97316;
+    color: #f97316;
+    background: transparent;
+    font-weight: 600;
+}
+
+.home-location {
+    display: flex;
+    flex-direction: column;
+    gap: 28px;
+}
+
+.home-location__content {
+    display: grid;
+    gap: 24px;
+    grid-template-columns: minmax(0, 1.2fr) minmax(0, 1fr);
+}
+
+.home-location__map {
+    background: #fff;
+    border-radius: 18px;
+    padding: 12px;
+    box-shadow: 0 12px 24px rgba(15, 23, 42, 0.08);
+}
+
+.home-location__map iframe {
+    width: 100%;
+    height: 280px;
+    border: 0;
+    border-radius: 12px;
+}
+
+.home-location__cards {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+
+.info-card {
+    display: flex;
+    align-items: flex-start;
+    gap: 14px;
+    background: #fff;
+    border-radius: 14px;
+    padding: 16px 18px;
+    box-shadow: 0 12px 24px rgba(15, 23, 42, 0.08);
+    border: 1px solid rgba(15, 23, 42, 0.06);
+}
+
+.info-card__icon {
+    width: 40px;
+    height: 40px;
+    border-radius: 12px;
+    display: grid;
+    place-items: center;
+    background: #fff1e6;
+    color: #f97316;
+    flex: 0 0 auto;
+}
+
+.info-card__body h3 {
+    margin: 0 0 6px;
+    font-size: 0.95rem;
+    font-weight: 700;
+    color: #2d2a26;
+}
+
+.info-card__body p {
+    margin: 0 0 4px;
+    color: #2d2a26;
+    font-size: 0.9rem;
+}
+
+.info-card__body span {
+    display: block;
+    color: #6f655c;
+    font-size: 0.88rem;
+}
+
+
+.home-location__cards article {
+    background: #fff;
+    border-radius: 14px;
+    padding: 16px 18px;
+    box-shadow: 0 12px 24px rgba(15, 23, 42, 0.08);
+}
+
+.home-location__cards h3 {
+    font-size: 1rem;
+    font-weight: 600;
+    margin-bottom: 6px;
+}
+
+.home-location__cards p {
+    margin: 0 0 4px;
+    color: #2d2a26;
+}
+
+.home-location__cards span {
+    color: #6f655c;
+    font-size: 0.9rem;
+}
+
+.home-footer {
+    text-align: center;
+    color: #8b8178;
+    font-size: 0.85rem;
+    margin-top: 12px;
+}
+
+@media (max-width: 991px) {
+    .home-container {
+        padding: 20px;
+    }
+
+    .home-location__content {
+        grid-template-columns: 1fr;
+    }
+}
+
+@media (max-width: 640px) {
+    .home-hero {
+        padding-top: 24px;
+    }
+
+    .home-offer-card__image {
+        height: 160px;
+    }
 }
 
 .password-modal-backdrop {
     position: fixed;
     inset: 0;
-    background: rgba(15, 23, 42, 0.55); /* gris oscuro con transparencia */
+    background: rgba(15, 23, 42, 0.55);
     backdrop-filter: blur(3px);
     display: flex;
     justify-content: center;
@@ -119,7 +399,6 @@
     font-weight: 500;
 }
 
-/* Animación suave */
 @keyframes popupFadeIn {
     from {
         opacity: 0;
@@ -130,4 +409,3 @@
         transform: translateY(0) scale(1);
     }
 }
-

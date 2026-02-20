@@ -1,8 +1,8 @@
-import type { LocalidadDTO } from "./LocalidadDTO";
+import type {LocalidadDTO} from "./LocalidadDTO";
 
 export interface DomicilioDTO {
-  calle: string;
-  codigoPostal: number;
-  numero: string;
-  localidad: LocalidadDTO;
+    calle: string;
+    codigoPostal: number;
+    numero: string;
+    localidad: LocalidadDTO;
 }

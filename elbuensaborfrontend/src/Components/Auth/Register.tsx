@@ -1,9 +1,10 @@
-import { useEffect, useState } from "react";
-import { registerUser, getLocalidades } from "../../services/authService";
+import {useEffect, useState} from "react";
+import {getLocalidades, loginWithGoogle, registerUser} from "../../services/authService";
 import "./auth.css";
-import type { RegisterRequest } from "../../dtos/RegisterRequest";
-import { useNavigate } from "react-router-dom";
-import { useUser } from "../../contexts/UsuarioContext";
+import type {RegisterRequest} from "../../dtos/RegisterRequest";
+import {Link, useNavigate} from "react-router-dom";
+import {useUser} from "../../contexts/UsuarioContext";
+import GoogleAuthButton from "./GoogleAuthButton";
 
 interface Localidad {
     id: number;
@@ -27,7 +28,7 @@ const Register = () => {
     const [confirmPassword, setConfirmPassword] = useState("");
     const [localidades, setLocalidades] = useState<Localidad[]>([]);
 
-    const { setUser } = useUser();
+    const {setUser} = useUser();
     const navigate = useNavigate();
 
     const [loading, setLoading] = useState(false);
@@ -55,7 +56,7 @@ const Register = () => {
     const handleChange = (
         e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
     ) => {
-        const { name, value } = e.target;
+        const {name, value} = e.target;
         setForm((prev) => ({
             ...prev,
             [name]:
@@ -79,7 +80,7 @@ const Register = () => {
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
         setLoading(true);
-        setMsg({ state: "", msg: "" });
+        setMsg({state: "", msg: ""});
 
         if (!form.username.trim()) {
             setMsg({
@@ -128,7 +129,7 @@ const Register = () => {
         }
 
         try {
-            const payload: RegisterRequest = { ...form };
+            const payload: RegisterRequest = {...form};
 
             const resp = await registerUser(payload);
 
@@ -141,8 +142,11 @@ const Register = () => {
                 token: resp.data.token,
                 username: resp.data.username,
                 role: resp.data.role,
+                subRole: resp.data.subRole ?? null,
                 userId: resp.data.userId,
                 mustChangePassword: resp.data.mustChangePassword,
+                sucursalId: resp.data.sucursalId ? Number(resp.data.sucursalId) : null,
+                fotoPerfil: resp.data.fotoPerfil ?? null,
             });
 
             setTimeout(() => {
@@ -160,11 +164,46 @@ const Register = () => {
         setLoading(false);
     };
 
+    const handleGoogleRegister = async (credential: string) => {
+        setLoading(true);
+        setMsg({state: "", msg: ""});
+        try {
+            const resp = await loginWithGoogle(credential);
+
+            setUser({
+                token: resp.data.token,
+                username: resp.data.username,
+                role: resp.data.role,
+                subRole: resp.data.subRole ?? null,
+                userId: resp.data.userId,
+                mustChangePassword: resp.data.mustChangePassword,
+                sucursalId: resp.data.sucursalId ? Number(resp.data.sucursalId) : null,
+                fotoPerfil: resp.data.fotoPerfil ?? null,
+            });
+
+            navigate("/");
+        } catch (err: any) {
+            setMsg({
+                state: "error",
+                msg:
+                    err.response?.data?.message ||
+                    "Error al registrarse con Google.",
+            });
+        }
+        setLoading(false);
+    };
+
     return (
         <div className="auth-container">
             <form onSubmit={handleSubmit} className="form-container-auth">
-                <h2>Crear cuenta</h2>
-                <hr />
+                <div className="auth-header">
+                    <div className="auth-logo" aria-hidden="true">
+                        🍽️
+                    </div>
+                    <h2 className="auth-title">El buen sabor</h2>
+                    <p className="auth-subtitle">Creá tu cuenta</p>
+                </div>
+                <hr/>
 
                 <input
                     type="text"
@@ -281,6 +320,11 @@ const Register = () => {
                     {loading ? "Registrando..." : "Registrarse"}
                 </button>
 
+                <div className="auth-divider">
+                    <span>o</span>
+                </div>
+                <GoogleAuthButton onSuccess={handleGoogleRegister} text="signup_with"/>
+
                 {msg.msg && (
                     <p
                         className={
@@ -291,6 +335,9 @@ const Register = () => {
                     </p>
                 )}
             </form>
+            <Link className="auth-back" to="/">
+                ← Volver a la tienda
+            </Link>
         </div>
     );
 };
