@@ -1,17 +1,15 @@
 package com.utn.elbuensabor.services.impl;
 
+import com.utn.elbuensabor.dtos.LocalidadDTO;
+import com.utn.elbuensabor.dtos.UserDTO;
 import com.utn.elbuensabor.dtos.UserEditRequestDTO;
 import com.utn.elbuensabor.dtos.UserRequestDTO;
 import com.utn.elbuensabor.entities.*;
 import com.utn.elbuensabor.repositories.*;
 import com.utn.elbuensabor.services.UserService;
+import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
-
-import com.utn.elbuensabor.dtos.LocalidadDTO;
-import com.utn.elbuensabor.dtos.UserDTO;
-
-import lombok.RequiredArgsConstructor;
 
 import java.util.List;
 
@@ -91,9 +89,7 @@ public class UserServiceImpl implements UserService {
             cliente.setDomicilio(domicilio);
 
             clienteRepository.save(cliente);
-        }
-
-        else if (dto.rolSistema() == RolSistema.EMPLEADO) {
+        } else if (dto.rolSistema() == RolSistema.EMPLEADO) {
             Empleado empleado = new Empleado();
             empleado.setUsuario(usuario);
             empleado.setNombre(dto.nombre());
@@ -156,7 +152,6 @@ public class UserServiceImpl implements UserService {
                 || !existingEmpleadoEmail.get().getId().equals(empleado.getId()))) {
             throw new IllegalArgumentException("Ya existe un usuario con ese email");
         }
-
 
 
         usuario.setUsername(userDTO.username());

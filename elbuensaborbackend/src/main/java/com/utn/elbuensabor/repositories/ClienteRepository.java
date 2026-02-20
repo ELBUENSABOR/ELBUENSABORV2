@@ -1,11 +1,10 @@
 package com.utn.elbuensabor.repositories;
 
-import java.util.Optional;
-
+import com.utn.elbuensabor.entities.Cliente;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
-import com.utn.elbuensabor.entities.Cliente;
+import java.util.Optional;
 
 @Repository
 public interface ClienteRepository extends JpaRepository<Cliente, Long> {

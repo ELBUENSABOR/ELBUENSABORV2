@@ -26,27 +26,27 @@ public record UserEditRequestDTO(
         Long sucursalId
 ) {
 
-        public boolean isSucursalValidaParaRol() {
-                return rolSistema != RolSistema.EMPLEADO || sucursalId != null;
-        }
+    public boolean isSucursalValidaParaRol() {
+        return rolSistema != RolSistema.EMPLEADO || sucursalId != null;
+    }
 
-        public boolean isDomicilioValidoParaRol() {
-                return rolSistema != RolSistema.CLIENTE || domicilio != null;
-        }
+    public boolean isDomicilioValidoParaRol() {
+        return rolSistema != RolSistema.CLIENTE || domicilio != null;
+    }
 
-        public record DomicilioDTO(
-                @NotBlank(message = "La calle es obligatoria")
-                String calle,
+    public record DomicilioDTO(
+            @NotBlank(message = "La calle es obligatoria")
+            String calle,
 
-                @NotBlank(message = "El número es obligatorio")
-                String numero,
+            @NotBlank(message = "El número es obligatorio")
+            String numero,
 
-                @NotNull(message = "El código postal es obligatorio")
-                Integer codigoPostal,
+            @NotNull(message = "El código postal es obligatorio")
+            Integer codigoPostal,
 
-                @NotNull(message = "La localidad es obligatoria")
-                Long localidadId
-        ) {
-        }
+            @NotNull(message = "La localidad es obligatoria")
+            Long localidadId
+    ) {
+    }
 
 }
