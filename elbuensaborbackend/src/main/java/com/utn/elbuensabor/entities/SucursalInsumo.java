@@ -1,16 +1,12 @@
 package com.utn.elbuensabor.entities;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.ManyToOne;
-import jakarta.persistence.Table;
-import jakarta.persistence.UniqueConstraint;
+import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
 
 @Entity
-@Table(name = "sucursal_insumo", 
-       uniqueConstraints = @UniqueConstraint(columnNames = {"sucursal_id", "insumo_id"}))
+@Table(name = "sucursal_insumo",
+        uniqueConstraints = @UniqueConstraint(columnNames = {"sucursal_id", "insumo_id"}))
 @Getter
 @Setter
 public class SucursalInsumo extends BaseEntity {

@@ -1,14 +1,17 @@
 import axios from "axios";
-import type { UnidadMedida } from "../models/UnidadMedida";
+import type {UnidadMedida} from "../models/UnidadMedida";
 
 const API_URL = import.meta.env.VITE_API_URL;
+
+const buildAuthHeaders = () => {
+    const token = sessionStorage.getItem("token");
+    return token ? {Authorization: `Bearer ${token}`} : {};
+};
 
 export const createInsumo = async (data: any) => {
     try {
         const res = await axios.post(`${API_URL}/insumos`, data, {
-            headers: {
-                Authorization: `Bearer ${sessionStorage.getItem("token")}`,
-            },
+            headers: buildAuthHeaders(),
             withCredentials: true,
         });
         return res.data;
@@ -21,9 +24,7 @@ export const createInsumo = async (data: any) => {
 export const updateInsumo = async (id: number, data: any) => {
     try {
         const res = await axios.put(`${API_URL}/insumos/${id}`, data, {
-            headers: {
-                Authorization: `Bearer ${sessionStorage.getItem("token")}`,
-            },
+            headers: buildAuthHeaders(),
             withCredentials: true,
         });
         return res.data;
@@ -36,9 +37,7 @@ export const updateInsumo = async (id: number, data: any) => {
 export const deleteInsumo = async (id: number) => {
     try {
         const res = await axios.delete(`${API_URL}/insumos/${id}`, {
-            headers: {
-                Authorization: `Bearer ${sessionStorage.getItem("token")}`,
-            },
+            headers: buildAuthHeaders(),
             withCredentials: true,
         });
         console.log(res.data);
@@ -52,9 +51,7 @@ export const deleteInsumo = async (id: number) => {
 export const getAllUnidadesMedida = async () => {
     try {
         const res = await axios.get(`${API_URL}/unidades-medida`, {
-            headers: {
-                Authorization: `Bearer ${sessionStorage.getItem("token")}`,
-            },
+            headers: buildAuthHeaders(),
             withCredentials: true,
         });
         return res.data;
@@ -67,9 +64,7 @@ export const getAllUnidadesMedida = async () => {
 export const createUnidadMedida = async (data: UnidadMedida) => {
     try {
         const res = await axios.post(`${API_URL}/unidades-medida`, data, {
-            headers: {
-                Authorization: `Bearer ${sessionStorage.getItem("token")}`,
-            },
+            headers: buildAuthHeaders(),
             withCredentials: true,
         });
         return res.data;
@@ -82,9 +77,7 @@ export const createUnidadMedida = async (data: UnidadMedida) => {
 export const editUnidadMedida = async (id: number | undefined, data: UnidadMedida) => {
     try {
         const res = await axios.put(`${API_URL}/unidades-medida/${id}`, data, {
-            headers: {
-                Authorization: `Bearer ${sessionStorage.getItem("token")}`,
-            },
+            headers: buildAuthHeaders(),
             withCredentials: true,
         });
         return res.data;
@@ -97,9 +90,7 @@ export const editUnidadMedida = async (id: number | undefined, data: UnidadMedid
 export const deleteUnidadMedida = async (id: number | undefined) => {
     try {
         const res = await axios.delete(`${API_URL}/unidades-medida/${id}`, {
-            headers: {
-                Authorization: `Bearer ${sessionStorage.getItem("token")}`,
-            },
+            headers: buildAuthHeaders(),
             withCredentials: true,
         });
         return res.data;
@@ -112,9 +103,7 @@ export const deleteUnidadMedida = async (id: number | undefined) => {
 export const getAll = async () => {
     try {
         const res = await axios.get(`${API_URL}/insumos`, {
-            headers: {
-                Authorization: `Bearer ${sessionStorage.getItem("token")}`,
-            },
+            headers: buildAuthHeaders(),
             withCredentials: true,
         });
         return res.data;
@@ -127,9 +116,7 @@ export const getAll = async () => {
 export const getInsumoById = async (id: string) => {
     try {
         const res = await axios.get(`${API_URL}/insumos/${id}`, {
-            headers: {
-                Authorization: `Bearer ${sessionStorage.getItem("token")}`,
-            },
+            headers: buildAuthHeaders(),
             withCredentials: true,
         });
         return res.data;
@@ -142,9 +129,7 @@ export const getInsumoById = async (id: string) => {
 export const registrarCompraInsumo = async (data: any) => {
     try {
         const res = await axios.post(`${API_URL}/insumos/compras`, data, {
-            headers: {
-                Authorization: `Bearer ${sessionStorage.getItem("token")}`,
-            },
+            headers: buildAuthHeaders(),
             withCredentials: true,
         });
         return res.data;
@@ -157,9 +142,7 @@ export const registrarCompraInsumo = async (data: any) => {
 export const getAllComprasInsumos = async () => {
     try {
         const res = await axios.get(`${API_URL}/insumos/compras`, {
-            headers: {
-                Authorization: `Bearer ${sessionStorage.getItem("token")}`,
-            },
+            headers: buildAuthHeaders(),
             withCredentials: true,
         });
         return res.data;
@@ -175,7 +158,7 @@ export const uploadImagenesInsumo = async (id: string, files: File[]) => {
         files.forEach((file) => formData.append("files", file));
         const res = await axios.post(`${API_URL}/insumos/${id}/imagenes`, formData, {
             headers: {
-                Authorization: `Bearer ${sessionStorage.getItem("token")}`,
+                ...buildAuthHeaders(),
                 "Content-Type": "multipart/form-data",
             },
             withCredentials: true,

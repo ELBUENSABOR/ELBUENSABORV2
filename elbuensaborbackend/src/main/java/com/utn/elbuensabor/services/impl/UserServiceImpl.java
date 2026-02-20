@@ -1,19 +1,23 @@
 package com.utn.elbuensabor.services.impl;
 
+import com.utn.elbuensabor.dtos.LocalidadDTO;
+import com.utn.elbuensabor.dtos.UserDTO;
 import com.utn.elbuensabor.dtos.UserEditRequestDTO;
 import com.utn.elbuensabor.dtos.UserRequestDTO;
 import com.utn.elbuensabor.entities.*;
 import com.utn.elbuensabor.repositories.*;
 import com.utn.elbuensabor.services.UserService;
+import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
-import com.utn.elbuensabor.dtos.LocalidadDTO;
-import com.utn.elbuensabor.dtos.UserDTO;
-
-import lombok.RequiredArgsConstructor;
-
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.StandardCopyOption;
 import java.util.List;
+import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
@@ -29,14 +33,12 @@ public class UserServiceImpl implements UserService {
     public UserDTO createUser(UserRequestDTO dto) {
 
         // Validación de email duplicado
-        if (dto.rolSistema() == RolSistema.EMPLEADO &&
-                empleadoRepository.existsByEmail(dto.email())) {
+        if (empleadoRepository.existsByEmail(dto.email())) {
 
             throw new IllegalArgumentException("Ya existe un empleado registrado con ese email");
         }
 
-        if (dto.rolSistema() == RolSistema.CLIENTE &&
-                clienteRepository.existsByEmail(dto.email())) {
+        if (clienteRepository.existsByEmail(dto.email())) {
             throw new IllegalArgumentException("Ya existe un cliente registrado con ese email");
         }
 
@@ -45,8 +47,9 @@ public class UserServiceImpl implements UserService {
         usuario.setPassword(encoder.encode(dto.password()));
         usuario.setActivo(true);
         usuario.setRolSistema(dto.rolSistema());
+        usuario.setFotoPerfil(dto.fotoPerfil());
 
-        // 💡 si es EMPLEADO → debe cambiar la contraseña en el primer login
+        // si es EMPLEADO → debe cambiar la contraseña en el primer login
         if (dto.rolSistema() == RolSistema.EMPLEADO) {
             usuario.setMustChangePassword(true);
         }
@@ -93,9 +96,7 @@ public class UserServiceImpl implements UserService {
             cliente.setDomicilio(domicilio);
 
             clienteRepository.save(cliente);
-        }
-
-        else if (dto.rolSistema() == RolSistema.EMPLEADO) {
+        } else if (dto.rolSistema() == RolSistema.EMPLEADO) {
             Empleado empleado = new Empleado();
             empleado.setUsuario(usuario);
             empleado.setNombre(dto.nombre());
@@ -138,15 +139,35 @@ public class UserServiceImpl implements UserService {
         Usuario usuario = usuarioRepository.findByIdWithClienteEmpleadoAndDomicilio(id)
                 .orElseThrow(() -> new RuntimeException("Usuario no encontrado"));
 
+        Cliente cliente = usuario.getCliente();
+        Empleado empleado = usuario.getEmpleado();
+
+        var existingUser = usuarioRepository.findByUsername(userDTO.username());
+        if (existingUser.isPresent() && !existingUser.get().getId().equals(usuario.getId())) {
+            String estado = Boolean.TRUE.equals(existingUser.get().getActivo()) ? "activo" : "inactivo";
+            throw new IllegalArgumentException("Ya existe un usuario con ese username (" + estado + ")");
+        }
+
+        var existingClienteEmail = clienteRepository.findByEmail(userDTO.email());
+        if (existingClienteEmail.isPresent() && (cliente == null
+                || !existingClienteEmail.get().getId().equals(cliente.getId()))) {
+            throw new IllegalArgumentException("Ya existe un usuario con ese email");
+        }
+
+        var existingEmpleadoEmail = empleadoRepository.findByEmail(userDTO.email());
+        if (existingEmpleadoEmail.isPresent() && (empleado == null
+                || !existingEmpleadoEmail.get().getId().equals(empleado.getId()))) {
+            throw new IllegalArgumentException("Ya existe un usuario con ese email");
+        }
+
+
         usuario.setUsername(userDTO.username());
         usuario.setActivo(true);
+        usuario.setFotoPerfil(userDTO.fotoPerfil());
 
         if (userDTO.password() != null && !userDTO.password().isBlank()) {
             usuario.setPassword(encoder.encode(userDTO.password()));
         }
-
-        Cliente cliente = usuario.getCliente();
-        Empleado empleado = usuario.getEmpleado();
 
         if (cliente != null) {
             cliente.setNombre(userDTO.nombre());
@@ -183,11 +204,16 @@ public class UserServiceImpl implements UserService {
             empleado.setPerfilEmpleado(userDTO.perfilEmpleado());
         }
 
-        if (userDTO.sucursalId() != null) {
+        if (usuario.getRolSistema() == RolSistema.EMPLEADO) {
+            if (userDTO.sucursalId() == null) {
+                throw new RuntimeException("Debe asignar una sucursal al empleado");
+            }
             SucursalEmpresa sucursal = sucursalEmpresaRepository.findById(userDTO.sucursalId())
                     .orElseThrow(() -> new RuntimeException("Sucursal no encontrada"));
 
             usuario.setSucursal(sucursal);
+        } else {
+            usuario.setSucursal(null);
         }
 
         usuarioRepository.save(usuario);
@@ -202,6 +228,38 @@ public class UserServiceImpl implements UserService {
 
         usuario.setActivo(false);
 
+        usuarioRepository.save(usuario);
+
+        return mapToUserDTO(usuario);
+    }
+
+
+    public UserDTO updateProfilePhoto(Long id, MultipartFile file) {
+
+        if (file == null || file.isEmpty()) {
+            throw new IllegalArgumentException("Debe seleccionar una imagen");
+        }
+
+        Usuario usuario = usuarioRepository.findByIdWithClienteEmpleadoAndDomicilio(id)
+                .orElseThrow(() -> new RuntimeException("Usuario no encontrado"));
+
+        String originalName = file.getOriginalFilename();
+        String safeName = (originalName == null || originalName.isBlank())
+                ? "perfil.jpg"
+                : originalName.replaceAll("[^a-zA-Z0-9._-]", "_");
+
+        Path uploadDir = Path.of("uploads", "perfiles");
+        String fileName = UUID.randomUUID() + "_" + safeName;
+
+        try {
+            Files.createDirectories(uploadDir);
+            Path destination = uploadDir.resolve(fileName);
+            Files.copy(file.getInputStream(), destination, StandardCopyOption.REPLACE_EXISTING);
+        } catch (IOException e) {
+            throw new RuntimeException("No se pudo guardar la imagen de perfil", e);
+        }
+
+        usuario.setFotoPerfil("/uploads/perfiles/" + fileName);
         usuarioRepository.save(usuario);
 
         return mapToUserDTO(usuario);
@@ -258,7 +316,8 @@ public class UserServiceImpl implements UserService {
                 u.getRolSistema(),
                 u.getActivo(),
                 u.getSucursal() != null ? u.getSucursal().getId() : null,
-                perfilEmpleado);
+                perfilEmpleado,
+                u.getFotoPerfil());
     }
 
 }

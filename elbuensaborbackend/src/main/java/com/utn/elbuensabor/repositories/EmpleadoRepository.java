@@ -1,11 +1,10 @@
 package com.utn.elbuensabor.repositories;
 
-import java.util.Optional;
-
+import com.utn.elbuensabor.entities.Empleado;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
-import com.utn.elbuensabor.entities.Empleado;
+import java.util.Optional;
 
 @Repository
 public interface EmpleadoRepository extends JpaRepository<Empleado, Long> {

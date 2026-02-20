@@ -23,9 +23,18 @@ public record UserEditRequestDTO(
         @Valid
         UserRequestDTO.DomicilioDTO domicilio,
         PerfilEmpleado perfilEmpleado,
-        @NotNull(message = "La sucursal es obligatoria")
-        Long sucursalId
+        Long sucursalId,
+        String fotoPerfil
 ) {
+
+    public boolean isSucursalValidaParaRol() {
+        return rolSistema != RolSistema.EMPLEADO || sucursalId != null;
+    }
+
+    public boolean isDomicilioValidoParaRol() {
+        return rolSistema != RolSistema.CLIENTE || domicilio != null;
+    }
+
     public record DomicilioDTO(
             @NotBlank(message = "La calle es obligatoria")
             String calle,
@@ -38,6 +47,7 @@ public record UserEditRequestDTO(
 
             @NotNull(message = "La localidad es obligatoria")
             Long localidadId
-    ) {}
+    ) {
+    }
 
 }

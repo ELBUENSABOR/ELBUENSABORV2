@@ -1,18 +1,18 @@
-import { Modal } from "react-bootstrap";
-import type { Ingredientes } from "../../../../models/Insumo";
+import {Modal} from "react-bootstrap";
+import type {Ingredientes} from "../../../../models/Insumo";
 import "./ingredientesModal.css";
-import { useEffect, useState } from "react";
+import {useEffect, useState} from "react";
 
 const BACKEND_URL = "http://localhost:8080";
 
 const IngredientesModal = ({
-    show,
-    onClose,
-    ingredientes,
-    onSave,
-    ingredientesSelected,
-    setIngredientesSelected,
-}: {
+                               show,
+                               onClose,
+                               ingredientes,
+                               onSave,
+                               ingredientesSelected,
+                               setIngredientesSelected,
+                           }: {
     show: boolean;
     onClose: () => void;
     ingredientes: Ingredientes[];
@@ -23,7 +23,6 @@ const IngredientesModal = ({
 
     const [cantidades, setCantidades] = useState<Record<number, number>>({});
     const [selected, setSelected] = useState<number | null>(null);
-    const [stockAlert, setStockAlert] = useState<string | null>("");
 
     useEffect(() => {
         console.log("Ingredientes:", ingredientes);
@@ -41,12 +40,12 @@ const IngredientesModal = ({
             if (existe) {
                 return prev.map(i =>
                     i.insumoId === ingrediente.insumoId
-                        ? { ...i, cantidad }
+                        ? {...i, cantidad}
                         : i
                 );
             }
 
-            return [...prev, { ...ingrediente, cantidad }];
+            return [...prev, {...ingrediente, cantidad}];
         });
 
         setSelected(null);
@@ -55,19 +54,6 @@ const IngredientesModal = ({
 
     const handleCantidadChange = (insumoId: number, value: number) => {
         if (value <= 0) return;
-
-        const ingrediente = ingredientes.find(i => i.insumoId === insumoId);
-
-        if (!ingrediente) return;
-
-        const stockActual = ingrediente.stockActual ?? 0;
-
-        if (value > stockActual) {
-            setStockAlert("Stock insuficiente");
-            return;
-        }
-
-        setStockAlert(null);
 
         setCantidades(prev => ({
             ...prev,
@@ -89,7 +75,8 @@ const IngredientesModal = ({
                         );
 
                         return (
-                            <div key={ingrediente.insumoId} className={ingrediente.activo && seleccionado ? "ingrediente-card selected" : ingrediente.activo && !seleccionado ? "ingrediente-card" : "ingrediente-card disabled"}>
+                            <div key={ingrediente.insumoId}
+                                 className={ingrediente.activo && seleccionado ? "ingrediente-card selected" : ingrediente.activo && !seleccionado ? "ingrediente-card" : "ingrediente-card disabled"}>
                                 <div
                                     className="ingrediente-card-header"
                                     onClick={() => setSelected(selected === index ? null : index)}
@@ -97,7 +84,8 @@ const IngredientesModal = ({
                                     <div className="d-flex align-items-center gap-2">
                                         {ingrediente.denominacion}
                                         {ingrediente.imagenes.length > 0 && (
-                                            <img src={`${BACKEND_URL}${ingrediente.imagenes[0]}`} alt={ingrediente.denominacion} className="img-ingrediente" />
+                                            <img src={`${BACKEND_URL}${ingrediente.imagenes[0]}`}
+                                                 alt={ingrediente.denominacion} className="img-ingrediente"/>
                                         )}
                                     </div>
                                     {seleccionado ? (
@@ -109,7 +97,7 @@ const IngredientesModal = ({
 
                                 {selected === index && (
                                     <div className="ingrediente-info">
-                                        <hr />
+                                        <hr/>
                                         <p>- Stock actual: {ingrediente.stockActual || 0} {ingrediente.unidadMedida}</p>
                                         <p>Cantidad ({ingrediente.unidadMedida})</p>
                                         <input
@@ -124,7 +112,6 @@ const IngredientesModal = ({
                                                 )
                                             }
                                         />
-                                        {stockAlert && <p className="text-danger">{stockAlert}</p>}
                                         <button
                                             className="btn btn-primary mt-2"
                                             onClick={() => handleAgregarIngrediente(ingrediente)}
