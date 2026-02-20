@@ -1,19 +1,18 @@
 package com.utn.elbuensabor.services.impl;
 
+import com.utn.elbuensabor.dtos.*;
+import com.utn.elbuensabor.entities.*;
+import com.utn.elbuensabor.repositories.ArticuloInsumoRepository;
+import com.utn.elbuensabor.repositories.CompraInsumoRepository;
+import com.utn.elbuensabor.repositories.SucursalInsumoRepository;
 import com.utn.elbuensabor.services.CompraInsumoService;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.utn.elbuensabor.dtos.*;
-import com.utn.elbuensabor.entities.*;
-import com.utn.elbuensabor.repositories.CompraInsumoRepository;
-import com.utn.elbuensabor.repositories.ArticuloInsumoRepository;
-import com.utn.elbuensabor.repositories.SucursalInsumoRepository;
 import java.time.LocalDateTime;
-import java.util.List;
 import java.util.ArrayList;
-
-import lombok.RequiredArgsConstructor;
+import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -72,20 +71,24 @@ public class CompraInsumoServiceImpl implements CompraInsumoService {
     }
 
     private ArticuloInsumoResponse mapToInsumoResponse(ArticuloInsumo i) {
+        UnidadMedidaDTO unidadMedidaDTO = null;
+        if (i.getUnidadMedida() != null) {
+            unidadMedidaDTO = new UnidadMedidaDTO(i.getUnidadMedida().getId(), i.getUnidadMedida().getDenominacion());
+        }
         return new ArticuloInsumoResponse(
                 i.getId(),
                 i.getDenominacion(),
-                "", // descripcion not present in entity
+                null,
                 i.getPrecioVenta(),
                 i.getPrecioCompra(),
-                0, // tiempoEstimado not present in entity
+                null, // tiempoEstimado not present in entity
                 mapToCategoriaResponse(i.getCategoriaArticuloInsumo()),
                 i.getEsParaElaborar(),
                 i.getActivo(),
                 new UnidadMedidaDTO(i.getUnidadMedida().getId(), i.getUnidadMedida().getDenominacion()),
                 new ArrayList<>(),
                 new ArrayList<>() // stockSucursal - passing empty to avoid recursion or extra query, seeing as
-                                  // this is just for display in list
+                // this is just for display in list
         );
     }
 

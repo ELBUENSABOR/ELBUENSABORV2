@@ -1,22 +1,17 @@
 package com.utn.elbuensabor.controllers;
 
+import com.utn.elbuensabor.dtos.UserDTO;
 import com.utn.elbuensabor.dtos.UserEditRequestDTO;
 import com.utn.elbuensabor.dtos.UserRequestDTO;
+import com.utn.elbuensabor.services.UserService;
 import jakarta.validation.Valid;
-import org.apache.catalina.User;
-import org.springframework.http.HttpStatus;
+import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
-import com.utn.elbuensabor.dtos.UserDTO;
-import com.utn.elbuensabor.services.UserService;
-
-import lombok.RequiredArgsConstructor;
-
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 @RestController
 @RequestMapping("/api/user")
@@ -28,8 +23,8 @@ public class UserController {
 
     @PostMapping
     public ResponseEntity<?> createUser(@RequestBody @Valid UserRequestDTO dto) {
-            UserDTO result = userService.createUser(dto);
-            return ResponseEntity.ok(result);
+        UserDTO result = userService.createUser(dto);
+        return ResponseEntity.ok(result);
     }
 
     @GetMapping
@@ -43,14 +38,20 @@ public class UserController {
     }
 
     @PutMapping("/{id}")
-    public  ResponseEntity<?> updateUser(@PathVariable Long id, @RequestBody @Valid UserEditRequestDTO user) {
-            UserDTO result = userService.updateUser(id, user);
-            return ResponseEntity.ok(result);
+    public ResponseEntity<?> updateUser(@PathVariable Long id, @RequestBody @Valid UserEditRequestDTO user) {
+        UserDTO result = userService.updateUser(id, user);
+        return ResponseEntity.ok(result);
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<UserDTO> deleteUser(@PathVariable Long id){
+    public ResponseEntity<UserDTO> deleteUser(@PathVariable Long id) {
         UserDTO dto = userService.deleteUser(id);
         return ResponseEntity.ok(dto);
+    }
+
+    @PostMapping("/{id}/foto-perfil")
+    public ResponseEntity<UserDTO> uploadProfilePhoto(@PathVariable Long id,
+                                                      @RequestParam("file") MultipartFile file) {
+        return ResponseEntity.ok(userService.updateProfilePhoto(id, file));
     }
 }

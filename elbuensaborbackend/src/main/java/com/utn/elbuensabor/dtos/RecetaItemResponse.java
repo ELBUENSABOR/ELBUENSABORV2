@@ -7,6 +7,7 @@ public record RecetaItemResponse(
         String unidadMedida,
         Double precioCompra,
         Double stockActual
-        ) {
+) {
+
 }
 

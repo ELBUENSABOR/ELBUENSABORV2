@@ -1,6 +1,7 @@
 import axios from "axios";
 
 const API_URL = import.meta.env.VITE_API_URL;
+const API_ORIGIN = API_URL ? new URL(API_URL).origin : "";
 
 export interface PedidoDetalleDTO {
     manufacturadoId?: number;
@@ -16,6 +17,8 @@ export interface PedidoRequest {
     detalles: PedidoDetalleDTO[];
     descuento?: number;
     observaciones?: string;
+    direccionEntrega?: string;
+    telefonoEntrega?: string;
 }
 
 export interface PedidoResponse {
@@ -30,6 +33,8 @@ export interface PedidoResponse {
     totalCosto: number;
     pagado: boolean;
     observaciones: string;
+    direccionEntrega?: string | null;
+    telefonoEntrega?: string | null;
     estado: string;
     tipoEnvio: "DELIVERY" | "TAKE_AWAY";
     formaPago: "EFECTIVO" | "MP";
@@ -48,6 +53,13 @@ export interface PedidoResponse {
         id: number;
         nombre: string;
     };
+    factura?: {
+        id: number;
+        numeroComprobante: string;
+        fechaFacturacion: string;
+        totalVenta: number;
+        pdfUrl?: string | null;
+    } | null;
     detalles: {
         id: number;
         articulo: {
@@ -115,8 +127,9 @@ export const getPedidosByCliente = async (clienteId: number) => {
         const token = sessionStorage.getItem("token");
 
         const res = await axios.get(
-            `${API_URL}/pedidos/cliente/${clienteId}`,
+            `${API_URL}/pedidos`,
             {
+                params: {clienteId},
                 headers: {
                     Authorization: `Bearer ${token}`,
                 },
@@ -128,6 +141,98 @@ export const getPedidosByCliente = async (clienteId: number) => {
     } catch (error: any) {
         console.error(
             "Error al obtener pedidos del cliente:",
+            error.response?.data || error.message
+        );
+        throw error;
+    }
+};
+export const getPedidosAll = async (
+    estado?: string,
+    sucursalId?: number | null
+) => {
+    try {
+        const token = sessionStorage.getItem("token");
+        const params: Record<string, string | number> = {};
+        if (estado) {
+            params.estado = estado;
+        }
+        if (sucursalId !== null && sucursalId !== undefined) {
+            params.sucursalId = sucursalId;
+        }
+
+        const res = await axios.get(
+            `${API_URL}/pedidos`,
+            {
+                params: Object.keys(params).length ? params : undefined,
+                headers: {
+                    Authorization: `Bearer ${token}`,
+                },
+                withCredentials: true,
+            }
+        );
+
+        return res.data;
+    } catch (error: any) {
+        console.error(
+            "Error al obtener pedidos:",
+            error.response?.data || error.message
+        );
+        throw error;
+    }
+};
+export const cambiarEstadoPedido = async (pedidoId: number, estado: string) => {
+    try {
+        const token = sessionStorage.getItem("token");
+
+        const res = await axios.put(
+            `${API_URL}/pedidos/${pedidoId}/estado`,
+            {estado},
+            {
+                headers: {
+                    Authorization: `Bearer ${token}`,
+                },
+                withCredentials: true,
+            }
+        );
+
+        return res.data;
+    } catch (error: any) {
+        console.error(
+            "Error al cambiar estado del pedido:",
+            error.response?.data || error.message
+        );
+        throw error;
+    }
+};
+
+export const resolveFacturaPdfUrl = (pdfUrl?: string | null) => {
+    if (!pdfUrl) return null;
+    if (/^https?:\/\//i.test(pdfUrl)) return pdfUrl;
+    if (!API_ORIGIN) return pdfUrl;
+    return pdfUrl.startsWith("/")
+        ? `${API_ORIGIN}${pdfUrl}`
+        : `${API_ORIGIN}/${pdfUrl}`;
+};
+
+export const marcarPedidoPagado = async (pedidoId: number) => {
+    try {
+        const token = sessionStorage.getItem("token");
+
+        const res = await axios.put(
+            `${API_URL}/pedidos/${pedidoId}/pagado`,
+            {},
+            {
+                headers: {
+                    Authorization: `Bearer ${token}`,
+                },
+                withCredentials: true,
+            }
+        );
+
+        return res.data;
+    } catch (error: any) {
+        console.error(
+            "Error al marcar pedido como pagado:",
             error.response?.data || error.message
         );
         throw error;

@@ -1,7 +1,7 @@
 export interface Rubro {
-  id: number;
-  denominacion: string;
-  categoriaPadreId: number | null;
-  activo: boolean;
-  children?: Rubro[];
+    id: number;
+    denominacion: string;
+    categoriaPadreId: number | null;
+    activo: boolean;
+    children?: Rubro[];
 }

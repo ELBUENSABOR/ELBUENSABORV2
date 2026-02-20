@@ -1,17 +1,15 @@
 package com.utn.elbuensabor.controllers;
 
-import java.util.List;
-
+import com.utn.elbuensabor.dtos.ArticuloManufacturadoRequest;
 import com.utn.elbuensabor.dtos.ArticuloManufacturadoResponse;
+import com.utn.elbuensabor.services.ArticuloManufacturadoService;
+import jakarta.validation.Valid;
+import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
-import com.utn.elbuensabor.dtos.ArticuloManufacturadoRequest;
-import com.utn.elbuensabor.services.ArticuloManufacturadoService;
-
-import jakarta.validation.Valid;
-import lombok.RequiredArgsConstructor;
+import java.util.List;
 
 @RestController
 @RequestMapping("/api/manufacturados")

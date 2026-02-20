@@ -1,20 +1,21 @@
-import { useNavigate } from "react-router-dom";
+import {Link, useLocation, useNavigate} from "react-router-dom";
 import "./auth.css";
-import type { LoginRequest } from "../../dtos/LoginRequest";
-import { useState } from "react";
-import { loginUser } from "../../services/authService";
-import { useUser } from "../../contexts/UsuarioContext";
-import { useLocation } from "react-router-dom";
+import type {LoginRequest} from "../../dtos/LoginRequest";
+import {useState} from "react";
+import {loginUser, loginWithGoogle} from "../../services/authService";
+import {useUser} from "../../contexts/UsuarioContext";
+import {getEmployeeDashboardRoute} from "../../utils/employeePanel";
+import GoogleAuthButton from "./GoogleAuthButton";
 
 const Login = () => {
-    const { state } = useLocation();
+    const {state} = useLocation();
     const [form, setForm] = useState<LoginRequest>({
         username: "",
         password: "",
     });
 
     const navigate = useNavigate();
-    const { setUser } = useUser();
+    const {setUser} = useUser();
 
     const [loading, setLoading] = useState(false);
     const [msg, setMsg] = useState({
@@ -25,14 +26,14 @@ const Login = () => {
     const handleChange = (
         e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
     ) => {
-        const { name, value } = e.target;
-        setForm((prev) => ({ ...prev, [name]: value }));
+        const {name, value} = e.target;
+        setForm((prev) => ({...prev, [name]: value}));
     };
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
         setLoading(true);
-        setMsg({ state: "", msg: "" });
+        setMsg({state: "", msg: ""});
 
         if (!form.username.trim()) {
             setMsg({
@@ -51,19 +52,26 @@ const Login = () => {
                 msg: "¡Login exitoso!",
             });
 
-            const { token, username, role, subRole, userId, mustChangePassword } = resp.data;
-
-            setUser({
+            const {token, username, role, subRole, userId, mustChangePassword, sucursalId, fotoPerfil} = resp.data;
+            const nextUser = {
                 token,
                 username,
                 role,
                 subRole,
                 userId,
                 mustChangePassword,
-            });
+                sucursalId: sucursalId ? Number(sucursalId) : null,
+                fotoPerfil: fotoPerfil ?? null,
+            };
+
+            setUser(nextUser);
 
             setTimeout(() => {
-                if (state?.from === "cart") {
+                if (role === "EMPLEADO") {
+                    navigate(getEmployeeDashboardRoute(role, subRole));
+                } else if (state?.redirectTo) {
+                    navigate(state.redirectTo);
+                } else if (state?.from === "cart") {
                     navigate("/confirm-order");
                 } else {
                     navigate("/");
@@ -82,11 +90,56 @@ const Login = () => {
         setLoading(false);
     };
 
+    const handleGoogleLogin = async (credential: string) => {
+        setLoading(true);
+        setMsg({state: "", msg: ""});
+        try {
+            const resp = await loginWithGoogle(credential);
+            const {token, username, role, subRole, userId, mustChangePassword, sucursalId, fotoPerfil} = resp.data;
+            const nextUser = {
+                token,
+                username,
+                role,
+                subRole,
+                userId,
+                mustChangePassword,
+                sucursalId: sucursalId ? Number(sucursalId) : null,
+                fotoPerfil: fotoPerfil ?? null,
+            };
+
+            setUser(nextUser);
+
+            if (role === "EMPLEADO") {
+                navigate(getEmployeeDashboardRoute(role, subRole));
+            } else if (state?.redirectTo) {
+                navigate(state.redirectTo);
+            } else if (state?.from === "cart") {
+                navigate("/confirm-order");
+            } else {
+                navigate("/");
+            }
+        } catch (err: any) {
+            setMsg({
+                state: "error",
+                msg:
+                    err.response?.data?.message ||
+                    "Error al iniciar sesión con Google.",
+            });
+        }
+        setLoading(false);
+    };
+
     return (
         <div className="auth-container">
             <form onSubmit={handleSubmit} className="form-container-auth">
-                <h2>Iniciar sesión</h2>
-                <hr />
+                <div className="auth-header">
+                    <div className="auth-logo" aria-hidden="true">
+                        🍽️
+                    </div>
+                    <h2 className="auth-title">El buen sabor</h2>
+                    <p className="auth-subtitle">Ingresá a tu cuenta</p>
+                </div>
+                <hr/>
                 <input
                     type="text"
                     name="username"
@@ -109,6 +162,11 @@ const Login = () => {
                     {loading ? "Iniciando sesión..." : "Iniciar sesión"}
                 </button>
 
+                <div className="auth-divider">
+                    <span>o</span>
+                </div>
+                <GoogleAuthButton onSuccess={handleGoogleLogin} text="signin_with"/>
+
                 {msg.msg && (
                     <p
                         className={
@@ -118,7 +176,18 @@ const Login = () => {
                         {msg.msg}
                     </p>
                 )}
+
+                <p className="auth-footer">
+                    ¿No tenés cuenta?{" "}
+                    <Link className="auth-link" to="/register">
+                        Registrate
+                    </Link>
+                </p>
+
             </form>
+            <Link className="auth-back" to="/">
+                ← Volver a la tienda
+            </Link>
         </div>
     );
 };

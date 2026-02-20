@@ -1,11 +1,5 @@
-import {
-    createContext,
-    useContext,
-    useState,
-    useEffect,
-    type ReactNode,
-} from "react";
-import type { User } from "../models/Usuario";
+import {createContext, type ReactNode, useContext, useEffect, useState,} from "react";
+import type {User} from "../models/Usuario";
 
 interface UserContextType {
     user: User | null;
@@ -17,16 +11,20 @@ const UserContext = createContext<UserContextType | undefined>(undefined);
 
 const INACTIVITY_LIMIT_MINUTES = 45;
 
-export const UserProvider = ({ children }: { children: ReactNode }) => {
+export const UserProvider = ({children}: { children: ReactNode }) => {
     const [user, setUserState] = useState<User | null>(() => {
-        const token = sessionStorage.getItem("token");
-        const username = sessionStorage.getItem("username");
-        const role = sessionStorage.getItem("role");
-        const subRole = sessionStorage.getItem("subRole");
-        const userId = sessionStorage.getItem("userId");
-        const mustChangePasswordStr = sessionStorage.getItem("mustChangePassword");
-        const lastActivityStr = sessionStorage.getItem("lastActivity");
+        const getStoredItem = (key: string) =>
+            sessionStorage.getItem(key) ?? localStorage.getItem(key);
 
+        const token = getStoredItem("token");
+        const username = getStoredItem("username");
+        const role = getStoredItem("role");
+        const subRole = getStoredItem("subRole");
+        const userId = getStoredItem("userId");
+        const sucursalIdRaw = getStoredItem("sucursalId");
+        const mustChangePasswordStr = getStoredItem("mustChangePassword");
+        const fotoPerfil = getStoredItem("fotoPerfil");
+        const lastActivityStr = getStoredItem("lastActivity");
         // si no hay datos básicos, no hay sesión
         if (!token || !username || !role || !userId) {
             return null;
@@ -46,6 +44,7 @@ export const UserProvider = ({ children }: { children: ReactNode }) => {
                 sessionStorage.removeItem("subRole");
                 sessionStorage.removeItem("userId");
                 sessionStorage.removeItem("mustChangePassword");
+                sessionStorage.removeItem("fotoPerfil");
                 sessionStorage.removeItem("lastActivity");
                 return null;
             }
@@ -58,6 +57,8 @@ export const UserProvider = ({ children }: { children: ReactNode }) => {
             subRole,
             userId,
             mustChangePassword: mustChangePasswordStr === "true",
+            sucursalId: sucursalIdRaw ? Number(sucursalIdRaw) : null,
+            fotoPerfil: fotoPerfil ?? null,
         };
     });
 
@@ -75,6 +76,16 @@ export const UserProvider = ({ children }: { children: ReactNode }) => {
             "mustChangePassword",
             user.mustChangePassword ? "true" : "false"
         );
+        if (user.fotoPerfil) {
+            sessionStorage.setItem("fotoPerfil", user.fotoPerfil);
+        } else {
+            sessionStorage.removeItem("fotoPerfil");
+        }
+        if (user.sucursalId !== undefined && user.sucursalId !== null) {
+            sessionStorage.setItem("sucursalId", user.sucursalId.toString());
+        } else {
+            sessionStorage.removeItem("sucursalId");
+        }
         sessionStorage.setItem("lastActivity", Date.now().toString());
         setUserState(user);
     };
@@ -86,6 +97,8 @@ export const UserProvider = ({ children }: { children: ReactNode }) => {
         sessionStorage.removeItem("subRole");
         sessionStorage.removeItem("userId");
         sessionStorage.removeItem("mustChangePassword");
+        sessionStorage.removeItem("fotoPerfil");
+        sessionStorage.removeItem("sucursalId");
         sessionStorage.removeItem("lastActivity");
         setUserState(null);
     };
@@ -124,7 +137,7 @@ export const UserProvider = ({ children }: { children: ReactNode }) => {
     }, [user]);
 
     return (
-        <UserContext.Provider value={{ user, setUser, logout }}>
+        <UserContext.Provider value={{user, setUser, logout}}>
             {children}
         </UserContext.Provider>
     );

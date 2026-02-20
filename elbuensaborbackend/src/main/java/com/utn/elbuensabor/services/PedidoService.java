@@ -1,12 +1,12 @@
 package com.utn.elbuensabor.services;
 
-import java.time.LocalDateTime;
-import java.util.List;
-
 import com.utn.elbuensabor.dtos.PedidoRequest;
 import com.utn.elbuensabor.dtos.PedidoResponse;
 import com.utn.elbuensabor.entities.EstadoPedido;
 import com.utn.elbuensabor.entities.PedidoVenta;
+
+import java.time.LocalDateTime;
+import java.util.List;
 
 public interface PedidoService {
 
@@ -21,6 +21,8 @@ public interface PedidoService {
 
     List<PedidoResponse> getByEstado(EstadoPedido estado);
 
+    List<PedidoResponse> getByEstadoAndSucursalId(EstadoPedido estado, Long sucursalId);
+
     List<PedidoResponse> getBySucursalId(Long sucursalId);
 
     PedidoResponse update(Long id, PedidoRequest request);
@@ -28,6 +30,8 @@ public interface PedidoService {
     void delete(Long id);
 
     PedidoResponse cambiarEstado(Long id, EstadoPedido nuevoEstado);
+
+    PedidoResponse marcarPagado(Long id);
 
     String generarNumeroPedido();
 

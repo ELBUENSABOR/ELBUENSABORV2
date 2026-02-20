@@ -1,7 +1,8 @@
 package com.utn.elbuensabor.config;
 
-import java.util.List;
-
+import com.utn.elbuensabor.repositories.UsuarioRepository;
+import com.utn.elbuensabor.security.JwtFilter;
+import com.utn.elbuensabor.security.JwtUtil;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
@@ -17,9 +18,7 @@ import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
-import com.utn.elbuensabor.repositories.UsuarioRepository;
-import com.utn.elbuensabor.security.JwtFilter;
-import com.utn.elbuensabor.security.JwtUtil;
+import java.util.List;
 
 @Configuration
 public class SecurityConfig {
@@ -28,10 +27,10 @@ public class SecurityConfig {
     public UserDetailsService userDetailsService(UsuarioRepository usuarioRepo) {
         return username -> usuarioRepo.findByUsername(username)
                 .map(u -> org.springframework.security.core.userdetails.User
-                .withUsername(u.getUsername())
-                .password(u.getPassword())
-                .roles(u.getRolSistema().name())
-                .build())
+                        .withUsername(u.getUsername())
+                        .password(u.getPassword())
+                        .roles(u.getRolSistema().name())
+                        .build())
                 .orElseThrow(() -> new RuntimeException("Usuario no encontrado"));
     }
 
@@ -55,10 +54,10 @@ public class SecurityConfig {
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration config = new CorsConfiguration();
 
-        config.setAllowedOrigins(List.of("http://localhost:5173")); // ORIGEN EXPLÍCITO ← CLAVE
+        config.setAllowedOriginPatterns(List.of("http://localhost:*", "http://127.0.0.1:*"));
         config.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS"));
         config.setAllowedHeaders(List.of("*"));
-        config.setAllowCredentials(true); // NECESARIO si usas cookies o auth
+        config.setAllowCredentials(true);
 
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
         source.registerCorsConfiguration("/**", config);
@@ -76,6 +75,7 @@ public class SecurityConfig {
                 .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll() // preflight
                 .requestMatchers("/api/auth/register").permitAll()
                 .requestMatchers("/api/auth/login").permitAll()
+                .requestMatchers("/api/auth/google").permitAll()
                 .requestMatchers("/api/localidad/**").permitAll()
                 .requestMatchers(HttpMethod.GET, "/api/sucursales/**").permitAll()
                 .requestMatchers("/uploads/**").permitAll()

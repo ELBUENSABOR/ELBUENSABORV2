@@ -1,11 +1,10 @@
 package com.utn.elbuensabor.repositories;
 
-import java.util.List;
-
+import com.utn.elbuensabor.entities.ArticuloManufacturadoDetalle;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
-import com.utn.elbuensabor.entities.ArticuloManufacturadoDetalle;
+import java.util.List;
 
 @Repository
 public interface ArticuloManufacturadoDetalleRepository extends JpaRepository<ArticuloManufacturadoDetalle, Long> {
