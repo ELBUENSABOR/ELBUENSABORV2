@@ -1,6 +1,7 @@
 import axios from "axios";
 
 const API_URL = import.meta.env.VITE_API_URL;
+const API_ORIGIN = API_URL ? new URL(API_URL).origin : "";
 
 export interface PedidoDetalleDTO {
     manufacturadoId?: number;
@@ -198,6 +199,40 @@ export const cambiarEstadoPedido = async (pedidoId: number, estado: string) => {
     } catch (error: any) {
         console.error(
             "Error al cambiar estado del pedido:",
+            error.response?.data || error.message
+        );
+        throw error;
+    }
+};
+
+export const resolveFacturaPdfUrl = (pdfUrl?: string | null) => {
+    if (!pdfUrl) return null;
+    if (/^https?:\/\//i.test(pdfUrl)) return pdfUrl;
+    if (!API_ORIGIN) return pdfUrl;
+    return pdfUrl.startsWith("/")
+        ? `${API_ORIGIN}${pdfUrl}`
+        : `${API_ORIGIN}/${pdfUrl}`;
+};
+
+export const marcarPedidoPagado = async (pedidoId: number) => {
+    try {
+        const token = sessionStorage.getItem("token");
+
+        const res = await axios.put(
+            `${API_URL}/pedidos/${pedidoId}/pagado`,
+            {},
+            {
+                headers: {
+                    Authorization: `Bearer ${token}`,
+                },
+                withCredentials: true,
+            }
+        );
+
+        return res.data;
+    } catch (error: any) {
+        console.error(
+            "Error al marcar pedido como pagado:",
             error.response?.data || error.message
         );
         throw error;

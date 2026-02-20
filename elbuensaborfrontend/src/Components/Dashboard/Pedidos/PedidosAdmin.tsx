@@ -1,6 +1,6 @@
-import { useEffect, useState } from "react";
-import { cambiarEstadoPedido, getPedidoById, getPedidosAll } from "../../../services/pedidoService";
-import type { PedidoResponse } from "../../../services/pedidoService";
+import {useEffect, useState} from "react";
+import type {PedidoResponse} from "../../../services/pedidoService";
+import {cambiarEstadoPedido, getPedidoById, getPedidosAll, marcarPedidoPagado} from "../../../services/pedidoService";
 import OrderDetailModal from "../../Common/OrderDetailModal/OrderDetailModal.tsx";
 import { useSucursal } from "../../../contexts/SucursalContext";
 import { useUser } from "../../../contexts/UsuarioContext";
@@ -105,6 +105,25 @@ const PedidosAdmin = () => {
     };
 
     const puedeEntregar = (pedido: PedidoResponse) => pedido.pagado;
+
+    const puedeMarcarPagado = (pedido: PedidoResponse) =>
+        pedido.tipoEnvio === "TAKE_AWAY" &&
+        pedido.formaPago === "EFECTIVO" &&
+        !pedido.pagado &&
+        pedido.estado === "LISTO";
+
+    const marcarPagado = async (pedido: PedidoResponse) => {
+        setLoading(true);
+        setError("");
+        try {
+            await marcarPedidoPagado(pedido.id);
+            await cargarPedidos(estado);
+        } catch (err) {
+            setError("No se pudo marcar el pedido como pagado.");
+        } finally {
+            setLoading(false);
+        }
+    };
 
     const actualizarEstado = async (pedido: PedidoResponse) => {
         const nuevoEstado = estadoSeleccionado[pedido.id];
@@ -252,6 +271,14 @@ const PedidosAdmin = () => {
                                             >
                                                 Actualizar
                                             </button>
+                                            {puedeMarcarPagado(pedido) && (
+                                                <button
+                                                    className="btn btn-sm btn-outline-success"
+                                                    onClick={() => marcarPagado(pedido)}
+                                                >
+                                                    Marcar pagado
+                                                </button>
+                                            )}
                                         </div>
                                     </td>
                                 </tr>

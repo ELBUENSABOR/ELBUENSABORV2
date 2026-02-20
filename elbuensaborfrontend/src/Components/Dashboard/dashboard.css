@@ -285,3 +285,27 @@
     color: hsl(var(--muted-foreground));
     font-size: 0.78rem;
 }
+
+.dashboard-topbar .navbar-user-trigger {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.dashboard-topbar .navbar-user-name {
+    font-weight: 500;
+}
+
+.dashboard-topbar .navbar-user-avatar {
+    width: 34px;
+    height: 34px;
+    border-radius: 50%;
+    border: 2px solid hsl(var(--primary));
+    object-fit: cover;
+    background: hsl(var(--secondary));
+}
+
+.dashboard-topbar .navbar-user-avatar--fallback {
+    padding: 3px;
+    color: hsl(var(--primary));
+}

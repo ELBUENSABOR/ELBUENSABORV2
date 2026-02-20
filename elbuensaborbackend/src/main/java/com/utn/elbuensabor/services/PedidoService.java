@@ -31,6 +31,8 @@ public interface PedidoService {
 
     PedidoResponse cambiarEstado(Long id, EstadoPedido nuevoEstado);
 
+    PedidoResponse marcarPagado(Long id);
+
     String generarNumeroPedido();
 
     Double calcularGastosEnvio();

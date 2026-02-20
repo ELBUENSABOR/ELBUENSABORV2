@@ -5,6 +5,8 @@ import {useUser} from "../../contexts/UsuarioContext";
 import {useCatalogFilters} from "../../contexts/CatalogFiltersContext";
 import {useSucursal} from "../../contexts/SucursalContext";
 import {LogIn, ShoppingCart} from 'lucide-react';
+import {HiOutlineUserCircle} from "react-icons/hi";
+import {getImageUrl} from "../../utils/image";
 
 interface MyNavbarProps {
     onCartOpen: () => void;
@@ -20,6 +22,7 @@ export default function MyNavbar({onCartOpen, isCartOpen}: MyNavbarProps) {
     } = useCatalogFilters();
 
     const dropdownTitle = user ? user.username : "Cuenta";
+    const profilePhotoUrl = user?.fotoPerfil ? getImageUrl(user.fotoPerfil) : "";
     const showSucursalSelector = user?.role !== "EMPLEADO";
 
     return (
@@ -105,7 +108,24 @@ export default function MyNavbar({onCartOpen, isCartOpen}: MyNavbarProps) {
                                 </Link>
                             </div>
                         ) : (
-                            <NavDropdown title={dropdownTitle} id="basic-nav-dropdown">
+                            <NavDropdown
+                                title={
+                                    <span className="navbar-user-trigger">
+                                        <span className="navbar-user-name">{dropdownTitle}</span>
+                                        {profilePhotoUrl ? (
+                                            <img
+                                                src={profilePhotoUrl}
+                                                alt="Foto de perfil"
+                                                className="navbar-user-avatar"
+                                            />
+                                        ) : (
+                                            <HiOutlineUserCircle className="navbar-user-avatar navbar-user-avatar--fallback"/>
+                                        )}
+                                    </span>
+                                }
+                                id="basic-nav-dropdown"
+                                align="end"
+                            >
                                 <NavDropdown.Item as={Link} to="/account">
                                     Perfil
                                 </NavDropdown.Item>

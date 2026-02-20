@@ -13,13 +13,18 @@ import com.utn.elbuensabor.entities.PedidoVentaDetalle;
 import com.utn.elbuensabor.repositories.FacturaVentaRepository;
 import com.utn.elbuensabor.services.FacturaService;
 
-import lombok.RequiredArgsConstructor;
+import java.io.IOException;
+import java.math.BigDecimal;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.time.LocalDateTime;
 
 @Service
 @RequiredArgsConstructor
 public class FacturaServiceImpl implements FacturaService {
 
     private final FacturaVentaRepository facturaVentaRepository;
+    private final FacturaPdfTemplateRenderer facturaPdfTemplateRenderer;
 
     @Transactional
     public FacturaVenta generarFactura(PedidoVenta pedido) {
@@ -46,7 +51,24 @@ public class FacturaServiceImpl implements FacturaService {
             factura.getDetalles().add(detalleFactura);
         }
 
+        factura = facturaVentaRepository.save(factura);
+        factura.setPdfUrl(generarPdfFactura(factura));
         return facturaVentaRepository.save(factura);
+    }
+
+    private String generarPdfFactura(FacturaVenta factura) {
+        Path dir = Path.of("uploads", "facturas");
+        try {
+            Files.createDirectories(dir);
+            String fileName = String.format("factura-%d.pdf", factura.getId());
+            Path filePath = dir.resolve(fileName);
+
+            facturaPdfTemplateRenderer.render(filePath, factura);
+
+            return "/uploads/facturas/" + fileName;
+        } catch (IOException ex) {
+            throw new RuntimeException("No se pudo generar el PDF de factura", ex);
+        }
     }
 
     private String generarNumeroComprobante() {

@@ -6,6 +6,7 @@ export interface User {
     token: string;
     mustChangePassword: boolean;
     sucursalId?: number | null;
+    fotoPerfil?: string | null;
 }
 
 export type RolSistema = "CLIENTE" | "EMPLEADO" | "ADMIN";
@@ -28,4 +29,5 @@ export interface UserRequestDTO {
         localidadId: number;
     };
     activo?: boolean;
+    fotoPerfil?: string | null;
 }

@@ -6,6 +6,9 @@ import java.util.stream.Collectors;
 
 import com.utn.elbuensabor.services.PedidoService;
 import com.utn.elbuensabor.services.StockService;
+import com.utn.elbuensabor.services.FacturaService;
+import com.utn.elbuensabor.services.EmailService;
+import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
@@ -45,12 +48,13 @@ public class PedidoServiceImpl implements PedidoService {
     private final ArticuloManufacturadoRepository manufacturadoRepository;
     private final StockService stockService;
     private final UsuarioRepository usuarioRepository;
+    private final FacturaService facturaService;
+    private final EmailService emailService;
 
     @Transactional
     public PedidoResponse create(PedidoRequest request) {
         // Validar cliente
-        Cliente cliente = clienteRepository.findById(request.clienteId())
-                .orElseThrow(() -> new IllegalArgumentException("Cliente no encontrado"));
+        Cliente cliente = resolveCliente(request.clienteId());
 
         // Validar sucursal
         SucursalEmpresa sucursal = sucursalRepository.findById(request.sucursalId())
@@ -172,9 +176,16 @@ public class PedidoServiceImpl implements PedidoService {
     }
 
     public List<PedidoResponse> getByClienteId(Long clienteId) {
-        return pedidoRepository.findByClienteIdWithDetalles(clienteId).stream()
+        Cliente cliente = resolveCliente(clienteId);
+        return pedidoRepository.findByClienteIdWithDetalles(cliente.getId()).stream()
                 .map(this::mapToResponse)
                 .collect(Collectors.toList());
+    }
+
+    private Cliente resolveCliente(Long clienteOrUsuarioId) {
+        return clienteRepository.findById(clienteOrUsuarioId)
+                .or(() -> clienteRepository.findByUsuarioId(clienteOrUsuarioId))
+                .orElseThrow(() -> new IllegalArgumentException("Cliente no encontrado"));
     }
 
     public List<PedidoResponse> getByEstado(EstadoPedido estado) {
@@ -375,6 +386,31 @@ public class PedidoServiceImpl implements PedidoService {
         }
 
         pedido.setEstado(nuevoEstado);
+        pedido = pedidoRepository.save(pedido);
+
+        return mapToResponse(pedido);
+    }
+
+    @Transactional
+    public PedidoResponse marcarPagado(Long id) {
+        PedidoVenta pedido = pedidoRepository.findByIdWithDetalles(id)
+                .orElseThrow(() -> new RuntimeException("Pedido no encontrado"));
+        validarAccesoSucursal(pedido.getSucursal());
+
+        if (pedido.getTipoEnvio() != TipoEnvio.TAKE_AWAY || pedido.getFormaPago() != FormaPago.EFECTIVO) {
+            throw new IllegalArgumentException("Solo se puede marcar como pagado pedidos de retiro en local con efectivo");
+        }
+
+        if (Boolean.TRUE.equals(pedido.getPagado())) {
+            return mapToResponse(pedido);
+        }
+
+        pedido.setPagado(true);
+        if (pedido.getFacturaVenta() == null) {
+            var factura = facturaService.generarFactura(pedido);
+            pedido.setFacturaVenta(factura);
+            emailService.enviarFactura(factura);
+        }
         pedido = pedidoRepository.save(pedido);
 
         return mapToResponse(pedido);

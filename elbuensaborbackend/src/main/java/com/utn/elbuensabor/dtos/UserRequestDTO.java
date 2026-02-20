@@ -30,8 +30,8 @@ public record UserRequestDTO(
         @Valid
         DomicilioDTO domicilio,
         PerfilEmpleado perfilEmpleado,
-        @NotNull(message = "La sucursal es obligatoria")
-        Long sucursalId
+        Long sucursalId,
+        String fotoPerfil
 ) {
     public record DomicilioDTO(
             @NotBlank(message = "La calle es obligatoria")

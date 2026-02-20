@@ -120,7 +120,8 @@ public class AuthServiceImpl implements AuthService {
                 null,
                 u.getId().toString(),
                 Boolean.TRUE.equals(u.getMustChangePassword()),
-                null); // Los clientes no tienen sucursal asignada
+                null,
+                u.getFotoPerfil()); // Los clientes no tienen sucursal asignada
     }
 
     public AuthResponse login(LoginRequest req) {
@@ -164,7 +165,8 @@ public class AuthServiceImpl implements AuthService {
                 u.getRolSistema() == RolSistema.EMPLEADO ? u.getEmpleado().getPerfilEmpleado().toString() : null,
                 u.getId().toString(),
                 Boolean.TRUE.equals(u.getMustChangePassword()),
-                sucursalId); // Usar la variable ya calculada que maneja el null
+                sucursalId,
+                u.getFotoPerfil()); // Usar la variable ya calculada que maneja el null
     }
 
     public AuthResponse loginWithGoogle(GoogleAuthRequest req) {
@@ -180,6 +182,7 @@ public class AuthServiceImpl implements AuthService {
 
         String email = jwtToken.getClaimAsString("email");
         Boolean emailVerified = jwtToken.getClaim("email_verified");
+        String picture = jwtToken.getClaimAsString("picture");
 
         if (!Boolean.TRUE.equals(emailVerified)) {
             throw new IllegalArgumentException("El email de Google no está verificado");
@@ -202,6 +205,9 @@ public class AuthServiceImpl implements AuthService {
             u = createGoogleCliente(jwtToken, auth0Id);
         } else if (u.getAuth0Id() == null || u.getAuth0Id().isBlank()) {
             u.setAuth0Id(auth0Id);
+            if (u.getFotoPerfil() == null || u.getFotoPerfil().isBlank()) {
+                u.setFotoPerfil(picture);
+            }
             usuarioRepo.save(u);
         }
 
@@ -221,7 +227,8 @@ public class AuthServiceImpl implements AuthService {
                 u.getRolSistema() == RolSistema.EMPLEADO ? u.getEmpleado().getPerfilEmpleado().toString() : null,
                 u.getId().toString(),
                 Boolean.TRUE.equals(u.getMustChangePassword()),
-                sucursalId);
+                sucursalId,
+                u.getFotoPerfil());
     }
 
     public void changePassword(String username, ChangePasswordRequest req) {
@@ -283,6 +290,7 @@ public class AuthServiceImpl implements AuthService {
         String givenName = jwtToken.getClaimAsString("given_name");
         String familyName = jwtToken.getClaimAsString("family_name");
         String username = generateUniqueUsername(email);
+        String picture = jwtToken.getClaimAsString("picture");
 
         Usuario u = new Usuario();
         u.setUsername(username);
@@ -290,6 +298,7 @@ public class AuthServiceImpl implements AuthService {
         u.setRolSistema(RolSistema.CLIENTE);
         u.setActivo(true);
         u.setAuth0Id(auth0Id);
+        u.setFotoPerfil(picture);
 
         Cliente c = new Cliente();
         String safeGivenName = givenName == null ? "" : givenName;

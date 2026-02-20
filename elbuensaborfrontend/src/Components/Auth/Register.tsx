@@ -146,6 +146,7 @@ const Register = () => {
                 userId: resp.data.userId,
                 mustChangePassword: resp.data.mustChangePassword,
                 sucursalId: resp.data.sucursalId ? Number(resp.data.sucursalId) : null,
+                fotoPerfil: resp.data.fotoPerfil ?? null,
             });
 
             setTimeout(() => {
@@ -177,6 +178,7 @@ const Register = () => {
                 userId: resp.data.userId,
                 mustChangePassword: resp.data.mustChangePassword,
                 sucursalId: resp.data.sucursalId ? Number(resp.data.sucursalId) : null,
+                fotoPerfil: resp.data.fotoPerfil ?? null,
             });
 
             navigate("/");
