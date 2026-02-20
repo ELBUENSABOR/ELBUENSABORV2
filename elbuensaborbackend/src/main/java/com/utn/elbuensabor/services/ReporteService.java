@@ -1,10 +1,10 @@
 package com.utn.elbuensabor.services;
 
+import com.utn.elbuensabor.dtos.ReporteClientesPedidosDTO;
+import com.utn.elbuensabor.dtos.ReporteProductosVendidosDTO;
+
 import java.time.LocalDate;
 import java.util.List;
-
-import com.utn.elbuensabor.dtos.ReporteProductosVendidosDTO;
-import com.utn.elbuensabor.dtos.ReporteClientesPedidosDTO;
 
 public interface ReporteService {
     ReporteProductosVendidosDTO obtenerProductosMasVendidos(LocalDate desde, LocalDate hasta);

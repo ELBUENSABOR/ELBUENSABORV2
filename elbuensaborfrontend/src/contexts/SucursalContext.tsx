@@ -1,16 +1,7 @@
-import {
-    createContext,
-    useContext,
-    useEffect,
-    useMemo,
-    useState,
-    type ReactNode,
-} from "react";
-import { useUser } from "./UsuarioContext";
-import {
-    fetchSucursales,
-} from "../services/dashboardService";
-import type { Sucursal } from "../models/Sucursal";
+import {createContext, type ReactNode, useContext, useEffect, useMemo, useState,} from "react";
+import {useUser} from "./UsuarioContext";
+import {fetchSucursales,} from "../services/dashboardService";
+import type {Sucursal} from "../models/Sucursal";
 
 interface SucursalContextType {
     sucursales: Sucursal[];
@@ -32,8 +23,8 @@ const readStoredSucursal = (): number | null => {
     return Number.isNaN(parsed) ? null : parsed;
 };
 
-export const SucursalProvider = ({ children }: { children: ReactNode }) => {
-    const { user } = useUser();
+export const SucursalProvider = ({children}: { children: ReactNode }) => {
+    const {user} = useUser();
     const [sucursales, setSucursales] = useState<Sucursal[]>([]);
     const [sucursalId, setSucursalIdState] = useState<number | null>(() => {
         if (typeof window === "undefined") return null;

@@ -1,27 +1,20 @@
 package com.utn.elbuensabor.services.impl;
 
-import java.util.List;
-import java.util.Map;
-import java.util.stream.Collectors;
-
 import com.utn.elbuensabor.dtos.*;
-import com.utn.elbuensabor.entities.ImagenInsumo;
-import com.utn.elbuensabor.entities.SucursalInsumo;
-import com.utn.elbuensabor.entities.UnidadMedida;
+import com.utn.elbuensabor.entities.*;
+import com.utn.elbuensabor.repositories.ArticuloInsumoRepository;
+import com.utn.elbuensabor.repositories.CategoriaArticuloInsumoRepository;
+import com.utn.elbuensabor.repositories.UnidadMedidaRepository;
 import com.utn.elbuensabor.services.ArticuloInsumoService;
+import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.utn.elbuensabor.entities.ArticuloInsumo;
-import com.utn.elbuensabor.entities.CategoriaArticuloInsumo;
-import com.utn.elbuensabor.repositories.ArticuloInsumoRepository;
-import com.utn.elbuensabor.repositories.CategoriaArticuloInsumoRepository;
-
-import com.utn.elbuensabor.repositories.UnidadMedidaRepository;
-
-import lombok.RequiredArgsConstructor;
+import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -192,7 +185,7 @@ public class ArticuloInsumoServiceImpl implements ArticuloInsumoService {
         }
         return categoriaDto;
     }
-    
+
     private Double resolveStockActual(Double existingStock, Double requestedStock) {
         if (isAdmin()) {
             return requestedStock != null ? requestedStock : 0.0;

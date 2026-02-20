@@ -1,9 +1,9 @@
-import { useEffect, useMemo, useState } from "react";
-import type { PedidoResponse } from "../../../services/pedidoService";
-import { cambiarEstadoPedido, getPedidosAll } from "../../../services/pedidoService";
+import {useEffect, useMemo, useState} from "react";
+import type {PedidoResponse} from "../../../services/pedidoService";
+import {cambiarEstadoPedido, getPedidosAll} from "../../../services/pedidoService";
 import OrderDetailModal from "../../Common/OrderDetailModal/OrderDetailModal.tsx";
-import { useSucursal } from "../../../contexts/SucursalContext";
-import { useUser } from "../../../contexts/UsuarioContext";
+import {useSucursal} from "../../../contexts/SucursalContext";
+import {useUser} from "../../../contexts/UsuarioContext";
 
 const formatDate = (value: string) => {
     const date = new Date(value);
@@ -18,8 +18,8 @@ const formatDate = (value: string) => {
 };
 
 const PedidosDelivery = () => {
-    const { sucursales, sucursalId, setSucursalId } = useSucursal();
-    const { user } = useUser();
+    const {sucursales, sucursalId, setSucursalId} = useSucursal();
+    const {user} = useUser();
     const [pedidos, setPedidos] = useState<PedidoResponse[]>([]);
     const [selectedPedido, setSelectedPedido] = useState<PedidoResponse | null>(null);
     const [loading, setLoading] = useState(true);

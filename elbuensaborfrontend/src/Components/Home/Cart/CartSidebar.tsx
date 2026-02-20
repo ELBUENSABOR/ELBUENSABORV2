@@ -1,7 +1,7 @@
 import "./cartSidebar.css";
 import {useCart} from "../../../contexts/CartContext";
 import {Package, Trash2} from "lucide-react";
-import { useNavigate } from "react-router-dom";
+import {useNavigate} from "react-router-dom";
 import {getImageUrl} from "../../../utils/image";
 
 const formatCurrency = (value: number) =>

@@ -1,15 +1,13 @@
 package com.utn.elbuensabor.services.impl;
 
+import com.utn.elbuensabor.entities.FacturaVenta;
+import com.utn.elbuensabor.services.EmailService;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.mail.MailException;
 import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.stereotype.Service;
-
-import com.utn.elbuensabor.entities.FacturaVenta;
-import com.utn.elbuensabor.services.EmailService;
-
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 
 @Service
 @RequiredArgsConstructor

@@ -13,5 +13,5 @@ export interface UserEditRequestDTO {
         localidadId: number;
     };
     perfilEmpleado?: string | null;
-    sucursalId: number;
+    sucursalId?: number;
 }

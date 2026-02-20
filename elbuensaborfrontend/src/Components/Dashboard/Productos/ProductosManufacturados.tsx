@@ -1,16 +1,16 @@
-import { useEffect, useState, type ChangeEvent } from "react";
-import { useSucursal } from "../../../contexts/SucursalContext";
-import { useUser } from "../../../contexts/UsuarioContext";
-import { getAll, deleteManufacturado } from "../../../services/manufacturadosService";
-import type { Manufacturado } from "../../../models/Manufacturado";
-import { useNavigate } from "react-router-dom";
-import { getRubrosManufacturados } from "../../../services/rubrosService";
-import type { Rubro } from "../../../models/Rubro";
+import {type ChangeEvent, useEffect, useState} from "react";
+import {useSucursal} from "../../../contexts/SucursalContext";
+import {useUser} from "../../../contexts/UsuarioContext";
+import {deleteManufacturado, getAll} from "../../../services/manufacturadosService";
+import type {Manufacturado} from "../../../models/Manufacturado";
+import {useNavigate} from "react-router-dom";
+import {getRubrosManufacturados} from "../../../services/rubrosService";
+import type {Rubro} from "../../../models/Rubro";
 import ModalConfirmAction from "../../Common/ModalConfirmAction/ModalConfirmAction";
 
 const ProductosManufacturados = () => {
-    const { sucursales, sucursalId, setSucursalId, loading } = useSucursal();
-    const { user } = useUser();
+    const {sucursales, sucursalId, setSucursalId, loading} = useSucursal();
+    const {user} = useUser();
     const [rubros, setRubros] = useState<Rubro[]>();
     const [manufacturados, setManufacturados] = useState<Manufacturado[]>();
     const [originalManufacturados, setOriginalManufacturados] =
@@ -98,10 +98,10 @@ const ProductosManufacturados = () => {
     const deleteManufacturadoConfirm = async () => {
         await deleteManufacturado(currentId);
         setManufacturados((prev) =>
-            prev?.map((m) => (m.id === currentId ? { ...m, activo: false } : m))
+            prev?.map((m) => (m.id === currentId ? {...m, activo: false} : m))
         );
         setOriginalManufacturados((prev) =>
-            prev?.map((m) => (m.id === currentId ? { ...m, activo: false } : m))
+            prev?.map((m) => (m.id === currentId ? {...m, activo: false} : m))
         );
         setShowModal(false);
     };
@@ -110,7 +110,7 @@ const ProductosManufacturados = () => {
         <div>
             <div>
                 <h5>Manufacturados</h5>
-                <hr />
+                <hr/>
                 <div>
                     {user?.role === "ADMIN" && (
                         <div className="d-flex flex-wrap align-items-center justify-content-between gap-3 mb-4">
@@ -217,8 +217,12 @@ const ProductosManufacturados = () => {
                                 {
                                     m.activo && (
                                         <>
-                                            <button className="btn btn-primary" onClick={() => navigate(`/dashboard/manufacturados/edit/${m.id}`)}>Editar</button>
-                                            <button className="btn btn-danger" onClick={() => handleDeleteManufacturado(m.id)}>Eliminar</button>
+                                            <button className="btn btn-primary"
+                                                    onClick={() => navigate(`/dashboard/manufacturados/edit/${m.id}`)}>Editar
+                                            </button>
+                                            <button className="btn btn-danger"
+                                                    onClick={() => handleDeleteManufacturado(m.id)}>Eliminar
+                                            </button>
                                         </>
                                     )
                                 }

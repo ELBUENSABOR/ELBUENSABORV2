@@ -1,10 +1,10 @@
-import React, { useEffect, useState } from "react";
-import { useUser } from "../../contexts/UsuarioContext";
-import { getUserService, updateUser } from "../../services/userService";
-import type { UsuarioDTO } from "../../dtos/UsuarioDTO";
-import { getLocalidades } from "../../services/authService";
-import { HiOutlineUserCircle } from "react-icons/hi";
-import type { UserEditRequestDTO } from "../../dtos/UserEditRequestDTO";
+import React, {useEffect, useState} from "react";
+import {useUser} from "../../contexts/UsuarioContext";
+import {getUserService, updateUser} from "../../services/userService";
+import type {UsuarioDTO} from "../../dtos/UsuarioDTO";
+import {getLocalidades} from "../../services/authService";
+import {HiOutlineUserCircle} from "react-icons/hi";
+import type {UserEditRequestDTO} from "../../dtos/UserEditRequestDTO";
 
 import "./account.css";
 
@@ -18,7 +18,7 @@ const Account = () => {
         },
     ]);
 
-    const { user, logout } = useUser();
+    const {user, logout} = useUser();
 
     const isEmpleado = user?.role === "EMPLEADO";
     const isCliente = user?.role === "CLIENTE";
@@ -46,7 +46,7 @@ const Account = () => {
         e.preventDefault();
         if (!editMode) return;
 
-        setMsg({ type: "", text: "" });
+        setMsg({type: "", text: ""});
 
         try {
             if (!userData) return;
@@ -132,7 +132,7 @@ const Account = () => {
     };
 
     const getUser = async () => {
-        setMsg({ type: "", text: "" });
+        setMsg({type: "", text: ""});
         const resp = await getUserService(user?.userId || "");
         console.log("resp", resp);
         setUserData(resp.data);
@@ -151,7 +151,7 @@ const Account = () => {
         e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
     ) => {
         const target = e.target as HTMLInputElement | HTMLSelectElement;
-        const { name, value } = target;
+        const {name, value} = target;
 
         setUserData((prev) => {
             if (!prev) return prev;
@@ -201,16 +201,16 @@ const Account = () => {
         setPassword("");
         setConfirmPassword("");
         getUser();
-        setMsg({ type: "", text: "" });
+        setMsg({type: "", text: ""});
     };
 
     if (!userData) {
         return (
             <div className="account-container">
                 <div className="header-account">
-                    <h4>Mi Perfil</h4> <HiOutlineUserCircle className="header-icon" />
+                    <h4>Mi Perfil</h4> <HiOutlineUserCircle className="header-icon"/>
                 </div>
-                <hr />
+                <hr/>
                 <p>Cargando información...</p>
             </div>
         );
@@ -219,11 +219,11 @@ const Account = () => {
     return (
         <div className="account-container">
             <div className="header-account">
-                <h4>Mi Perfil</h4> <HiOutlineUserCircle className="header-icon" />
+                <h4>Mi Perfil</h4> <HiOutlineUserCircle className="header-icon"/>
             </div>
-            <hr />
+            <hr/>
 
-            <div style={{ marginBottom: "10px" }}>
+            <div style={{marginBottom: "10px"}}>
                 {!editMode ? (
                     <button
                         type="button"

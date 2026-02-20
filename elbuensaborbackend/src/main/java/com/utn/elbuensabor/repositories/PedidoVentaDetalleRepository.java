@@ -1,15 +1,14 @@
 package com.utn.elbuensabor.repositories;
 
-import java.time.LocalDateTime;
-import java.util.List;
-
+import com.utn.elbuensabor.dtos.ProductoVendidoDTO;
+import com.utn.elbuensabor.entities.PedidoVentaDetalle;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
-import com.utn.elbuensabor.dtos.ProductoVendidoDTO;
-import com.utn.elbuensabor.entities.PedidoVentaDetalle;
+import java.time.LocalDateTime;
+import java.util.List;
 
 @Repository
 public interface PedidoVentaDetalleRepository extends JpaRepository<PedidoVentaDetalle, Long> {

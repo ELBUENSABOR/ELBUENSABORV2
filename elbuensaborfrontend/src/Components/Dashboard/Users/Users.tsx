@@ -1,11 +1,11 @@
-import { useEffect, useMemo, useState, type ChangeEvent } from "react";
-import { getAllUsers, deleteUserService } from "../../../services/userService";
-import type { UsuarioDTO } from "../../../dtos/UsuarioDTO";
+import {type ChangeEvent, useEffect, useMemo, useState} from "react";
+import {deleteUserService, getAllUsers} from "../../../services/userService";
+import type {UsuarioDTO} from "../../../dtos/UsuarioDTO";
 import "./users.css";
-import { useNavigate } from "react-router-dom";
+import {useNavigate} from "react-router-dom";
 import ModalConfirmAction from "../../Common/ModalConfirmAction/ModalConfirmAction";
 import Alert from "../../Alert/Alert";
-import { Users as UsersIcon } from "lucide-react";
+import {Users as UsersIcon} from "lucide-react";
 
 const Users = () => {
     const [originalUsers, setOriginalUsers] = useState<UsuarioDTO[]>();
@@ -109,7 +109,7 @@ const Users = () => {
             <div className="users-header">
                 <div className="users-title">
           <span className="users-title-icon" aria-hidden="true">
-            <UsersIcon />
+            <UsersIcon/>
           </span>
                     <div>
                         <h5>Usuarios</h5>
