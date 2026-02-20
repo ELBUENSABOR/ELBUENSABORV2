@@ -1,8 +1,5 @@
 package com.utn.elbuensabor.dtos;
 
-import com.utn.elbuensabor.entities.CategoriaArticuloInsumo;
-import com.utn.elbuensabor.entities.UnidadMedida;
-
 import java.util.List;
 
 public record ArticuloInsumoResponse(

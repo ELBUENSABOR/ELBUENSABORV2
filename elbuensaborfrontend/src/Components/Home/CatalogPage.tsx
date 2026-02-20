@@ -1,18 +1,18 @@
 import Catalog from "./Catalog/Catalog";
 import CartSidebar from "./Cart/CartSidebar";
-import { ChangePasswordPopup } from "./ChangePasswordPopup";
+import {ChangePasswordPopup} from "./ChangePasswordPopup";
 import "./catalogPage.css";
 
 const CatalogPage = () => {
     return (
         <div className="catalog-page">
-            <ChangePasswordPopup />
+            <ChangePasswordPopup/>
             <div className="catalog-page__content">
                 <div className="catalog-page__main">
-                    <Catalog />
+                    <Catalog/>
                 </div>
                 <div className="catalog-page__cart">
-                    <CartSidebar />
+                    <CartSidebar/>
                 </div>
             </div>
         </div>

@@ -1,10 +1,10 @@
-import {useEffect, useState, type ChangeEvent, type JSX} from "react";
+import {type ChangeEvent, type JSX, useEffect, useState} from "react";
 import "./rubros.css";
 import {useNavigate} from "react-router-dom";
 import ModalConfirmAction from "../../Common/ModalConfirmAction/ModalConfirmAction";
 import Alert from "../../Alert/Alert";
 import type {Rubro} from "../../../models/Rubro";
-import {getRubrosInsumos, deleteRubroInsumoService} from "../../../services/rubrosService";
+import {deleteRubroInsumoService, getRubrosInsumos} from "../../../services/rubrosService";
 
 interface RubroWithChildren extends Rubro {
     children?: RubroWithChildren[];

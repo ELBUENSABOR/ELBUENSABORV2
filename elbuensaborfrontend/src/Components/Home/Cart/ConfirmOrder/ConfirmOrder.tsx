@@ -1,21 +1,21 @@
-import { useEffect, useState } from "react";
-import { useCart } from "../../../../contexts/CartContext";
-import { useUser } from "../../../../contexts/UsuarioContext";
-import { useSucursal } from "../../../../contexts/SucursalContext";
-import { useNavigate } from "react-router-dom";
+import {useEffect, useState} from "react";
+import {useCart} from "../../../../contexts/CartContext";
+import {useUser} from "../../../../contexts/UsuarioContext";
+import {useSucursal} from "../../../../contexts/SucursalContext";
+import {useNavigate} from "react-router-dom";
 import "./confirmOrder.css";
-import { createPedido } from "../../../../services/pedidoService";
-import { pagarConMercadoPago } from "../../../../services/pagoService";
-import { getUserService } from "../../../../services/userService";
-import type { UsuarioDTO } from "../../../../dtos/UsuarioDTO";
+import {createPedido} from "../../../../services/pedidoService";
+import {pagarConMercadoPago} from "../../../../services/pagoService";
+import {getUserService} from "../../../../services/userService";
+import type {UsuarioDTO} from "../../../../dtos/UsuarioDTO";
 
 type TipoEnvio = "TAKE_AWAY" | "DELIVERY";
 type FormaPago = "EFECTIVO" | "MP";
 
 const ConfirmOrder = () => {
-    const { items, total, clearCart } = useCart();
-    const { user } = useUser();
-    const { sucursalId, sucursales, setSucursalId, loading } = useSucursal();
+    const {items, total, clearCart} = useCart();
+    const {user} = useUser();
+    const {sucursalId, sucursales, setSucursalId, loading} = useSucursal();
     const navigate = useNavigate();
 
     const [step, setStep] = useState<1 | 2 | 3>(1);
@@ -30,7 +30,7 @@ const ConfirmOrder = () => {
     useEffect(() => {
         if (!user) {
             navigate("/login", {
-                state: { redirectTo: "/confirm-order" },
+                state: {redirectTo: "/confirm-order"},
                 replace: true,
             });
         }
@@ -156,7 +156,7 @@ const ConfirmOrder = () => {
     return (
         <div className="confirm-order-container">
             <h3 className="mb-4">Confirmar pedido</h3>
-            <hr />
+            <hr/>
             {step === 1 && (
                 <>
                     <h5>Forma de entrega</h5>
@@ -299,7 +299,7 @@ const ConfirmOrder = () => {
                         </div>
                     ))}
 
-                    <hr />
+                    <hr/>
                     <p>Subtotal: ${total}</p>
                     {descuento > 0 && <p>Descuento: -${descuento}</p>}
                     {costoEnvio > 0 && <p>Envío: ${costoEnvio}</p>}

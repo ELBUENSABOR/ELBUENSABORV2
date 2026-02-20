@@ -1,17 +1,15 @@
 package com.utn.elbuensabor.services.impl;
 
-import java.util.List;
-
+import com.utn.elbuensabor.dtos.SucursalDTO;
 import com.utn.elbuensabor.entities.Empresa;
+import com.utn.elbuensabor.entities.SucursalEmpresa;
 import com.utn.elbuensabor.repositories.EmpresaRepository;
+import com.utn.elbuensabor.repositories.SucursalEmpresaRepository;
 import com.utn.elbuensabor.services.SucursalService;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
-import com.utn.elbuensabor.dtos.SucursalDTO;
-import com.utn.elbuensabor.entities.SucursalEmpresa;
-import com.utn.elbuensabor.repositories.SucursalEmpresaRepository;
-
-import lombok.RequiredArgsConstructor;
+import java.util.List;
 
 @Service
 @RequiredArgsConstructor

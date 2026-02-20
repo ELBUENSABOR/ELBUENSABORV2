@@ -28,6 +28,6 @@ public record RegisterRequest(
         Long localidad,
         @NotBlank
         String numero
-        ) {
+) {
 
 }

@@ -12,8 +12,8 @@ public record PedidoDetalleDTO(
 ) {
     // Validación: debe tener manufacturadoId o insumoId, pero no ambos
     public boolean isValid() {
-        return (manufacturadoId != null && insumoId == null) || 
-               (manufacturadoId == null && insumoId != null);
+        return (manufacturadoId != null && insumoId == null) ||
+                (manufacturadoId == null && insumoId != null);
     }
 }
 

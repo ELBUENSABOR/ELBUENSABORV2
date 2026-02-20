@@ -1,5 +1,3 @@
-import type { Insumo } from "./Insumo";
-
 export interface SucursalInsumo {
     id: number;
     sucursalId: number;

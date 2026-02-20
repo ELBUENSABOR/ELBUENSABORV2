@@ -1,10 +1,7 @@
-import { useEffect, useMemo, useState } from "react";
-import {
-    fetchClientesPorPedidos,
-    ReporteClientesPedidosDTO,
-} from "../../../services/reportesService";
-import { getPedidosByCliente } from "../../../services/pedidoService";
-import type { PedidoResponse } from "../../../services/pedidoService";
+import {useEffect, useMemo, useState} from "react";
+import {fetchClientesPorPedidos, ReporteClientesPedidosDTO,} from "../../../services/reportesService";
+import type {PedidoResponse} from "../../../services/pedidoService";
+import {getPedidosByCliente} from "../../../services/pedidoService";
 import OrderDetailModal from "../../Common/OrderDetailModal/OrderDetailModal";
 
 const formatDateInput = (date: Date) => {
@@ -27,7 +24,7 @@ const formatDateTime = (value: string) => {
 };
 
 const formatCurrency = (value: number) =>
-    new Intl.NumberFormat("es-AR", { style: "currency", currency: "ARS" }).format(value);
+    new Intl.NumberFormat("es-AR", {style: "currency", currency: "ARS"}).format(value);
 
 const buildCsv = (data: ReporteClientesPedidosDTO[]) => {
     const lines: string[] = ["Cliente,Email,Cantidad de pedidos,Importe total"];
@@ -73,7 +70,7 @@ const ClientesPorPedidos = () => {
 
     const handleExport = () => {
         const csv = buildCsv(data);
-        const blob = new Blob([csv], { type: "text/csv;charset=utf-8;" });
+        const blob = new Blob([csv], {type: "text/csv;charset=utf-8;"});
         const url = window.URL.createObjectURL(blob);
         const link = document.createElement("a");
         link.href = url;
@@ -117,7 +114,8 @@ const ClientesPorPedidos = () => {
 
     return (
         <div className="dashboard-table-card">
-            <div className="dashboard-table-header d-flex flex-column flex-md-row align-items-md-center gap-3 justify-content-between">
+            <div
+                className="dashboard-table-header d-flex flex-column flex-md-row align-items-md-center gap-3 justify-content-between">
                 <div>
                     <h5 className="mb-1">Clientes por pedidos</h5>
                     <small className="text-muted">
@@ -221,7 +219,7 @@ const ClientesPorPedidos = () => {
 
             {selectedCliente && (
                 <>
-                    <div className="modal fade show" style={{ display: "block" }} role="dialog" aria-modal="true">
+                    <div className="modal fade show" style={{display: "block"}} role="dialog" aria-modal="true">
                         <div className="modal-dialog modal-xl modal-dialog-scrollable">
                             <div className="modal-content">
                                 <div className="modal-header">
@@ -300,7 +298,7 @@ const ClientesPorPedidos = () => {
                             </div>
                         </div>
                     </div>
-                    <div className="modal-backdrop fade show" onClick={closePedidosModal} />
+                    <div className="modal-backdrop fade show" onClick={closePedidosModal}/>
                 </>
             )}
 

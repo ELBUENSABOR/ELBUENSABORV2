@@ -1,11 +1,7 @@
 package com.utn.elbuensabor.services;
 
 
-import com.utn.elbuensabor.dtos.AuthResponse;
-import com.utn.elbuensabor.dtos.ChangePasswordRequest;
-import com.utn.elbuensabor.dtos.GoogleAuthRequest;
-import com.utn.elbuensabor.dtos.LoginRequest;
-import com.utn.elbuensabor.dtos.RegisterRequest;
+import com.utn.elbuensabor.dtos.*;
 
 public interface AuthService {
 

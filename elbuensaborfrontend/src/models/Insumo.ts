@@ -1,7 +1,7 @@
-import type { Imagen } from "./Imagen";
-import type { Rubro } from "./Rubro";
-import type { SucursalInsumo } from "./SucursalInsumo";
-import type { UnidadMedida } from "./UnidadMedida";
+import type {Imagen} from "./Imagen";
+import type {Rubro} from "./Rubro";
+import type {SucursalInsumo} from "./SucursalInsumo";
+import type {UnidadMedida} from "./UnidadMedida";
 
 export interface InsumoRequest {
     id?: number;

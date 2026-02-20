@@ -1,9 +1,9 @@
 package com.utn.elbuensabor.dtos;
 
-import java.util.List;
-
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
+
+import java.util.List;
 
 public record ArticuloManufacturadoRequest(
         @NotNull Long sucursalId,
