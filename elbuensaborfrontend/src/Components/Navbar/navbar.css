@@ -179,39 +179,84 @@
     display: none;
 }
 
+.navbar-search--mobile.is-open {
+    display: block;
+}
+
 .navbar-search--desktop {
     display: block;
 }
 
 @media (max-width: 991px) {
     .navbar-main {
-        padding: 10px 16px;
+        padding: 10px 12px;
+        display: grid;
+        grid-template-columns: auto 1fr auto;
+        gap: 8px;
+        align-items: center;
     }
 
-    .navbar-search {
-        width: 100%;
-        min-width: 100%;
-        margin: 12px 0;
+    .navbar-brand-group {
+        min-width: 0;
+        gap: 8px;
+    }
+
+    .navbar-brand-logo {
+        width: 30px;
+        height: 30px;
+        border-radius: 9px;
+        font-size: 0.62rem;
+    }
+
+    .navbar-brand-name {
+        font-size: 0.82rem;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        max-width: 120px;
+    }
+
+    .navbar-mobile-sucursal {
+        display: inline-block;
+        min-width: 0;
+        font-size: 0.78rem;
+        color: hsl(var(--muted-foreground));
+        text-align: center;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
     }
 
     .navbar-controls {
         display: flex;
         align-items: center;
-        gap: 10px;
+        gap: 6px;
         margin-left: auto;
     }
 
-    .navbar-search-wrapper {
-        padding: 0 16px 12px;
-        width: 100%;
+    .navbar-icon-button {
+        width: 34px;
+        height: 34px;
+        border-radius: 11px;
     }
 
-    .navbar-search--mobile {
-        display: block;
+    .navbar-search {
+        width: 100%;
+        min-width: 100%;
+        margin: 8px 0;
+    }
+
+    .navbar-search-wrapper {
+        display: none;
+        padding: 0 12px 10px;
+        width: 100%;
     }
 
     .navbar-search--desktop {
         display: none;
+    }
+
+    .navbar-mobile-auth-link {
+        display: block;
     }
 
     .navbar-sucursal {
@@ -224,14 +269,7 @@
     }
 
     .navbar-auth-buttons {
-        width: 100%;
-        flex-direction: column;
-        margin-top: 12px;
-    }
-
-    .navbar-auth-buttons .btn {
-        width: 100%;
-        text-align: center;
+        display: none;
     }
 
     .navbar-auth-btn {
@@ -275,4 +313,38 @@
 
 .navbar-actions .dropdown-toggle::after {
     margin-left: 0.55rem;
+}
+
+
+
+.navbar-brand-group {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.navbar-brand-logo {
+    width: 34px;
+    height: 34px;
+    border-radius: 10px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    background: hsl(var(--primary));
+    color: hsl(var(--primary-foreground));
+    font-size: 0.72rem;
+    font-weight: 700;
+    letter-spacing: 0.03em;
+}
+
+.navbar-brand-name {
+    white-space: nowrap;
+}
+
+.navbar-mobile-sucursal {
+    display: none;
+}
+
+.navbar-mobile-auth-link {
+    display: none;
 }

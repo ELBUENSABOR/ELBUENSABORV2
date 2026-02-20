@@ -1,10 +1,11 @@
+import {useState} from "react";
 import {Container, Form, Nav, Navbar, NavDropdown} from "react-bootstrap";
 import {Link} from "react-router-dom";
 import "./navbar.css";
 import {useUser} from "../../contexts/UsuarioContext";
 import {useCatalogFilters} from "../../contexts/CatalogFiltersContext";
 import {useSucursal} from "../../contexts/SucursalContext";
-import {LogIn, ShoppingCart} from 'lucide-react';
+import {LogIn, Search, ShoppingCart} from 'lucide-react';
 import {HiOutlineUserCircle} from "react-icons/hi";
 import {getImageUrl} from "../../utils/image";
 
@@ -15,6 +16,7 @@ interface MyNavbarProps {
 
 export default function MyNavbar({onCartOpen, isCartOpen}: MyNavbarProps) {
     const {user, logout} = useUser();
+    const [isMobileSearchOpen, setIsMobileSearchOpen] = useState(false);
     const {sucursales, sucursalId, setSucursalId, loading: loadingSucursales} = useSucursal();
     const {
         searchTerm,
@@ -24,13 +26,21 @@ export default function MyNavbar({onCartOpen, isCartOpen}: MyNavbarProps) {
     const dropdownTitle = user ? user.username : "Cuenta";
     const profilePhotoUrl = user?.fotoPerfil ? getImageUrl(user.fotoPerfil) : "";
     const showSucursalSelector = user?.role !== "EMPLEADO";
+    const selectedSucursal = sucursales.find((sucursal) => sucursal.id === sucursalId);
 
     return (
         <Navbar expand="lg" className="navbar-container" sticky="top">
             <Container className="navbar-main">
-                <Navbar.Brand as={Link} to="/">
-                    EL BUEN SABOR
+                <Navbar.Brand as={Link} to="/" className="navbar-brand-group">
+                    <span className="navbar-brand-logo" aria-hidden="true">EBS</span>
+                    <span className="navbar-brand-name">EL BUEN SABOR</span>
                 </Navbar.Brand>
+
+                {showSucursalSelector && (
+                    <span className="navbar-mobile-sucursal">
+                        {selectedSucursal?.nombre ?? "Sucursal"}
+                    </span>
+                )}
 
                 <div className="navbar-controls">
                     <button
@@ -41,6 +51,15 @@ export default function MyNavbar({onCartOpen, isCartOpen}: MyNavbarProps) {
                         aria-expanded={isCartOpen}
                     >
                         <ShoppingCart/>
+                    </button>
+                    <button
+                        type="button"
+                        className="navbar-icon-button"
+                        onClick={() => setIsMobileSearchOpen((prev) => !prev)}
+                        aria-label="Abrir buscador"
+                        aria-expanded={isMobileSearchOpen}
+                    >
+                        <Search/>
                     </button>
                     <Navbar.Toggle aria-controls="main-navbar"/>
                 </div>
@@ -61,6 +80,16 @@ export default function MyNavbar({onCartOpen, isCartOpen}: MyNavbarProps) {
                         <Nav.Link as={Link} to="/catalog">
                             Catalogo
                         </Nav.Link>
+                        {!user && (
+                            <>
+                                <Nav.Link as={Link} to="/login" className="navbar-mobile-auth-link">
+                                    Ingresar
+                                </Nav.Link>
+                                <Nav.Link as={Link} to="/register" className="navbar-mobile-auth-link">
+                                    Registrarse
+                                </Nav.Link>
+                            </>
+                        )}
                         {showSucursalSelector && (
                             <Form className="navbar-sucursal">
                                 <Form.Label className="navbar-sucursal-label">
@@ -144,7 +173,7 @@ export default function MyNavbar({onCartOpen, isCartOpen}: MyNavbarProps) {
                 </Navbar.Collapse>
             </Container>
 
-            <div className="navbar-search-wrapper navbar-search--mobile">
+            <div className={`navbar-search-wrapper navbar-search--mobile${isMobileSearchOpen ? " is-open" : ""}`}>
                 <Container>
                     <Form className="navbar-search">
                         <Form.Control
