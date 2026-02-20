@@ -62,15 +62,14 @@ public class FacturaPdfTemplateRenderer {
         content.addRect(0, topY - headerHeight, right + left, headerHeight);
         content.fill();
 
-        Path logoPath = Path.of(facturaLogoPath);
+        Path logoPath = resolveLogoPath();
         if (Files.exists(logoPath)) {
             PDImageXObject logo = PDImageXObject.createFromFileByContent(logoPath.toFile(), document);
-            content.drawImage(logo, left, topY - 65, 64, 32);
+            content.drawImage(logo, left - 2, topY - 66, 92, 46);
         }
 
-        writeText(content, "El Buen Sabor", left + 74, topY - 35, PDType1Font.HELVETICA_BOLD, 14f, WHITE);
-        writeText(content, "Comida artesanal", left + 74, topY - 52, PDType1Font.HELVETICA, 10f, LIGHT_GRAY);
-
+        writeText(content, "El Buen Sabor", left + 96, topY - 35, PDType1Font.HELVETICA_BOLD, 14f, WHITE);
+        writeText(content, "Comida artesanal", left + 96, topY - 52, PDType1Font.HELVETICA, 10f, LIGHT_GRAY);
         writeText(content, "FACTURA", right - 120, topY - 34, PDType1Font.HELVETICA, 10f, LIGHT_GRAY);
         writeRightText(content, "#" + factura.getNumeroComprobante(), right, topY - 53, PDType1Font.HELVETICA_BOLD, 16f, WHITE);
     }
@@ -279,6 +278,20 @@ public class FacturaPdfTemplateRenderer {
     private String formatMoney(Double value) {
         if (value == null) return "$0,00";
         return String.format(new Locale("es", "AR"), "$%,.2f", value);
+    }
+
+
+    private Path resolveLogoPath() {
+        Path configured = Path.of(facturaLogoPath);
+        if (Files.exists(configured)) return configured;
+
+        Path rootRelative = Path.of("uploads", "el buen sabor", "logo.png");
+        if (Files.exists(rootRelative)) return rootRelative;
+
+        Path parentRelative = Path.of("..", "uploads", "el buen sabor", "logo.png");
+        if (Files.exists(parentRelative)) return parentRelative;
+
+        return configured;
     }
 
     private void writeCenteredText(PDPageContentStream content,
