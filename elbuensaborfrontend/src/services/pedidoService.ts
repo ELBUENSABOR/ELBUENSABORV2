@@ -1,6 +1,7 @@
 import axios from "axios";
 
 const API_URL = import.meta.env.VITE_API_URL;
+const API_ORIGIN = API_URL ? new URL(API_URL).origin : "";
 
 export interface PedidoDetalleDTO {
     manufacturadoId?: number;
@@ -202,6 +203,15 @@ export const cambiarEstadoPedido = async (pedidoId: number, estado: string) => {
         );
         throw error;
     }
+};
+
+export const resolveFacturaPdfUrl = (pdfUrl?: string | null) => {
+    if (!pdfUrl) return null;
+    if (/^https?:\/\//i.test(pdfUrl)) return pdfUrl;
+    if (!API_ORIGIN) return pdfUrl;
+    return pdfUrl.startsWith("/")
+        ? `${API_ORIGIN}${pdfUrl}`
+        : `${API_ORIGIN}/${pdfUrl}`;
 };
 
 export const marcarPedidoPagado = async (pedidoId: number) => {

@@ -2,7 +2,7 @@ import {useEffect, useMemo, useState} from "react";
 import {useNavigate} from "react-router-dom";
 import {useUser} from "../../../contexts/UsuarioContext";
 import type {PedidoResponse} from "../../../services/pedidoService";
-import {getPedidosByCliente} from "../../../services/pedidoService";
+import {getPedidosByCliente, resolveFacturaPdfUrl} from "../../../services/pedidoService";
 import OrderDetailModal from "../../Common/OrderDetailModal/OrderDetailModal.tsx";
 
 const formatDate = (value: string) => {
@@ -98,16 +98,24 @@ const OrdersHistory = () => {
                                     >
                                         Ver detalle
                                     </button>
-                                    {pedido.factura?.pdfUrl && (
+                                    {resolveFacturaPdfUrl(pedido.factura?.pdfUrl) ? (
                                         <a
                                             className="btn btn-sm btn-outline-success"
-                                            href={pedido.factura.pdfUrl}
+                                            href={resolveFacturaPdfUrl(pedido.factura?.pdfUrl)!}
                                             target="_blank"
                                             rel="noreferrer"
-                                            download
                                         >
                                             Ver factura (PDF)
                                         </a>
+                                    ) : (
+                                        <button
+                                            className="btn btn-sm btn-outline-secondary"
+                                            type="button"
+                                            disabled
+                                            title="La factura aún no está disponible"
+                                        >
+                                            Ver factura (PDF)
+                                        </button>
                                     )}
                                 </td>
                             </tr>

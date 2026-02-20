@@ -7,6 +7,8 @@ import com.utn.elbuensabor.entities.*;
 import com.utn.elbuensabor.repositories.*;
 import com.utn.elbuensabor.services.PedidoService;
 import com.utn.elbuensabor.services.StockService;
+import com.utn.elbuensabor.services.FacturaService;
+import com.utn.elbuensabor.services.EmailService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -28,6 +30,8 @@ public class PedidoServiceImpl implements PedidoService {
     private final ArticuloManufacturadoRepository manufacturadoRepository;
     private final StockService stockService;
     private final UsuarioRepository usuarioRepository;
+    private final FacturaService facturaService;
+    private final EmailService emailService;
 
     @Transactional
     public PedidoResponse create(PedidoRequest request) {
@@ -384,6 +388,11 @@ public class PedidoServiceImpl implements PedidoService {
         }
 
         pedido.setPagado(true);
+        if (pedido.getFacturaVenta() == null) {
+            var factura = facturaService.generarFactura(pedido);
+            pedido.setFacturaVenta(factura);
+            emailService.enviarFactura(factura);
+        }
         pedido = pedidoRepository.save(pedido);
 
         return mapToResponse(pedido);

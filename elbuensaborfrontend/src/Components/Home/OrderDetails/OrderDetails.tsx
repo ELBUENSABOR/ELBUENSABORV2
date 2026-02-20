@@ -1,7 +1,7 @@
 import {useEffect, useState} from "react";
 import {useParams} from "react-router-dom";
 import type {PedidoResponse} from "../../../services/pedidoService";
-import {getPedidoById} from "../../../services/pedidoService";
+import {getPedidoById, resolveFacturaPdfUrl} from "../../../services/pedidoService";
 import {pagarConMercadoPago} from "../../../services/pagoService";
 
 const OrderDetails = () => {
@@ -99,12 +99,11 @@ const OrderDetails = () => {
                     <h5>Factura</h5>
                     <p>Número: {pedido.factura.numeroComprobante}</p>
                     <p>Total: ${pedido.factura.totalVenta}</p>
-                    {pedido.factura.pdfUrl && (
+                    {resolveFacturaPdfUrl(pedido.factura.pdfUrl) && (
                         <a
-                            href={pedido.factura.pdfUrl}
+                            href={resolveFacturaPdfUrl(pedido.factura.pdfUrl)!}
                             target="_blank"
                             rel="noreferrer"
-                            download
                             className="btn btn-outline-success"
                         >
                             Ver factura (PDF)

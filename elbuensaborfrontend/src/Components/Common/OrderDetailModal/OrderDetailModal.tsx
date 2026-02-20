@@ -1,5 +1,6 @@
 import type {ReactNode} from "react";
-import type {PedidoResponse} from "../../services/pedidoService";
+import type {PedidoResponse} from "../../../services/pedidoService";
+import {resolveFacturaPdfUrl} from "../../../services/pedidoService";
 
 type OrderDetailModalProps = {
     pedido: PedidoResponse | null;
@@ -9,6 +10,8 @@ type OrderDetailModalProps = {
 
 const OrderDetailModal = ({pedido, onClose, children}: OrderDetailModalProps) => {
     if (!pedido) return null;
+
+    const fechaFormateada = new Date(pedido.fechaPedido).toLocaleString("es-AR");
 
     return (
         <>
@@ -21,7 +24,21 @@ const OrderDetailModal = ({pedido, onClose, children}: OrderDetailModalProps) =>
                         </div>
                         <div className="modal-body">
                             <p>
+                                <strong>Fecha:</strong> {fechaFormateada}
+                            </p>
+                            <p>
+                                <strong>Número de pedido:</strong> {pedido.numero}
+                            </p>
+                            <p>
                                 <strong>Cliente:</strong> {pedido.cliente.nombre} {pedido.cliente.apellido}
+                            </p>
+                            <p>
+                                <strong>Forma de entrega:</strong>{" "}
+                                {pedido.tipoEnvio === "DELIVERY" ? "Envío a domicilio" : "Retiro en local"}
+                            </p>
+                            <p>
+                                <strong>Forma de pago:</strong>{" "}
+                                {pedido.formaPago === "MP" ? "Mercado Pago" : "Efectivo"}
                             </p>
                             {pedido.telefonoEntrega && (
                                 <p>
@@ -57,6 +74,28 @@ const OrderDetailModal = ({pedido, onClose, children}: OrderDetailModalProps) =>
                                     <span>${detalle.subTotal}</span>
                                 </div>
                             ))}
+                            <div className="mt-3 text-end">
+                                <p className="mb-1">Subtotal: ${pedido.subTotal}</p>
+                                {pedido.descuento > 0 && (
+                                    <p className="mb-1">Descuento: -${pedido.descuento}</p>
+                                )}
+                                {pedido.gastosEnvio > 0 && (
+                                    <p className="mb-1">Envío: ${pedido.gastosEnvio}</p>
+                                )}
+                                <h6 className="mb-0">Total: ${pedido.total}</h6>
+                            </div>
+                            {resolveFacturaPdfUrl(pedido.factura?.pdfUrl) && (
+                                <div className="mt-3">
+                                    <a
+                                        href={resolveFacturaPdfUrl(pedido.factura?.pdfUrl)!}
+                                        target="_blank"
+                                        rel="noreferrer"
+                                        className="btn btn-outline-success"
+                                    >
+                                        Ver factura (PDF)
+                                    </a>
+                                </div>
+                            )}
                             {children}
                         </div>
                         <div className="modal-footer">
