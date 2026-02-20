@@ -5,7 +5,7 @@ import {getPedidoById, resolveFacturaPdfUrl} from "../../../services/pedidoServi
 import {pagarConMercadoPago} from "../../../services/pagoService";
 
 const OrderDetails = () => {
-    const {id} = useParams();
+    const { id } = useParams();
     const [pedido, setPedido] = useState<PedidoResponse | null>(null);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState("");
@@ -51,7 +51,7 @@ const OrderDetails = () => {
             <p>
                 ⏱ Tiempo estimado: <strong>{minutosEstimados} minutos</strong>
             </p>
-            <hr/>
+            <hr />
             <p>
                 <strong>Sucursal:</strong> {pedido.sucursal.nombre}
             </p>
@@ -77,7 +77,7 @@ const OrderDetails = () => {
                 <strong>Pago:</strong>{" "}
                 {pedido.pagado ? "Aprobado" : "Pendiente"}
             </p>
-            <hr/>
+            <hr />
             <h5>Detalle del pedido</h5>
             {pedido.detalles.map(det => (
                 <div key={det.id} className="d-flex justify-content-between border-bottom py-2">
@@ -87,7 +87,7 @@ const OrderDetails = () => {
                     <div>${det.subTotal}</div>
                 </div>
             ))}
-            <hr/>
+            <hr />
             <div className="text-end">
                 <p>Subtotal: ${pedido.subTotal}</p>
                 {pedido.descuento > 0 && <p>Descuento: -${pedido.descuento}</p>}

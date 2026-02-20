@@ -1,10 +1,9 @@
 package com.utn.elbuensabor.services.impl;
 
-import com.utn.elbuensabor.dtos.PedidoDetalleDTO;
-import com.utn.elbuensabor.dtos.PedidoRequest;
-import com.utn.elbuensabor.dtos.PedidoResponse;
-import com.utn.elbuensabor.entities.*;
-import com.utn.elbuensabor.repositories.*;
+import java.time.LocalDateTime;
+import java.util.List;
+import java.util.stream.Collectors;
+
 import com.utn.elbuensabor.services.PedidoService;
 import com.utn.elbuensabor.services.StockService;
 import com.utn.elbuensabor.services.FacturaService;
@@ -15,9 +14,28 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.time.LocalDateTime;
-import java.util.List;
-import java.util.stream.Collectors;
+import com.utn.elbuensabor.dtos.PedidoDetalleDTO;
+import com.utn.elbuensabor.dtos.PedidoRequest;
+import com.utn.elbuensabor.dtos.PedidoResponse;
+import com.utn.elbuensabor.entities.ArticuloInsumo;
+import com.utn.elbuensabor.entities.ArticuloManufacturado;
+import com.utn.elbuensabor.entities.Cliente;
+import com.utn.elbuensabor.entities.EstadoPedido;
+import com.utn.elbuensabor.entities.FormaPago;
+import com.utn.elbuensabor.entities.PedidoVenta;
+import com.utn.elbuensabor.entities.PedidoVentaDetalle;
+import com.utn.elbuensabor.entities.RolSistema;
+import com.utn.elbuensabor.entities.SucursalEmpresa;
+import com.utn.elbuensabor.entities.TipoEnvio;
+import com.utn.elbuensabor.entities.Usuario;
+import com.utn.elbuensabor.repositories.ArticuloInsumoRepository;
+import com.utn.elbuensabor.repositories.ArticuloManufacturadoRepository;
+import com.utn.elbuensabor.repositories.ClienteRepository;
+import com.utn.elbuensabor.repositories.PedidoVentaRepository;
+import com.utn.elbuensabor.repositories.SucursalEmpresaRepository;
+import com.utn.elbuensabor.repositories.UsuarioRepository;
+
+import lombok.RequiredArgsConstructor;
 
 @Service
 @RequiredArgsConstructor
@@ -429,7 +447,7 @@ public class PedidoServiceImpl implements PedidoService {
         LocalDateTime now = LocalDateTime.now();
         String fecha = now.format(java.time.format.DateTimeFormatter.ofPattern("yyyyMMdd"));
         String hora = now.format(java.time.format.DateTimeFormatter.ofPattern("HHmmss"));
-        String random = String.format("%04d", (int) (Math.random() * 10000));
+        String random = String.format("%04d", (int)(Math.random() * 10000));
         return "PED-" + fecha + "-" + hora + "-" + random;
     }
 
@@ -463,8 +481,7 @@ public class PedidoServiceImpl implements PedidoService {
     public boolean esTransicionValida(EstadoPedido estadoActual, EstadoPedido nuevoEstado) {
         // Definir transiciones válidas
         return switch (estadoActual) {
-            case A_CONFIRMAR ->
-                    nuevoEstado == EstadoPedido.A_COCINA || nuevoEstado == EstadoPedido.CANCELADO || nuevoEstado == EstadoPedido.RECHAZADO;
+            case A_CONFIRMAR -> nuevoEstado == EstadoPedido.A_COCINA || nuevoEstado == EstadoPedido.CANCELADO || nuevoEstado == EstadoPedido.RECHAZADO;
             case A_COCINA -> nuevoEstado == EstadoPedido.LISTO || nuevoEstado == EstadoPedido.CANCELADO;
             case LISTO -> nuevoEstado == EstadoPedido.EN_DELIVERY || nuevoEstado == EstadoPedido.ENTREGADO;
             case EN_DELIVERY -> nuevoEstado == EstadoPedido.ENTREGADO;

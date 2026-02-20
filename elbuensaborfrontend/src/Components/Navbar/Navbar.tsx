@@ -1,4 +1,4 @@
-import {Container, Form, Nav, Navbar, NavDropdown} from "react-bootstrap";
+import {Navbar, Nav, Container, NavDropdown, Form} from "react-bootstrap";
 import {Link} from "react-router-dom";
 import "./navbar.css";
 import {useUser} from "../../contexts/UsuarioContext";
@@ -144,7 +144,7 @@ export default function MyNavbar({onCartOpen, isCartOpen}: MyNavbarProps) {
                 </Navbar.Collapse>
             </Container>
 
-            <div className="navbar-search-wrapper navbar-search--mobile">
+            <div className="navbar-search-wrapper navbar-search--mobile" >
                 <Container>
                     <Form className="navbar-search">
                         <Form.Control

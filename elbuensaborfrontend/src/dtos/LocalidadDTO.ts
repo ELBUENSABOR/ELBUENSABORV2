@@ -1,4 +1,4 @@
 export interface LocalidadDTO {
-    id: number;
-    nombre: string;
+  id: number;
+  nombre: string;
 }

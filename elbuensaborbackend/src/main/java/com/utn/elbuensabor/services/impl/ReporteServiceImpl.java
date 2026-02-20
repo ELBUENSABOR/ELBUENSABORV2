@@ -1,20 +1,22 @@
 package com.utn.elbuensabor.services.impl;
 
-import com.utn.elbuensabor.dtos.ProductoVendidoDTO;
-import com.utn.elbuensabor.dtos.ReporteClientesPedidosDTO;
-import com.utn.elbuensabor.dtos.ReporteProductosVendidosDTO;
-import com.utn.elbuensabor.repositories.PedidoVentaDetalleRepository;
-import com.utn.elbuensabor.repositories.PedidoVentaRepository;
-import com.utn.elbuensabor.services.ReporteService;
-import lombok.RequiredArgsConstructor;
-import org.springframework.stereotype.Service;
-
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
+import java.util.List;
 import java.util.ArrayList;
 import java.util.Comparator;
-import java.util.List;
+
+import org.springframework.stereotype.Service;
+
+import com.utn.elbuensabor.dtos.ProductoVendidoDTO;
+import com.utn.elbuensabor.dtos.ReporteClientesPedidosDTO;
+import com.utn.elbuensabor.dtos.ReporteProductosVendidosDTO;
+import com.utn.elbuensabor.repositories.PedidoVentaRepository;
+import com.utn.elbuensabor.repositories.PedidoVentaDetalleRepository;
+import com.utn.elbuensabor.services.ReporteService;
+
+import lombok.RequiredArgsConstructor;
 
 @Service
 @RequiredArgsConstructor
@@ -42,7 +44,6 @@ public class ReporteServiceImpl implements ReporteService {
 
         return new ReporteProductosVendidosDTO(productosCocina, bebidas);
     }
-
     @Override
     public List<ReporteClientesPedidosDTO> obtenerClientesPorPedidos(LocalDate desde, LocalDate hasta, String orden) {
         LocalDate fechaInicio = desde;

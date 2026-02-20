@@ -1,5 +1,5 @@
-import type {DomicilioDTO} from "./DomicilioDTO";
-import type {RolSistema} from "../models/Usuario";
+import type { DomicilioDTO } from "./DomicilioDTO";
+import type { RolSistema } from "../models/Usuario";
 
 export interface UsuarioDTO {
     id: number;
