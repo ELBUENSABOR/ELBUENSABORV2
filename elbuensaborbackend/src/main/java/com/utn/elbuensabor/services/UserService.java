@@ -1,6 +1,5 @@
 package com.utn.elbuensabor.services;
 
-import com.utn.elbuensabor.dtos.UserDTO;
 import com.utn.elbuensabor.dtos.UserEditRequestDTO;
 import com.utn.elbuensabor.dtos.UserRequestDTO;
 

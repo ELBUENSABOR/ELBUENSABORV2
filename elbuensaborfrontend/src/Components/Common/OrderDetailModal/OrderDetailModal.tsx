@@ -8,19 +8,19 @@ type OrderDetailModalProps = {
     children?: ReactNode;
 };
 
-const OrderDetailModal = ({pedido, onClose, children}: OrderDetailModalProps) => {
+const OrderDetailModal = ({ pedido, onClose, children }: OrderDetailModalProps) => {
     if (!pedido) return null;
 
     const fechaFormateada = new Date(pedido.fechaPedido).toLocaleString("es-AR");
 
     return (
         <>
-            <div className="modal fade show" style={{display: "block"}} role="dialog" aria-modal="true">
+            <div className="modal fade show" style={{ display: "block" }} role="dialog" aria-modal="true">
                 <div className="modal-dialog modal-lg modal-dialog-scrollable">
                     <div className="modal-content">
                         <div className="modal-header">
                             <h5 className="modal-title">Detalle del pedido {pedido.numero}</h5>
-                            <button type="button" className="btn-close" onClick={onClose} aria-label="Cerrar"/>
+                            <button type="button" className="btn-close" onClick={onClose} aria-label="Cerrar" />
                         </div>
                         <div className="modal-body">
                             <p>
@@ -61,7 +61,7 @@ const OrderDetailModal = ({pedido, onClose, children}: OrderDetailModalProps) =>
                                     <strong>Total:</strong> ${pedido.total}
                                 </p>
                             )}
-                            <hr/>
+                            <hr />
                             <h6>Ítems del pedido</h6>
                             {pedido.detalles.map((detalle) => (
                                 <div
@@ -106,7 +106,7 @@ const OrderDetailModal = ({pedido, onClose, children}: OrderDetailModalProps) =>
                     </div>
                 </div>
             </div>
-            <div className="modal-backdrop fade show" onClick={onClose}/>
+            <div className="modal-backdrop fade show" onClick={onClose} />
         </>
     );
 };

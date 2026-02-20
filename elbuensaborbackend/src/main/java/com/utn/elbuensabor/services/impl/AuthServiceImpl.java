@@ -1,22 +1,43 @@
 package com.utn.elbuensabor.services.impl;
 
-import com.utn.elbuensabor.dtos.*;
-import com.utn.elbuensabor.entities.*;
-import com.utn.elbuensabor.repositories.*;
-import com.utn.elbuensabor.security.JwtUtil;
+import com.utn.elbuensabor.dtos.ChangePasswordRequest;
+import com.utn.elbuensabor.dtos.GoogleAuthRequest;
 import com.utn.elbuensabor.services.AuthService;
-import jakarta.transaction.Transactional;
-import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.security.oauth2.core.OAuth2Error;
+import org.springframework.stereotype.Service;
 import org.springframework.security.oauth2.core.OAuth2TokenValidator;
 import org.springframework.security.oauth2.core.OAuth2TokenValidatorResult;
-import org.springframework.security.oauth2.jwt.*;
-import org.springframework.stereotype.Service;
+import org.springframework.security.oauth2.core.OAuth2Error;
+import org.springframework.security.oauth2.jwt.Jwt;
+import org.springframework.security.oauth2.jwt.JwtDecoder;
+import org.springframework.security.oauth2.jwt.JwtDecoders;
+import org.springframework.security.oauth2.jwt.JwtValidators;
+import org.springframework.security.oauth2.jwt.NimbusJwtDecoder;
+
+import com.utn.elbuensabor.dtos.AuthResponse;
+import com.utn.elbuensabor.dtos.LoginRequest;
+import com.utn.elbuensabor.dtos.RegisterRequest;
+import com.utn.elbuensabor.entities.Cliente;
+import com.utn.elbuensabor.entities.Domicilio;
+import com.utn.elbuensabor.entities.Localidad;
+import com.utn.elbuensabor.entities.Pais;
+import com.utn.elbuensabor.entities.Provincia;
+import com.utn.elbuensabor.entities.RolSistema;
+import com.utn.elbuensabor.entities.Usuario;
+import com.utn.elbuensabor.repositories.ClienteRepository;
+import com.utn.elbuensabor.repositories.LocalidadRepository;
+import com.utn.elbuensabor.repositories.EmpleadoRepository;
+import com.utn.elbuensabor.repositories.PaisRepository;
+import com.utn.elbuensabor.repositories.ProvinciaRepository;
+import com.utn.elbuensabor.repositories.UsuarioRepository;
+import com.utn.elbuensabor.security.JwtUtil;
+
+import jakarta.transaction.Transactional;
+import lombok.RequiredArgsConstructor;
 
 import java.util.List;
 import java.util.UUID;
@@ -240,7 +261,7 @@ public class AuthServiceImpl implements AuthService {
     }
 
     private JwtDecoder buildGoogleJwtDecoder() {
-        NimbusJwtDecoder decoder = JwtDecoders.fromIssuerLocation(googleIssuer);
+        NimbusJwtDecoder decoder = (NimbusJwtDecoder) JwtDecoders.fromIssuerLocation(googleIssuer);
         OAuth2TokenValidator<Jwt> withIssuer = JwtValidators.createDefaultWithIssuer(googleIssuer);
         OAuth2TokenValidator<Jwt> withAudience = jwt -> {
             List<String> audience = jwt.getAudience();

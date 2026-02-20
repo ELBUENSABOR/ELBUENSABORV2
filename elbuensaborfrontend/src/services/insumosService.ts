@@ -1,11 +1,11 @@
 import axios from "axios";
-import type {UnidadMedida} from "../models/UnidadMedida";
+import type { UnidadMedida } from "../models/UnidadMedida";
 
 const API_URL = import.meta.env.VITE_API_URL;
 
 const buildAuthHeaders = () => {
     const token = sessionStorage.getItem("token");
-    return token ? {Authorization: `Bearer ${token}`} : {};
+    return token ? { Authorization: `Bearer ${token}` } : {};
 };
 
 export const createInsumo = async (data: any) => {
