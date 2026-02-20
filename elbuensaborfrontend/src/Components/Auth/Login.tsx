@@ -52,7 +52,7 @@ const Login = () => {
                 msg: "¡Login exitoso!",
             });
 
-            const {token, username, role, subRole, userId, mustChangePassword, sucursalId} = resp.data;
+            const {token, username, role, subRole, userId, mustChangePassword, sucursalId, fotoPerfil} = resp.data;
             const nextUser = {
                 token,
                 username,
@@ -61,6 +61,7 @@ const Login = () => {
                 userId,
                 mustChangePassword,
                 sucursalId: sucursalId ? Number(sucursalId) : null,
+                fotoPerfil: fotoPerfil ?? null,
             };
 
             setUser(nextUser);
@@ -94,7 +95,7 @@ const Login = () => {
         setMsg({state: "", msg: ""});
         try {
             const resp = await loginWithGoogle(credential);
-            const {token, username, role, subRole, userId, mustChangePassword, sucursalId} = resp.data;
+            const {token, username, role, subRole, userId, mustChangePassword, sucursalId, fotoPerfil} = resp.data;
             const nextUser = {
                 token,
                 username,
@@ -103,6 +104,7 @@ const Login = () => {
                 userId,
                 mustChangePassword,
                 sucursalId: sucursalId ? Number(sucursalId) : null,
+                fotoPerfil: fotoPerfil ?? null,
             };
 
             setUser(nextUser);

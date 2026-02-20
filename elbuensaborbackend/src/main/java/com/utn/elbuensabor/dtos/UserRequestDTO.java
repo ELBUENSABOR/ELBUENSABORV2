@@ -30,7 +30,8 @@ public record UserRequestDTO(
         @Valid
         DomicilioDTO domicilio,
         PerfilEmpleado perfilEmpleado,
-        Long sucursalId
+        Long sucursalId,
+        String fotoPerfil
 ) {
     public boolean isSucursalValidaParaRol() {
         return rolSistema != RolSistema.EMPLEADO || sucursalId != null;

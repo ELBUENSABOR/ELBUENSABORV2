@@ -23,6 +23,7 @@ export const UserProvider = ({children}: { children: ReactNode }) => {
         const userId = getStoredItem("userId");
         const sucursalIdRaw = getStoredItem("sucursalId");
         const mustChangePasswordStr = getStoredItem("mustChangePassword");
+        const fotoPerfil = getStoredItem("fotoPerfil");
         const lastActivityStr = getStoredItem("lastActivity");
         // si no hay datos básicos, no hay sesión
         if (!token || !username || !role || !userId) {
@@ -43,6 +44,7 @@ export const UserProvider = ({children}: { children: ReactNode }) => {
                 sessionStorage.removeItem("subRole");
                 sessionStorage.removeItem("userId");
                 sessionStorage.removeItem("mustChangePassword");
+                sessionStorage.removeItem("fotoPerfil");
                 sessionStorage.removeItem("lastActivity");
                 return null;
             }
@@ -56,6 +58,7 @@ export const UserProvider = ({children}: { children: ReactNode }) => {
             userId,
             mustChangePassword: mustChangePasswordStr === "true",
             sucursalId: sucursalIdRaw ? Number(sucursalIdRaw) : null,
+            fotoPerfil: fotoPerfil ?? null,
         };
     });
 
@@ -73,6 +76,11 @@ export const UserProvider = ({children}: { children: ReactNode }) => {
             "mustChangePassword",
             user.mustChangePassword ? "true" : "false"
         );
+        if (user.fotoPerfil) {
+            sessionStorage.setItem("fotoPerfil", user.fotoPerfil);
+        } else {
+            sessionStorage.removeItem("fotoPerfil");
+        }
         if (user.sucursalId !== undefined && user.sucursalId !== null) {
             sessionStorage.setItem("sucursalId", user.sucursalId.toString());
         } else {
@@ -89,6 +97,7 @@ export const UserProvider = ({children}: { children: ReactNode }) => {
         sessionStorage.removeItem("subRole");
         sessionStorage.removeItem("userId");
         sessionStorage.removeItem("mustChangePassword");
+        sessionStorage.removeItem("fotoPerfil");
         sessionStorage.removeItem("sucursalId");
         sessionStorage.removeItem("lastActivity");
         setUserState(null);

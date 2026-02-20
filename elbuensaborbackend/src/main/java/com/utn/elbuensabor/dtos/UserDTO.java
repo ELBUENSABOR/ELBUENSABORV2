@@ -14,7 +14,8 @@ public record UserDTO(
         RolSistema rolSistema,
         boolean activo,
         Long sucursalId,
-        PerfilEmpleado perfilEmpleado) {
+        PerfilEmpleado perfilEmpleado,
+        String fotoPerfil) {
 
     public record Domicilio(String calle, Integer codigoPostal, String numero, LocalidadDTO localidad) {
 

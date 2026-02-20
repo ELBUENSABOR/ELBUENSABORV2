@@ -248,3 +248,31 @@
         color: hsl(var(--primary-foreground));
     }
 }
+
+.navbar-user-trigger {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.navbar-user-name {
+    font-weight: 500;
+}
+
+.navbar-user-avatar {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    border: 2px solid hsl(var(--primary));
+    object-fit: cover;
+    background: hsl(var(--secondary));
+}
+
+.navbar-user-avatar--fallback {
+    padding: 3px;
+    color: hsl(var(--primary));
+}
+
+.navbar-actions .dropdown-toggle::after {
+    margin-left: 0.55rem;
+}

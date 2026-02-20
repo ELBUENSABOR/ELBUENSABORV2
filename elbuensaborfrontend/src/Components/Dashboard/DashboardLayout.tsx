@@ -3,12 +3,13 @@ import {useState} from "react";
 import {FaRegArrowAltCircleRight} from "react-icons/fa";
 import {FiExternalLink, FiGrid} from "react-icons/fi";
 import {NavDropdown} from "react-bootstrap";
+import {HiOutlineUserCircle} from "react-icons/hi";
 import Sidebar from "./Sidebar/Sidebar";
 import "./dashboard.css";
 import {useUser} from "../../contexts/UsuarioContext";
 import {getEmployeePanelLabel} from "../../utils/employeePanel";
 import {ChangePasswordPopup} from "../Home/ChangePasswordPopup";
-
+import {getImageUrl} from "../../utils/image";
 
 const DashboardLayout = () => {
     const [open, setOpen] = useState(false);
@@ -17,6 +18,8 @@ const DashboardLayout = () => {
     const panelTitle = isEmployee
         ? getEmployeePanelLabel(user?.subRole)
         : "Panel de Administración";
+
+    const profilePhotoUrl = user?.fotoPerfil ? getImageUrl(user.fotoPerfil) : "";
 
     return (
         <div className="d-flex layout-dashboard">
@@ -43,7 +46,20 @@ const DashboardLayout = () => {
                             </a>
                         )}
                         <NavDropdown
-                            title={user?.username ?? "Cuenta"}
+                            title={
+                                <span className="navbar-user-trigger">
+                                    <span className="navbar-user-name">{user?.username ?? "Cuenta"}</span>
+                                    {profilePhotoUrl ? (
+                                        <img
+                                            src={profilePhotoUrl}
+                                            alt="Foto de perfil"
+                                            className="navbar-user-avatar"
+                                        />
+                                    ) : (
+                                        <HiOutlineUserCircle className="navbar-user-avatar navbar-user-avatar--fallback"/>
+                                    )}
+                                </span>
+                            }
                             id="dashboard-user-dropdown"
                             align="end"
                         >

@@ -11,4 +11,5 @@ export interface UsuarioDTO {
     domicilio: DomicilioDTO;
     rolSistema: RolSistema;
     activo?: boolean;
+    fotoPerfil?: string | null;
 }

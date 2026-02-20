@@ -14,4 +14,5 @@ export interface UserEditRequestDTO {
     };
     perfilEmpleado?: string | null;
     sucursalId?: number;
+    fotoPerfil?: string | null;
 }

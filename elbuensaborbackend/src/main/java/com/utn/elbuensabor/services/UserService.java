@@ -4,6 +4,7 @@ import com.utn.elbuensabor.dtos.UserDTO;
 import com.utn.elbuensabor.dtos.UserEditRequestDTO;
 import com.utn.elbuensabor.dtos.UserRequestDTO;
 
+import org.springframework.web.multipart.MultipartFile;
 import java.util.List;
 
 public interface UserService {
@@ -17,4 +18,6 @@ public interface UserService {
     UserDTO updateUser(Long id, UserEditRequestDTO userDTO);
 
     UserDTO deleteUser(Long id);
+
+    UserDTO updateProfilePhoto(Long id, MultipartFile file);
 }

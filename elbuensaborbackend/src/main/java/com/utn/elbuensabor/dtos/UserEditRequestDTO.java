@@ -23,7 +23,8 @@ public record UserEditRequestDTO(
         @Valid
         UserRequestDTO.DomicilioDTO domicilio,
         PerfilEmpleado perfilEmpleado,
-        Long sucursalId
+        Long sucursalId,
+        String fotoPerfil
 ) {
 
     public boolean isSucursalValidaParaRol() {

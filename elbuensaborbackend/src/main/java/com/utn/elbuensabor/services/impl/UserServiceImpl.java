@@ -10,8 +10,14 @@ import com.utn.elbuensabor.services.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.StandardCopyOption;
 import java.util.List;
+import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
@@ -41,6 +47,7 @@ public class UserServiceImpl implements UserService {
         usuario.setPassword(encoder.encode(dto.password()));
         usuario.setActivo(true);
         usuario.setRolSistema(dto.rolSistema());
+        usuario.setFotoPerfil(dto.fotoPerfil());
 
         // si es EMPLEADO → debe cambiar la contraseña en el primer login
         if (dto.rolSistema() == RolSistema.EMPLEADO) {
@@ -156,6 +163,7 @@ public class UserServiceImpl implements UserService {
 
         usuario.setUsername(userDTO.username());
         usuario.setActivo(true);
+        usuario.setFotoPerfil(userDTO.fotoPerfil());
 
         if (userDTO.password() != null && !userDTO.password().isBlank()) {
             usuario.setPassword(encoder.encode(userDTO.password()));
@@ -225,6 +233,38 @@ public class UserServiceImpl implements UserService {
         return mapToUserDTO(usuario);
     }
 
+
+    public UserDTO updateProfilePhoto(Long id, MultipartFile file) {
+
+        if (file == null || file.isEmpty()) {
+            throw new IllegalArgumentException("Debe seleccionar una imagen");
+        }
+
+        Usuario usuario = usuarioRepository.findByIdWithClienteEmpleadoAndDomicilio(id)
+                .orElseThrow(() -> new RuntimeException("Usuario no encontrado"));
+
+        String originalName = file.getOriginalFilename();
+        String safeName = (originalName == null || originalName.isBlank())
+                ? "perfil.jpg"
+                : originalName.replaceAll("[^a-zA-Z0-9._-]", "_");
+
+        Path uploadDir = Path.of("uploads", "perfiles");
+        String fileName = UUID.randomUUID() + "_" + safeName;
+
+        try {
+            Files.createDirectories(uploadDir);
+            Path destination = uploadDir.resolve(fileName);
+            Files.copy(file.getInputStream(), destination, StandardCopyOption.REPLACE_EXISTING);
+        } catch (IOException e) {
+            throw new RuntimeException("No se pudo guardar la imagen de perfil", e);
+        }
+
+        usuario.setFotoPerfil("/uploads/perfiles/" + fileName);
+        usuarioRepository.save(usuario);
+
+        return mapToUserDTO(usuario);
+    }
+
     private UserDTO mapToUserDTO(Usuario u) {
 
         Cliente cliente = u.getCliente();
@@ -276,7 +316,8 @@ public class UserServiceImpl implements UserService {
                 u.getRolSistema(),
                 u.getActivo(),
                 u.getSucursal() != null ? u.getSucursal().getId() : null,
-                perfilEmpleado);
+                perfilEmpleado,
+                u.getFotoPerfil());
     }
 
 }
