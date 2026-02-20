@@ -32,8 +32,7 @@ public class PedidoServiceImpl implements PedidoService {
     @Transactional
     public PedidoResponse create(PedidoRequest request) {
         // Validar cliente
-        Cliente cliente = clienteRepository.findById(request.clienteId())
-                .orElseThrow(() -> new IllegalArgumentException("Cliente no encontrado"));
+        Cliente cliente = resolveCliente(request.clienteId());
 
         // Validar sucursal
         SucursalEmpresa sucursal = sucursalRepository.findById(request.sucursalId())
@@ -155,9 +154,16 @@ public class PedidoServiceImpl implements PedidoService {
     }
 
     public List<PedidoResponse> getByClienteId(Long clienteId) {
-        return pedidoRepository.findByClienteIdWithDetalles(clienteId).stream()
+        Cliente cliente = resolveCliente(clienteId);
+        return pedidoRepository.findByClienteIdWithDetalles(cliente.getId()).stream()
                 .map(this::mapToResponse)
                 .collect(Collectors.toList());
+    }
+
+    private Cliente resolveCliente(Long clienteOrUsuarioId) {
+        return clienteRepository.findById(clienteOrUsuarioId)
+                .or(() -> clienteRepository.findByUsuarioId(clienteOrUsuarioId))
+                .orElseThrow(() -> new IllegalArgumentException("Cliente no encontrado"));
     }
 
     public List<PedidoResponse> getByEstado(EstadoPedido estado) {
