@@ -1,5 +1,5 @@
 import {useEffect, useState} from "react";
-import {getLocalidades, loginWithGoogle, registerUser} from "../../services/authService";
+import {registerUser, getLocalidades, loginWithGoogle} from "../../services/authService";
 import "./auth.css";
 import type {RegisterRequest} from "../../dtos/RegisterRequest";
 import {Link, useNavigate} from "react-router-dom";
@@ -321,7 +321,7 @@ const Register = () => {
                 <div className="auth-divider">
                     <span>o</span>
                 </div>
-                <GoogleAuthButton onSuccess={handleGoogleRegister} text="signup_with"/>
+                <GoogleAuthButton onSuccess={handleGoogleRegister} text="signup_with" />
 
                 {msg.msg && (
                     <p

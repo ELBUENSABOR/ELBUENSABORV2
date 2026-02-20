@@ -1,5 +1,5 @@
-import {createContext, type ReactNode, useContext, useMemo, useState} from "react";
-import type {CartItem} from "../models/CartItem";
+import { createContext, useContext, useMemo, useState, type ReactNode } from "react";
+import type { CartItem } from "../models/CartItem";
 
 interface CartContextType {
     items: CartItem[];
@@ -12,7 +12,7 @@ interface CartContextType {
 
 const CartContext = createContext<CartContextType | undefined>(undefined);
 
-export const CartProvider = ({children}: { children: ReactNode }) => {
+export const CartProvider = ({ children }: { children: ReactNode }) => {
     const [items, setItems] = useState<CartItem[]>([]);
 
     const addItem = (item: CartItem) => {
@@ -21,7 +21,7 @@ export const CartProvider = ({children}: { children: ReactNode }) => {
             if (existing) {
                 return prev.map(i =>
                     i.manufacturadoId === item.manufacturadoId
-                        ? {...i, cantidad: i.cantidad + item.cantidad}
+                        ? { ...i, cantidad: i.cantidad + item.cantidad }
                         : i
                 );
             }
@@ -37,7 +37,7 @@ export const CartProvider = ({children}: { children: ReactNode }) => {
         setItems(prev =>
             prev.map(i =>
                 i.manufacturadoId === manufacturadoId
-                    ? {...i, cantidad}
+                    ? { ...i, cantidad }
                     : i
             )
         );
@@ -52,7 +52,7 @@ export const CartProvider = ({children}: { children: ReactNode }) => {
 
     return (
         <CartContext.Provider
-            value={{items, addItem, removeItem, updateQuantity, clearCart, total}}
+            value={{ items, addItem, removeItem, updateQuantity, clearCart, total }}
         >
             {children}
         </CartContext.Provider>

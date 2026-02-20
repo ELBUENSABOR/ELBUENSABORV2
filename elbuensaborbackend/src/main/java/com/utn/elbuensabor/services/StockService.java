@@ -1,10 +1,10 @@
 package com.utn.elbuensabor.services;
 
+import java.util.List;
+
 import com.utn.elbuensabor.dtos.StockAlertaDTO;
 import com.utn.elbuensabor.entities.PedidoVenta;
 import com.utn.elbuensabor.entities.SucursalInsumo;
-
-import java.util.List;
 
 
 public interface StockService {

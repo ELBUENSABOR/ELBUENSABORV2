@@ -2,6 +2,7 @@ import {useEffect, useState} from "react";
 import type {InsumoRequest} from "../../../models/Insumo";
 import type {Sucursal} from "../../../models/Sucursal";
 import type {Rubro} from "../../../models/Rubro";
+import type {Imagen} from "../../../models/Imagen";
 import type {UnidadMedida} from "../../../models/UnidadMedida";
 import {fetchSucursales} from "../../../services/dashboardService";
 import {getRubrosInsumos} from "../../../services/rubrosService";
@@ -14,7 +15,8 @@ import {
 } from "../../../services/insumosService";
 import {useSucursal} from "../../../contexts/SucursalContext";
 import {useUser} from "../../../contexts/UsuarioContext";
-import {useNavigate, useParams} from "react-router-dom";
+import {useParams} from "react-router-dom";
+import {useNavigate} from "react-router-dom";
 
 const initialState: InsumoRequest = {
     id: 0,

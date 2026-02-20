@@ -2,7 +2,11 @@ import React, {useEffect, useState} from "react";
 import {useNavigate, useParams} from "react-router-dom";
 import type {Rubro} from "../../../models/Rubro";
 import {useUser} from "../../../contexts/UsuarioContext";
-import {createRubro, getRubroInsumoById, updateRubro,} from "../../../services/rubrosService";
+import {
+    createRubro,
+    getRubroInsumoById,
+    updateRubro,
+} from "../../../services/rubrosService";
 
 const initialState: Rubro = {
     id: 0,
@@ -57,7 +61,7 @@ const AddRubroInsumo = () => {
     }, [id, token, isEdit]);
 
     const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-        const {name, value, type, checked} = e.target;
+        const { name, value, type, checked } = e.target;
         setForm((prev) => ({
             ...prev,
             [name]: type === "checkbox" ? checked : value,

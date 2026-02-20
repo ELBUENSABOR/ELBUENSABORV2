@@ -1,5 +1,5 @@
 import axios from "axios";
-import type {Sucursal} from "../models/Sucursal";
+import type { Sucursal } from "../models/Sucursal";
 
 const API_BASE = import.meta.env.VITE_API_URL ?? "";
 

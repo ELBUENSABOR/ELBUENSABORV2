@@ -1,5 +1,5 @@
-import React, {useEffect, useState} from 'react';
-import {Alert, Button, Col, Form, Row, Spinner, Table} from 'react-bootstrap';
+import React, {useState, useEffect} from 'react';
+import {Form, Button, Row, Col, Alert, Spinner, Table} from 'react-bootstrap';
 import {getAll, getAllComprasInsumos, registrarCompraInsumo} from '../../../services/insumosService';
 import {useSucursal} from '../../../contexts/SucursalContext';
 import {useLocation, useNavigate} from 'react-router-dom';
