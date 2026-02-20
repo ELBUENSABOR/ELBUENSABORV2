@@ -1,4 +1,11 @@
-import {Building2, DollarSign, Package, ShoppingBag, TrendingUp, Users} from "lucide-react";
+import {
+    Building2,
+    Users,
+    Package,
+    DollarSign,
+    TrendingUp,
+    ShoppingBag
+} from "lucide-react";
 
 const DashboardHome = () => {
     return (

@@ -1,9 +1,8 @@
 package com.utn.elbuensabor.controllers;
 
-import com.utn.elbuensabor.dtos.ReporteClientesPedidosDTO;
-import com.utn.elbuensabor.dtos.ReporteProductosVendidosDTO;
-import com.utn.elbuensabor.services.ReporteService;
-import lombok.RequiredArgsConstructor;
+import java.time.LocalDate;
+import java.util.List;
+
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -11,8 +10,11 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.time.LocalDate;
-import java.util.List;
+import com.utn.elbuensabor.dtos.ReporteProductosVendidosDTO;
+import com.utn.elbuensabor.dtos.ReporteClientesPedidosDTO;
+import com.utn.elbuensabor.services.ReporteService;
+
+import lombok.RequiredArgsConstructor;
 
 @RestController
 @RequestMapping("/api/reportes")

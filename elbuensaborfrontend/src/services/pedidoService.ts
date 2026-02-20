@@ -128,7 +128,7 @@ export const getPedidosByCliente = async (clienteId: number) => {
         const res = await axios.get(
             `${API_URL}/pedidos`,
             {
-                params: {clienteId},
+                params: { clienteId },
                 headers: {
                     Authorization: `Bearer ${token}`,
                 },
@@ -185,7 +185,7 @@ export const cambiarEstadoPedido = async (pedidoId: number, estado: string) => {
 
         const res = await axios.put(
             `${API_URL}/pedidos/${pedidoId}/estado`,
-            {estado},
+            { estado },
             {
                 headers: {
                     Authorization: `Bearer ${token}`,

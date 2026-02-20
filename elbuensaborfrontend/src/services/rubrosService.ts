@@ -131,14 +131,14 @@ export const deleteRubroInsumoService = async (id: number) => {
 };
 
 export const deleteRubroManufacturadoService = async (id: number) => {
-    try {
-        return axios.delete(`${API_BASE}/manufacturados/rubros/${id}`, {
-            headers: {
-                Authorization: `Bearer ${sessionStorage.getItem("token")}`,
-            },
-            withCredentials: true,
-        });
-    } catch (error) {
-        throw error;
-    }
+  try {
+    return axios.delete(`${API_BASE}/manufacturados/rubros/${id}`, {
+      headers: {
+        Authorization: `Bearer ${sessionStorage.getItem("token")}`,
+      },
+      withCredentials: true,
+    });
+  } catch (error) {
+    throw error;
+  }
 };

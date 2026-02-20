@@ -1,16 +1,16 @@
-import {type ChangeEvent, useEffect, useMemo, useState} from "react";
-import {Alert, Button, Form, Spinner} from "react-bootstrap";
-import {useNavigate} from "react-router-dom";
-import {useSucursal} from "../../../contexts/SucursalContext";
-import type {InsumoResponse} from "../../../models/Insumo";
-import {getAll} from "../../../services/insumosService";
+import { useEffect, useMemo, useState, type ChangeEvent } from "react";
+import { Alert, Button, Form, Spinner } from "react-bootstrap";
+import { useNavigate } from "react-router-dom";
+import { useSucursal } from "../../../contexts/SucursalContext";
+import type { InsumoResponse } from "../../../models/Insumo";
+import { getAll } from "../../../services/insumosService";
 
 const StockAlert = () => {
     const [insumos, setInsumos] = useState<InsumoResponse[]>([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
     const [thresholdPercent, setThresholdPercent] = useState(20);
-    const {sucursales, sucursalId, setSucursalId, loading: loadingSucursal} = useSucursal();
+    const { sucursales, sucursalId, setSucursalId, loading: loadingSucursal } = useSucursal();
     const navigate = useNavigate();
 
     useEffect(() => {
@@ -47,9 +47,9 @@ const StockAlert = () => {
         setSucursalId(value ? Number(value) : null);
     };
 
-    const {lowStock, nearStock} = useMemo(() => {
+    const { lowStock, nearStock } = useMemo(() => {
         if (!sucursalId) {
-            return {lowStock: [], nearStock: []};
+            return { lowStock: [], nearStock: [] };
         }
 
         const low: Array<InsumoResponse & {
@@ -70,13 +70,13 @@ const StockAlert = () => {
 
             const limiteCercano = stockMinimo * (1 + thresholdPercent / 100);
             if (stockActual < stockMinimo) {
-                low.push({...insumo, stockActual, stockMinimo});
+                low.push({ ...insumo, stockActual, stockMinimo });
             } else if (stockActual <= limiteCercano) {
-                near.push({...insumo, stockActual, stockMinimo});
+                near.push({ ...insumo, stockActual, stockMinimo });
             }
         });
 
-        return {lowStock: low, nearStock: near};
+        return { lowStock: low, nearStock: near };
     }, [insumos, sucursalId, thresholdPercent]);
 
     const renderTable = (
@@ -91,39 +91,39 @@ const StockAlert = () => {
             <div className="table-responsive">
                 <table className="table table-hover dashboard-table">
                     <thead>
-                    <tr>
-                        <th>Ingrediente</th>
-                        <th>Unidad</th>
-                        <th>Stock mínimo</th>
-                        <th>Stock actual</th>
-                        <th>Diferencia</th>
-                        <th>Acciones</th>
-                    </tr>
+                        <tr>
+                            <th>Ingrediente</th>
+                            <th>Unidad</th>
+                            <th>Stock mínimo</th>
+                            <th>Stock actual</th>
+                            <th>Diferencia</th>
+                            <th>Acciones</th>
+                        </tr>
                     </thead>
                     <tbody>
-                    {items.map((insumo) => {
-                        const diferencia = insumo.stockActual - insumo.stockMinimo;
-                        return (
+                        {items.map((insumo) => {
+                            const diferencia = insumo.stockActual - insumo.stockMinimo;
+                            return (
                             <tr key={insumo.id ?? insumo.denominacion}>
-                                <td>{insumo.denominacion}</td>
-                                <td>{insumo.unidadMedida.denominacion}</td>
-                                <td>{insumo.stockMinimo}</td>
-                                <td>{insumo.stockActual}</td>
-                                <td className={diferencia < 0 ? "text-danger fw-semibold" : "text-warning fw-semibold"}>
-                                    {diferencia}
-                                </td>
-                                <td>
-                                    <Button
-                                        size="sm"
-                                        variant="primary"
-                                        onClick={() => navigate("/dashboard/compras", {state: {insumoId: insumo.id}})}
-                                    >
-                                        Registrar compra
-                                    </Button>
-                                </td>
-                            </tr>
-                        );
-                    })}
+                                    <td>{insumo.denominacion}</td>
+                                    <td>{insumo.unidadMedida.denominacion}</td>
+                                    <td>{insumo.stockMinimo}</td>
+                                    <td>{insumo.stockActual}</td>
+                                    <td className={diferencia < 0 ? "text-danger fw-semibold" : "text-warning fw-semibold"}>
+                                        {diferencia}
+                                    </td>
+                                    <td>
+                                        <Button
+                                            size="sm"
+                                            variant="primary"
+                                            onClick={() => navigate("/dashboard/compras", { state: { insumoId: insumo.id } })}
+                                        >
+                                            Registrar compra
+                                        </Button>
+                                    </td>
+                                </tr>
+                            );
+                        })}
                     </tbody>
                 </table>
             </div>
@@ -187,7 +187,7 @@ const StockAlert = () => {
 
             {!sucursalId ? null : loading ? (
                 <div className="text-center p-3">
-                    <Spinner animation="border" variant="primary"/>
+                    <Spinner animation="border" variant="primary" />
                     <p className="mt-2">Cargando insumos...</p>
                 </div>
             ) : (
