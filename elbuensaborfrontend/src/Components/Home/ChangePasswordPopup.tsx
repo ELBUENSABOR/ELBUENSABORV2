@@ -1,12 +1,12 @@
-import { useState } from "react";
+import {useState} from "react";
 import axios from "axios";
-import { useUser } from "../../contexts/UsuarioContext.tsx";
-import { FiLock } from "react-icons/fi";
+import {useUser} from "../../contexts/UsuarioContext.tsx";
+import {FiLock} from "react-icons/fi";
 
 const API_URL = import.meta.env.VITE_API_URL;
 
 export const ChangePasswordPopup = () => {
-    const { user, setUser } = useUser();
+    const {user, setUser} = useUser();
 
     const [oldPass, setOldPass] = useState("");
     const [newPass, setNewPass] = useState("");
@@ -26,15 +26,15 @@ export const ChangePasswordPopup = () => {
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
-        setMsg({ type: "", text: "" });
+        setMsg({type: "", text: ""});
 
         if (!oldPass || !newPass || !confirm) {
-            setMsg({ type: "error", text: "Debes completar todos los campos." });
+            setMsg({type: "error", text: "Debes completar todos los campos."});
             return;
         }
 
         if (newPass !== confirm) {
-            setMsg({ type: "error", text: "Las nuevas contraseñas no coinciden." });
+            setMsg({type: "error", text: "Las nuevas contraseñas no coinciden."});
             return;
         }
 
@@ -52,7 +52,7 @@ export const ChangePasswordPopup = () => {
 
             await axios.post(
                 `${API_URL}/auth/change-password`,
-                { oldPassword: oldPass, newPassword: newPass },
+                {oldPassword: oldPass, newPassword: newPass},
                 {
                     headers: {
                         Authorization: `Bearer ${sessionStorage.getItem("token")}`,
@@ -66,7 +66,7 @@ export const ChangePasswordPopup = () => {
                 mustChangePassword: false,
             });
 
-            setMsg({ type: "success", text: "Contraseña actualizada correctamente." });
+            setMsg({type: "success", text: "Contraseña actualizada correctamente."});
             setOldPass("");
             setNewPass("");
             setConfirm("");
@@ -92,7 +92,7 @@ export const ChangePasswordPopup = () => {
             <div className="password-modal">
                 <div className="password-modal-header">
                     <div className="password-modal-icon">
-                        <FiLock />
+                        <FiLock/>
                     </div>
                     <div>
                         <h3>Cambiar contraseña</h3>

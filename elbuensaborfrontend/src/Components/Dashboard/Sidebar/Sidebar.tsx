@@ -3,17 +3,7 @@ import {useUser} from "../../../contexts/UsuarioContext";
 import "./sidebar.css";
 import {getEmployeePanelLabel} from "../../../utils/employeePanel";
 
-import {
-    Home,
-    Building2,
-    Users,
-    Tags,
-    Package,
-    Boxes,
-    Factory,
-    BarChart3,
-    ClipboardList
-} from "lucide-react";
+import {BarChart3, Boxes, Building2, ClipboardList, Factory, Home, Package, Tags, Users} from "lucide-react";
 
 const links = [
     {

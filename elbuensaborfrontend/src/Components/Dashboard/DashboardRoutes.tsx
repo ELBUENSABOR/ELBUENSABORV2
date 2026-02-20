@@ -30,7 +30,7 @@ const DashboardIndex = () => {
     const {user} = useUser();
 
     if (user?.role === "EMPLEADO") {
-        return <EmployeeDashboardHome subRole={user.subRole} />;
+        return <EmployeeDashboardHome subRole={user.subRole}/>;
     }
 
     return <DashboardHome/>;
@@ -105,11 +105,11 @@ const DashboardRoutes = () => (
             <Route element={<PrivateRoute roles={["ADMIN", "EMPLEADO"]}/>}>
                 <Route path="pedidos" element={<PedidosAdmin/>}/>
             </Route>
-            <Route element={<PrivateRoute roles={["COCINERO", "ADMIN"]} />}>
-                <Route path="cocina" element={<PedidosCocina />} />
+            <Route element={<PrivateRoute roles={["COCINERO", "ADMIN"]}/>}>
+                <Route path="cocina" element={<PedidosCocina/>}/>
             </Route>
-            <Route element={<PrivateRoute roles={["DELIVERY", "ADMIN"]} />}>
-                <Route path="delivery" element={<PedidosDelivery />} />
+            <Route element={<PrivateRoute roles={["DELIVERY", "ADMIN"]}/>}>
+                <Route path="delivery" element={<PedidosDelivery/>}/>
             </Route>
         </Route>
     </Routes>

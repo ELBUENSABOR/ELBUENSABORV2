@@ -1,12 +1,4 @@
-import {
-    AlertTriangle,
-    ClipboardList,
-    Clock3,
-    Package,
-    Receipt,
-    ShoppingBag,
-    Truck
-} from "lucide-react";
+import {AlertTriangle, ClipboardList, Clock3, Package, Receipt, ShoppingBag, Truck} from "lucide-react";
 
 type EmployeeDashboardHomeProps = {
     subRole?: string | null;
@@ -148,7 +140,7 @@ const EmployeeDashboardHome = ({subRole}: EmployeeDashboardHomeProps) => {
                             <strong>{card.value}</strong>
                             <p className="summary-detail">{card.description}</p>
                         </div>
-                        <card.icon className="summary-icon" size={16} />
+                        <card.icon className="summary-icon" size={16}/>
                     </article>
                 ))}
             </section>
