@@ -75,11 +75,7 @@ const InsumoForm = () => {
                     unidadMedidaId: insumo.unidadMedida.id,
                 }));
 
-                setImagenesActuales(
-                    insumo.imagenes.map((url: string) => ({
-                        url
-                    }))
-                );
+                setImagenesActuales(insumo.imagenes || []);
             }
         };
 
@@ -150,7 +146,7 @@ const InsumoForm = () => {
             navigate("/dashboard/productos-insumos");
         } catch (error) {
             console.error(error);
-            alert("Error al crear el insumo");
+            alert(isEdit ? "Error al actualizar el insumo" : "Error al crear el insumo");
         }
     };
 
@@ -388,7 +384,7 @@ const InsumoForm = () => {
                             {imagenesActuales.map((img, index) => (
                                 <div key={index} className="position-relative">
                                     <img
-                                        src={`${BACKEND_URL}${img.url}`}
+                                        src={`${BACKEND_URL}${img}`}
                                         alt="Imagen producto"
                                         style={{
                                             width: 150,
