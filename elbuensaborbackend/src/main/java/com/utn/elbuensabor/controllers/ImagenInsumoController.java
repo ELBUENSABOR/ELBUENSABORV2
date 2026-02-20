@@ -1,6 +1,8 @@
 package com.utn.elbuensabor.controllers;
 
 import com.utn.elbuensabor.entities.ArticuloInsumo;
+import com.utn.elbuensabor.entities.ArticuloManufacturado;
+import com.utn.elbuensabor.entities.ImagenArticuloManufacturado;
 import com.utn.elbuensabor.entities.ImagenInsumo;
 import com.utn.elbuensabor.repositories.ArticuloInsumoRepository;
 import lombok.RequiredArgsConstructor;

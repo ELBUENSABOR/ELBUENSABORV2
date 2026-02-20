@@ -1,4 +1,4 @@
-import type {Rubro} from "../../../models/Rubro";
+import type { Rubro } from "../../../models/Rubro";
 
 const CategoryNode = ({
                           node,

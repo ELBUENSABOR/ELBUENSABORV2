@@ -1,7 +1,7 @@
-import {Modal} from "react-bootstrap";
-import type {Ingredientes} from "../../../../models/Insumo";
+import { Modal } from "react-bootstrap";
+import type { Ingredientes } from "../../../../models/Insumo";
 import "./ingredientesModal.css";
-import {useEffect, useState} from "react";
+import { useEffect, useState } from "react";
 
 const BACKEND_URL = "http://localhost:8080";
 
@@ -40,12 +40,12 @@ const IngredientesModal = ({
             if (existe) {
                 return prev.map(i =>
                     i.insumoId === ingrediente.insumoId
-                        ? {...i, cantidad}
+                        ? { ...i, cantidad }
                         : i
                 );
             }
 
-            return [...prev, {...ingrediente, cantidad}];
+            return [...prev, { ...ingrediente, cantidad }];
         });
 
         setSelected(null);
@@ -75,8 +75,7 @@ const IngredientesModal = ({
                         );
 
                         return (
-                            <div key={ingrediente.insumoId}
-                                 className={ingrediente.activo && seleccionado ? "ingrediente-card selected" : ingrediente.activo && !seleccionado ? "ingrediente-card" : "ingrediente-card disabled"}>
+                            <div key={ingrediente.insumoId} className={ingrediente.activo && seleccionado ? "ingrediente-card selected" : ingrediente.activo && !seleccionado ? "ingrediente-card" : "ingrediente-card disabled"}>
                                 <div
                                     className="ingrediente-card-header"
                                     onClick={() => setSelected(selected === index ? null : index)}
@@ -84,8 +83,7 @@ const IngredientesModal = ({
                                     <div className="d-flex align-items-center gap-2">
                                         {ingrediente.denominacion}
                                         {ingrediente.imagenes.length > 0 && (
-                                            <img src={`${BACKEND_URL}${ingrediente.imagenes[0]}`}
-                                                 alt={ingrediente.denominacion} className="img-ingrediente"/>
+                                            <img src={`${BACKEND_URL}${ingrediente.imagenes[0]}`} alt={ingrediente.denominacion} className="img-ingrediente" />
                                         )}
                                     </div>
                                     {seleccionado ? (
@@ -97,7 +95,7 @@ const IngredientesModal = ({
 
                                 {selected === index && (
                                     <div className="ingrediente-info">
-                                        <hr/>
+                                        <hr />
                                         <p>- Stock actual: {ingrediente.stockActual || 0} {ingrediente.unidadMedida}</p>
                                         <p>Cantidad ({ingrediente.unidadMedida})</p>
                                         <input

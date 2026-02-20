@@ -1,5 +1,8 @@
 import {useEffect, useMemo, useState} from "react";
-import {fetchProductosMasVendidos, ReporteProductosVendidosDTO,} from "../../../services/reportesService";
+import {
+    fetchProductosMasVendidos,
+    ReporteProductosVendidosDTO,
+} from "../../../services/reportesService";
 
 const formatDateInput = (date: Date) => {
     const year = date.getFullYear();
@@ -66,8 +69,7 @@ const ProductosMasVendidos = () => {
 
     return (
         <div className="dashboard-table-card">
-            <div
-                className="dashboard-table-header d-flex flex-column flex-md-row align-items-md-center gap-3 justify-content-between">
+            <div className="dashboard-table-header d-flex flex-column flex-md-row align-items-md-center gap-3 justify-content-between">
                 <div>
                     <h5 className="mb-1">Productos más vendidos</h5>
                     <small className="text-muted">

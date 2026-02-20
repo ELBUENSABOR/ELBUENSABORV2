@@ -1,8 +1,7 @@
 package com.utn.elbuensabor.config;
 
-import com.utn.elbuensabor.repositories.UsuarioRepository;
-import com.utn.elbuensabor.security.JwtFilter;
-import com.utn.elbuensabor.security.JwtUtil;
+import java.util.List;
+
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
@@ -18,7 +17,9 @@ import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
-import java.util.List;
+import com.utn.elbuensabor.repositories.UsuarioRepository;
+import com.utn.elbuensabor.security.JwtFilter;
+import com.utn.elbuensabor.security.JwtUtil;
 
 @Configuration
 public class SecurityConfig {
@@ -27,10 +28,10 @@ public class SecurityConfig {
     public UserDetailsService userDetailsService(UsuarioRepository usuarioRepo) {
         return username -> usuarioRepo.findByUsername(username)
                 .map(u -> org.springframework.security.core.userdetails.User
-                        .withUsername(u.getUsername())
-                        .password(u.getPassword())
-                        .roles(u.getRolSistema().name())
-                        .build())
+                .withUsername(u.getUsername())
+                .password(u.getPassword())
+                .roles(u.getRolSistema().name())
+                .build())
                 .orElseThrow(() -> new RuntimeException("Usuario no encontrado"));
     }
 

@@ -1,10 +1,11 @@
 package com.utn.elbuensabor.repositories;
 
-import com.utn.elbuensabor.entities.ArticuloInsumo;
+import java.util.Optional;
+
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
-import java.util.Optional;
+import com.utn.elbuensabor.entities.ArticuloInsumo;
 
 @Repository
 public interface ArticuloInsumoRepository extends JpaRepository<ArticuloInsumo, Long> {

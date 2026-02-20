@@ -8,5 +8,4 @@ public record AuthResponse(
         String userId,
         boolean mustChangePassword,
         String sucursalId
-) {
-}
+) {}
