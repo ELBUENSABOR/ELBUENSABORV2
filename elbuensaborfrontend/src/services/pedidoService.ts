@@ -203,3 +203,28 @@ export const cambiarEstadoPedido = async (pedidoId: number, estado: string) => {
         throw error;
     }
 };
+
+export const marcarPedidoPagado = async (pedidoId: number) => {
+    try {
+        const token = sessionStorage.getItem("token");
+
+        const res = await axios.put(
+            `${API_URL}/pedidos/${pedidoId}/pagado`,
+            {},
+            {
+                headers: {
+                    Authorization: `Bearer ${token}`,
+                },
+                withCredentials: true,
+            }
+        );
+
+        return res.data;
+    } catch (error: any) {
+        console.error(
+            "Error al marcar pedido como pagado:",
+            error.response?.data || error.message
+        );
+        throw error;
+    }
+};

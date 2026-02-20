@@ -369,6 +369,26 @@ public class PedidoServiceImpl implements PedidoService {
         return mapToResponse(pedido);
     }
 
+    @Transactional
+    public PedidoResponse marcarPagado(Long id) {
+        PedidoVenta pedido = pedidoRepository.findByIdWithDetalles(id)
+                .orElseThrow(() -> new RuntimeException("Pedido no encontrado"));
+        validarAccesoSucursal(pedido.getSucursal());
+
+        if (pedido.getTipoEnvio() != TipoEnvio.TAKE_AWAY || pedido.getFormaPago() != FormaPago.EFECTIVO) {
+            throw new IllegalArgumentException("Solo se puede marcar como pagado pedidos de retiro en local con efectivo");
+        }
+
+        if (Boolean.TRUE.equals(pedido.getPagado())) {
+            return mapToResponse(pedido);
+        }
+
+        pedido.setPagado(true);
+        pedido = pedidoRepository.save(pedido);
+
+        return mapToResponse(pedido);
+    }
+
     private void validarAccesoSucursal(SucursalEmpresa sucursalPedido) {
         Long sucursalId = resolveSucursalIdForEmpleado();
         if (sucursalId == null) {
