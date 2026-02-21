@@ -1,8 +1,8 @@
-import {Link, Outlet} from "react-router-dom";
-import {useState} from "react";
-import {FaRegArrowAltCircleRight} from "react-icons/fa";
-import {FiExternalLink, FiGrid} from "react-icons/fi";
-import {NavDropdown} from "react-bootstrap";
+import { Link, Outlet } from "react-router-dom";
+import { useState } from "react";
+import { FaRegArrowAltCircleRight } from "react-icons/fa";
+import { FiExternalLink, FiGrid } from "react-icons/fi";
+import { NavDropdown } from "react-bootstrap";
 import {HiOutlineUserCircle} from "react-icons/hi";
 import Sidebar from "./Sidebar/Sidebar";
 import "./dashboard.css";
@@ -21,21 +21,21 @@ const DashboardLayout = () => {
 
     const profilePhotoUrl = user?.fotoPerfil ? getImageUrl(user.fotoPerfil) : "";
 
-    return (
-        <div className="d-flex layout-dashboard">
-            <ChangePasswordPopup/>
-            <button className="menu-toggle" onClick={() => setOpen(true)}>
-                <FaRegArrowAltCircleRight/>
-            </button>
+  return (
+    <div className="d-flex layout-dashboard">
+      <ChangePasswordPopup />
+      <button className="menu-toggle" onClick={() => setOpen(true)}>
+        <FaRegArrowAltCircleRight />
+      </button>
 
-            {open && <div className="overlay" onClick={() => setOpen(false)}></div>}
+      {open && <div className="overlay" onClick={() => setOpen(false)}></div>}
 
-            <Sidebar open={open} close={() => setOpen(false)}/>
-            <div className="dashboard-content">
-                <header className="dashboard-topbar">
-                    <div className="topbar-title">
+      <Sidebar open={open} close={() => setOpen(false)} />
+      <div className="dashboard-content">
+        <header className="dashboard-topbar">
+          <div className="topbar-title">
             <span className="topbar-icon">
-              <FiGrid/>
+              <FiGrid />
             </span>
                         {panelTitle}
                     </div>

@@ -1,17 +1,9 @@
-import {Modal, ModalBody, ModalFooter, ModalHeader, ModalTitle} from "react-bootstrap";
-import {
-    createUnidadMedida,
-    deleteUnidadMedida,
-    editUnidadMedida,
-    getAllUnidadesMedida
-} from "../../../../services/insumosService";
-import {useEffect, useState} from "react";
-import type {UnidadMedida} from "../../../../models/UnidadMedida";
+import { Modal, ModalBody, ModalFooter, ModalHeader, ModalTitle } from "react-bootstrap";
+import { getAllUnidadesMedida, createUnidadMedida, editUnidadMedida, deleteUnidadMedida } from "../../../../services/insumosService";
+import { useEffect, useState } from "react";
+import type { UnidadMedida } from "../../../../models/UnidadMedida";
 
-const UnidadMedidaModal = ({showModal, setShowModal}: {
-    showModal: boolean,
-    setShowModal: (show: boolean) => void
-}) => {
+const UnidadMedidaModal = ({ showModal, setShowModal }: { showModal: boolean, setShowModal: (show: boolean) => void }) => {
     const [unidadesMedida, setUnidadesMedida] = useState<UnidadMedida[]>([]);
     const [createNewUnidad, setCreateNewUnidad] = useState(false);
     const [newUnidad, setNewUnidad] = useState({
@@ -75,58 +67,37 @@ const UnidadMedidaModal = ({showModal, setShowModal}: {
     };
 
     return (
-        <Modal show={showModal} onHide={() => {
-            setShowModal(false);
-            setCreateNewUnidad(false);
-        }} size="lg">
+        <Modal show={showModal} onHide={() => { setShowModal(false); setCreateNewUnidad(false); }} size="lg">
             <ModalHeader closeButton>
                 <ModalTitle>Unidades de Medida</ModalTitle>
             </ModalHeader>
             <ModalBody>
                 {
                     createNewUnidad ? (
-                        <form onSubmit={(e) => {
-                            e.preventDefault();
-                            handleSubmit();
-                            setCreateNewUnidad(false)
-                        }}>
+                        <form onSubmit={(e) => { e.preventDefault(); handleSubmit(); setCreateNewUnidad(false) }}>
                             <p>Crear nueva unidad de medida</p>
-                            <input type="text" placeholder="Denominación" className="form-control mb-3"
-                                   value={newUnidad.denominacion}
-                                   onChange={(e) => setNewUnidad({...newUnidad, denominacion: e.target.value})}
-                                   required/>
+                            <input type="text" placeholder="Denominación" className="form-control mb-3" value={newUnidad.denominacion} onChange={(e) => setNewUnidad({ ...newUnidad, denominacion: e.target.value })} required />
                             <button className="btn btn-primary" type="submit">Guardar</button>
                         </form>
                     ) : editUnidad ? (
-                        <form onSubmit={(e) => {
-                            e.preventDefault();
-                            handleEditSubmit();
-                            setEditUnidad(false)
-                        }}>
+                        <form onSubmit={(e) => { e.preventDefault(); handleEditSubmit(); setEditUnidad(false) }}>
                             <p>Editar unidad de medida</p>
-                            <input type="text" placeholder="Denominación" className="form-control mb-3"
-                                   value={newUnidad.denominacion}
-                                   onChange={(e) => setNewUnidad({...newUnidad, denominacion: e.target.value})}
-                                   required/>
+                            <input type="text" placeholder="Denominación" className="form-control mb-3" value={newUnidad.denominacion} onChange={(e) => setNewUnidad({ ...newUnidad, denominacion: e.target.value })} required />
                             <button className="btn btn-primary" type="submit">Guardar</button>
                         </form>) : (
                         <div>
                             <p>Lista de unidades de medida:</p>
                             {
                                 unidadesMedida.map((u) => (
-                                    <div key={u.id}>
+                                    <div key={u.id} >
                                         <div className="d-flex justify-content-between align-items-center">
                                             <p className="mb-0">- {u.denominacion}</p>
                                             <div>
-                                                <button className="btn btn-primary btn-sm"
-                                                        onClick={() => handleEdit(u.id)}>Editar
-                                                </button>
-                                                <button className="btn btn-danger btn-sm"
-                                                        onClick={() => handleDelete(u.id)}>Eliminar
-                                                </button>
+                                                <button className="btn btn-primary btn-sm" onClick={() => handleEdit(u.id)}>Editar</button>
+                                                <button className="btn btn-danger btn-sm" onClick={() => handleDelete(u.id)}>Eliminar</button>
                                             </div>
                                         </div>
-                                        <hr/>
+                                        <hr />
                                     </div>
                                 ))
                             }
@@ -135,11 +106,7 @@ const UnidadMedidaModal = ({showModal, setShowModal}: {
                 }
             </ModalBody>
             <ModalFooter>
-                <button className="btn btn-primary" onClick={() => {
-                    setCreateNewUnidad(true);
-                    setNewUnidad({denominacion: "", activo: true});
-                }}>+ Nueva
-                </button>
+                <button className="btn btn-primary" onClick={() => { setCreateNewUnidad(true); setNewUnidad({ denominacion: "", activo: true }); }}>+ Nueva</button>
             </ModalFooter>
         </Modal>
     );

@@ -1,14 +1,18 @@
 package com.utn.elbuensabor.services.impl;
 
+import java.math.BigDecimal;
+import java.time.LocalDateTime;
+
+import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
 import com.utn.elbuensabor.entities.FacturaVenta;
 import com.utn.elbuensabor.entities.FacturaVentaDetalle;
 import com.utn.elbuensabor.entities.PedidoVenta;
 import com.utn.elbuensabor.entities.PedidoVentaDetalle;
 import com.utn.elbuensabor.repositories.FacturaVentaRepository;
 import com.utn.elbuensabor.services.FacturaService;
-import lombok.RequiredArgsConstructor;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.io.IOException;
 import java.math.BigDecimal;
@@ -34,6 +38,9 @@ public class FacturaServiceImpl implements FacturaService {
         factura.setDescuento(pedido.getDescuento());
         factura.setGastosEnvio(pedido.getGastosEnvio());
         factura.setTotalVenta(pedido.getTotal());
+        if (pedido.getDatosMercadoPago() != null && pedido.getDatosMercadoPago().getPaymentId() != null) {
+            factura.setPaymentId(pedido.getDatosMercadoPago().getPaymentId());
+        }
 
         for (PedidoVentaDetalle detalle : pedido.getDetalles()) {
             FacturaVentaDetalle detalleFactura = new FacturaVentaDetalle();

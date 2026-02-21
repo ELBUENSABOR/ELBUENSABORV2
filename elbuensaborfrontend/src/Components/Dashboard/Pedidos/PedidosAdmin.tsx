@@ -2,15 +2,15 @@ import {useEffect, useState} from "react";
 import type {PedidoResponse} from "../../../services/pedidoService";
 import {cambiarEstadoPedido, getPedidoById, getPedidosAll, marcarPedidoPagado} from "../../../services/pedidoService";
 import OrderDetailModal from "../../Common/OrderDetailModal/OrderDetailModal.tsx";
-import {useSucursal} from "../../../contexts/SucursalContext";
-import {useUser} from "../../../contexts/UsuarioContext";
+import { useSucursal } from "../../../contexts/SucursalContext";
+import { useUser } from "../../../contexts/UsuarioContext";
 
 const ESTADOS = [
-    {label: "A confirmar", value: "A_CONFIRMAR"},
-    {label: "En cocina", value: "A_COCINA"},
-    {label: "Listo", value: "LISTO"},
-    {label: "En delivery", value: "EN_DELIVERY"},
-    {label: "Entregado", value: "ENTREGADO"},
+    { label: "A confirmar", value: "A_CONFIRMAR" },
+    { label: "En cocina", value: "A_COCINA" },
+    { label: "Listo", value: "LISTO" },
+    { label: "En delivery", value: "EN_DELIVERY" },
+    { label: "Entregado", value: "ENTREGADO" },
 ];
 
 const formatDate = (value: string) => {
@@ -26,8 +26,8 @@ const formatDate = (value: string) => {
 };
 
 const PedidosAdmin = () => {
-    const {sucursales, sucursalId, setSucursalId} = useSucursal();
-    const {user} = useUser();
+    const { sucursales, sucursalId, setSucursalId } = useSucursal();
+    const { user } = useUser();
     const [pedidos, setPedidos] = useState<PedidoResponse[]>([]);
     const [estado, setEstado] = useState("");
     const [busquedaId, setBusquedaId] = useState("");
@@ -133,7 +133,7 @@ const PedidosAdmin = () => {
         try {
             await cambiarEstadoPedido(pedido.id, nuevoEstado);
             setEstadoSeleccionado((prev) => {
-                const next = {...prev};
+                const next = { ...prev };
                 delete next[pedido.id];
                 return next;
             });
@@ -244,7 +244,7 @@ const PedidosAdmin = () => {
                                             </button>
                                             <select
                                                 className="form-select form-select-sm"
-                                                style={{width: "180px"}}
+                                                style={{ width: "180px" }}
                                                 value={estadoSeleccionado[pedido.id] || ""}
                                                 onChange={(event) =>
                                                     setEstadoSeleccionado((prev) => ({

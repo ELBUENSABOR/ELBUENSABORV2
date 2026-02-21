@@ -1,12 +1,18 @@
 package com.utn.elbuensabor.entities;
 
-import jakarta.persistence.*;
-import lombok.Getter;
-import lombok.Setter;
-
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+
+import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.OneToMany;
+import jakarta.persistence.OneToOne;
+import jakarta.persistence.Table;
+import lombok.Getter;
+import lombok.Setter;
 
 @Entity
 @Table(name = "factura_venta")
@@ -28,6 +34,7 @@ public class FacturaVenta extends BaseEntity {
     private Double descuento;
     private Double gastosEnvio;
     private Double totalVenta;
+    private String paymentId;
     private String pdfUrl;
 
     @OneToMany(mappedBy = "factura", cascade = jakarta.persistence.CascadeType.ALL, orphanRemoval = true)

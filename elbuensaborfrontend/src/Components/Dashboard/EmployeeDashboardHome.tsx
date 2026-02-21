@@ -221,7 +221,7 @@ const EmployeeDashboardHome = ({subRole}: EmployeeDashboardHomeProps) => {
                             <strong>{loading ? "..." : card.value}</strong>
                             <p className="summary-detail">{card.description}</p>
                         </div>
-                        <card.icon className="summary-icon" size={16}/>
+                        <card.icon className="summary-icon" size={16} />
                     </article>
                 ))}
             </section>

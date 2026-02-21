@@ -1,14 +1,15 @@
-import {Link, useLocation, useNavigate} from "react-router-dom";
+import {Link, useNavigate} from "react-router-dom";
 import "./auth.css";
-import type {LoginRequest} from "../../dtos/LoginRequest";
-import {useState} from "react";
-import {loginUser, loginWithGoogle} from "../../services/authService";
-import {useUser} from "../../contexts/UsuarioContext";
+import type { LoginRequest } from "../../dtos/LoginRequest";
+import { useState } from "react";
+import { loginUser, loginWithGoogle } from "../../services/authService";
+import { useUser } from "../../contexts/UsuarioContext";
+import { useLocation } from "react-router-dom";
 import {getEmployeeDashboardRoute} from "../../utils/employeePanel";
 import GoogleAuthButton from "./GoogleAuthButton";
 
 const Login = () => {
-    const {state} = useLocation();
+    const { state } = useLocation();
     const [form, setForm] = useState<LoginRequest>({
         username: "",
         password: "",
@@ -165,7 +166,7 @@ const Login = () => {
                 <div className="auth-divider">
                     <span>o</span>
                 </div>
-                <GoogleAuthButton onSuccess={handleGoogleLogin} text="signin_with"/>
+                <GoogleAuthButton onSuccess={handleGoogleLogin} text="signin_with" />
 
                 {msg.msg && (
                     <p

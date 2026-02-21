@@ -3,7 +3,18 @@ import {useUser} from "../../../contexts/UsuarioContext";
 import "./sidebar.css";
 import {getEmployeePanelLabel} from "../../../utils/employeePanel";
 
-import {BarChart3, Boxes, Building2, ClipboardList, Factory, Home, Package, Tags, Users} from "lucide-react";
+import {
+    Home,
+    Building2,
+    Users,
+    Tags,
+    Package,
+    Boxes,
+    Factory,
+    BarChart3,
+    ClipboardList,
+    ShoppingBag
+} from "lucide-react";
 
 const links = [
     {
@@ -38,6 +49,8 @@ const links = [
         icon: Tags,
         rol: ["COCINERO", "ADMIN"]
     },
+
+    {path: "/dashboard/productos-venta", label: "Productos a la venta", icon: ShoppingBag, rol: ["ADMIN"]},
     {
         path: "/dashboard/reportes/productos-mas-vendidos",
         label: "Productos más vendidos",

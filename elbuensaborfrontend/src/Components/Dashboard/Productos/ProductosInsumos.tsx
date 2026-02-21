@@ -1,9 +1,9 @@
-import {type ChangeEvent, useEffect, useState} from 'react'
+import {useEffect, useState, type ChangeEvent} from 'react'
 import {useUser} from '../../../contexts/UsuarioContext';
 import {useSucursal} from '../../../contexts/SucursalContext';
 import {useNavigate} from 'react-router-dom';
 import type {InsumoResponse} from '../../../models/Insumo';
-import {deleteInsumo, getAll} from '../../../services/insumosService';
+import {getAll, deleteInsumo} from '../../../services/insumosService';
 import UnidadMedidaModal from './UnidadesMedidaModal/UnidadMedidaModal';
 import {getRubrosInsumos} from '../../../services/rubrosService';
 import type {Rubro} from '../../../models/Rubro';
