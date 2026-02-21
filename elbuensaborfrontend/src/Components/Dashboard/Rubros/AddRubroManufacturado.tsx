@@ -1,11 +1,11 @@
-import React, {useEffect, useState} from "react";
-import {useNavigate, useParams} from "react-router-dom";
-import type {Rubro} from "../../../models/Rubro";
-import {useUser} from "../../../contexts/UsuarioContext";
+import React, { useEffect, useState } from "react";
+import { useNavigate, useParams } from "react-router-dom";
+import type { Rubro } from "../../../models/Rubro";
+import { useUser } from "../../../contexts/UsuarioContext";
 import {
-    createRubroManufacturado,
-    getRubroManufacturadoById,
-    updateRubroManufacturado,
+  createRubroManufacturado,
+  getRubroManufacturadoById,
+  updateRubroManufacturado,
 } from "../../../services/rubrosService";
 
 const initialState: Rubro = {
@@ -16,37 +16,37 @@ const initialState: Rubro = {
 };
 
 const AddRubroManufacturado = () => {
-    const {id, parentId} = useParams<{ id?: string; parentId?: string }>();
+  const { id, parentId } = useParams<{ id?: string; parentId?: string }>();
 
-    const isEdit = Boolean(id);
-    const isSubrubro = Boolean(parentId);
+  const isEdit = Boolean(id);
+  const isSubrubro = Boolean(parentId);
 
-    const [form, setForm] = useState<Rubro>(initialState);
-    const [parentData, setParentData] = useState<Rubro>(initialState);
-    const navigate = useNavigate();
-    const {user} = useUser();
-    const token = user?.token;
+  const [form, setForm] = useState<Rubro>(initialState);
+  const [parentData, setParentData] = useState<Rubro>(initialState);
+  const navigate = useNavigate();
+  const { user } = useUser();
+  const token = user?.token;
 
-    // Si es subrubro, setear categoriaPadreId desde la URL
-    useEffect(() => {
-        const setParent = async () => {
-            if (isSubrubro) {
-                setForm((prev) => ({
-                    ...prev,
-                    categoriaPadreId: Number(parentId),
-                }));
+  // Si es subrubro, setear categoriaPadreId desde la URL
+  useEffect(() => {
+    const setParent = async () => {
+      if (isSubrubro) {
+        setForm((prev) => ({
+          ...prev,
+          categoriaPadreId: Number(parentId),
+        }));
 
-                const parentRes = await getRubroManufacturadoById(Number(parentId));
-                setParentData(parentRes.data);
+        const parentRes = await getRubroManufacturadoById(Number(parentId));
+        setParentData(parentRes.data);
 
-                console.log("parentRes", parentRes);
-            }
-        };
-        setParent();
-    }, [parentId, isSubrubro]);
+        console.log("parentRes", parentRes);
+      }
+    };
+    setParent();
+  }, [parentId, isSubrubro]);
 
-    useEffect(() => {
-        if (!isEdit || !token) return;
+  useEffect(() => {
+    if (!isEdit || !token) return;
 
         const getData = async () => {
             try {
