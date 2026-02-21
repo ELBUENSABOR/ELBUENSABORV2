@@ -1,24 +1,24 @@
-import { useState } from "react";
-import { Container, Form, Nav, Navbar, NavDropdown } from "react-bootstrap";
-import { Link } from "react-router-dom";
+import {useState} from "react";
+import {Container, Form, Nav, Navbar, NavDropdown} from "react-bootstrap";
+import {Link} from "react-router-dom";
 import "./navbar.css";
-import { useUser } from "../../contexts/UsuarioContext";
-import { useCatalogFilters } from "../../contexts/CatalogFiltersContext";
-import { useSucursal } from "../../contexts/SucursalContext";
-import { LogIn, Search, ShoppingCart } from "lucide-react";
-import { HiOutlineUserCircle } from "react-icons/hi";
-import { getImageUrl } from "../../utils/image";
+import {useUser} from "../../contexts/UsuarioContext";
+import {useCatalogFilters} from "../../contexts/CatalogFiltersContext";
+import {useSucursal} from "../../contexts/SucursalContext";
+import {LogIn, Search, ShoppingCart} from "lucide-react";
+import {HiOutlineUserCircle} from "react-icons/hi";
+import {getImageUrl} from "../../utils/image";
 
 interface MyNavbarProps {
     onCartOpen: () => void;
     isCartOpen: boolean;
 }
 
-export default function MyNavbar({ onCartOpen, isCartOpen }: MyNavbarProps) {
-    const { user, logout } = useUser();
+export default function MyNavbar({onCartOpen, isCartOpen}: MyNavbarProps) {
+    const {user, logout} = useUser();
     const [isMobileSearchOpen, setIsMobileSearchOpen] = useState(false);
-    const { sucursales, sucursalId, setSucursalId, loading: loadingSucursales } = useSucursal();
-    const { searchTerm, setSearchTerm } = useCatalogFilters();
+    const {sucursales, sucursalId, setSucursalId, loading: loadingSucursales} = useSucursal();
+    const {searchTerm, setSearchTerm} = useCatalogFilters();
 
     const dropdownTitle = user ? user.username : "Cuenta";
     const profilePhotoUrl = user?.fotoPerfil ? getImageUrl(user.fotoPerfil) : "";
@@ -28,7 +28,9 @@ export default function MyNavbar({ onCartOpen, isCartOpen }: MyNavbarProps) {
         <Navbar expand="lg" className="navbar-container" sticky="top">
             <Container className="navbar-main">
                 <Navbar.Brand as={Link} to="/" className="navbar-brand-group" aria-label="Ir al inicio">
-                    <img src="/logo.png" alt="El Buen Sabor" className="navbar-brand-logo-img" />
+                    <span className="navbar-brand-logo-mark" aria-hidden="true">
+                        <img src="/logo.png" alt="El Buen Sabor" className="navbar-brand-logo-img"/>
+                    </span>
                 </Navbar.Brand>
 
                 {showSucursalSelector && (
@@ -60,7 +62,7 @@ export default function MyNavbar({ onCartOpen, isCartOpen }: MyNavbarProps) {
                         aria-label="Abrir carrito"
                         aria-expanded={isCartOpen}
                     >
-                        <ShoppingCart size={18} />
+                        <ShoppingCart size={18}/>
                     </button>
 
                     <button
@@ -70,10 +72,10 @@ export default function MyNavbar({ onCartOpen, isCartOpen }: MyNavbarProps) {
                         aria-label="Abrir buscador"
                         aria-expanded={isMobileSearchOpen}
                     >
-                        <Search size={18} />
+                        <Search size={18}/>
                     </button>
 
-                    <Navbar.Toggle aria-controls="main-navbar" className="navbar-toggle" />
+                    <Navbar.Toggle aria-controls="main-navbar" className="navbar-toggle"/>
                 </div>
 
                 <Navbar.Collapse id="main-navbar">
@@ -85,6 +87,8 @@ export default function MyNavbar({ onCartOpen, isCartOpen }: MyNavbarProps) {
                         <Nav.Link as={Link} to="/catalog" className="navbar-link">
                             Catálogo
                         </Nav.Link>
+
+                        <hr className="navbar-mobile-divider"/>
 
                         {!user && (
                             <>
@@ -102,42 +106,41 @@ export default function MyNavbar({ onCartOpen, isCartOpen }: MyNavbarProps) {
                                 Panel de administración
                             </Nav.Link>
                         )}
+
+                        {/* MOBILE: items de usuario dentro del toggler */}
+                        {user && (
+                            <>
+                                <Nav.Link as={Link} to="/account" className="navbar-link">
+                                    Perfil
+                                </Nav.Link>
+
+                                {(user?.role === "CLIENTE" || user?.role === "ADMIN") && (
+                                    <Nav.Link as={Link} to="/pedidos" className="navbar-link">
+                                        Mis pedidos
+                                    </Nav.Link>
+                                )}
+
+                                <hr className="navbar-mobile-divider"/>
+
+                                <Nav.Link onClick={logout} className="navbar-link navbar-link--danger">
+                                    Cerrar sesión
+                                </Nav.Link>
+                            </>
+                        )}
                     </Nav>
 
-                    <div className="d-none d-lg-flex w-100 align-items-center">
-                        <Nav className="me-auto align-items-lg-center gap-lg-2">
-                            <Form className="navbar-search navbar-search--desktop" role="search" aria-label="Buscar">
-                <span className="navbar-search-icon" aria-hidden="true">
-                  <Search size={16} />
-                </span>
-                                <Form.Control
-                                    type="search"
-                                    placeholder="Buscar comida o bebida"
-                                    value={searchTerm}
-                                    onChange={(event) => setSearchTerm(event.target.value)}
-                                />
-                            </Form>
-
-                            <Nav.Link as={Link} to="/" className="navbar-link">
-                                Inicio
-                            </Nav.Link>
-
-                            <Nav.Link as={Link} to="/catalog" className="navbar-link">
-                                Catálogo
-                            </Nav.Link>
-
+                    <div className="d-none d-lg-flex w-100 align-items-center navbar-desktop-row">
+                        {/* Left: Logo + Sucursal */}
+                        <div className="navbar-desktop-left">
                             {showSucursalSelector && (
-                                <Form className="navbar-sucursal">
-                                    <Form.Label className="navbar-sucursal-label">Sucursal</Form.Label>
+                                <Form className="navbar-sucursal navbar-sucursal--desktop" role="group" aria-label="Seleccionar sucursal">
                                     <Form.Select
                                         value={sucursalId ?? ""}
-                                        onChange={(event) =>
-                                            setSucursalId(event.target.value ? Number(event.target.value) : null)
-                                        }
+                                        onChange={(event) => setSucursalId(event.target.value ? Number(event.target.value) : null)}
                                         disabled={loadingSucursales || sucursales.length === 0}
                                         aria-label="Seleccionar sucursal"
                                     >
-                                        <option value="">Seleccioná una sucursal...</option>
+                                        <option value="">{loadingSucursales ? "Cargando..." : "Sucursal Principal"}</option>
                                         {sucursales.map((sucursal) => (
                                             <option key={sucursal.id} value={sucursal.id}>
                                                 {sucursal.nombre}
@@ -146,6 +149,30 @@ export default function MyNavbar({ onCartOpen, isCartOpen }: MyNavbarProps) {
                                     </Form.Select>
                                 </Form>
                             )}
+                        </div>
+
+                        {/* Center: Search */}
+                        <Form className="navbar-search navbar-search--desktop navbar-desktop-search" role="search" aria-label="Buscar">
+    <span className="navbar-search-icon" aria-hidden="true">
+      <Search size={16} />
+    </span>
+                            <Form.Control
+                                type="search"
+                                placeholder="Buscar comidas, bebidas..."
+                                value={searchTerm}
+                                onChange={(event) => setSearchTerm(event.target.value)}
+                            />
+                        </Form>
+
+                        {/* Links */}
+                        <Nav className="navbar-desktop-links">
+                            <Nav.Link as={Link} to="/" className="navbar-link">
+                                Inicio
+                            </Nav.Link>
+
+                            <Nav.Link as={Link} to="/catalog" className="navbar-link">
+                                Catálogo
+                            </Nav.Link>
 
                             {user?.role === "ADMIN" && (
                                 <Nav.Link as={Link} to="/dashboard/home" className="navbar-admin-link">
@@ -154,7 +181,8 @@ export default function MyNavbar({ onCartOpen, isCartOpen }: MyNavbarProps) {
                             )}
                         </Nav>
 
-                        <Nav className="navbar-actions">
+                        {/* Right actions */}
+                        <Nav className="navbar-actions navbar-desktop-actions">
                             {!user ? (
                                 <div className="navbar-auth-buttons">
                                     <Link className="btn navbar-auth-btn" to="/login">
@@ -163,25 +191,20 @@ export default function MyNavbar({ onCartOpen, isCartOpen }: MyNavbarProps) {
                                     </Link>
 
                                     <Link className="btn btn-light" to="/register">
-                                        Registrarse
+                                        Registrarme
                                     </Link>
                                 </div>
                             ) : (
                                 <NavDropdown
                                     title={
                                         <span className="navbar-user-trigger">
-                      <span className="navbar-user-name">{dropdownTitle}</span>
-
-                                            {profilePhotoUrl ? (
-                                                <img
-                                                    src={profilePhotoUrl}
-                                                    alt="Foto de perfil"
-                                                    className="navbar-user-avatar"
-                                                />
-                                            ) : (
-                                                <HiOutlineUserCircle className="navbar-user-avatar navbar-user-avatar--fallback" />
-                                            )}
-                    </span>
+            {profilePhotoUrl ? (
+                <img src={profilePhotoUrl} alt="Foto de perfil" className="navbar-user-avatar" />
+            ) : (
+                <HiOutlineUserCircle className="navbar-user-avatar navbar-user-avatar--fallback" />
+            )}
+                                            <span className="navbar-user-name">{dropdownTitle}</span>
+          </span>
                                     }
                                     id="basic-nav-dropdown"
                                     align="end"

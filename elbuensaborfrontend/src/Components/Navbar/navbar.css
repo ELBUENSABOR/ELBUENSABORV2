@@ -64,6 +64,16 @@
     display: block;
 }
 
+.navbar-brand-logo-mark {
+    width: 30px;
+    height: 30px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.45rem;
+    color: hsl(var(--primary));
+}
+
 /* =========================
    NAV LINKS (DESKTOP)
 ========================= */
@@ -382,48 +392,229 @@
     box-shadow: none;
 }
 
-/* =========================
-   RESPONSIVE
-========================= */
+
+/* =========================================
+   MOBILE: look like screenshot (no JSX changes)
+========================================= */
 @media (max-width: 991px) {
     .navbar-container {
-        --navbar-height: 60px;
+        --navbar-height: 56px;
         --navbar-padding-x: 12px;
-        --navbar-gap: 8px;
+        --navbar-gap: 10px;
+
+        /* si querés más “crema” como la captura */
+        background: hsl(var(--card));
     }
 
     .navbar-main {
-        padding: 10px var(--navbar-padding-x);
+        min-height: var(--navbar-height);
+        padding: 8px var(--navbar-padding-x);
+
+        /* 3 zonas: izquierda (logo), centro (select), derecha (iconos) */
         display: grid;
         grid-template-columns: auto 1fr auto;
-        gap: var(--navbar-gap);
         align-items: center;
+        gap: var(--navbar-gap);
     }
 
-    .navbar-controls {
-        display: flex;
+    /* -------- Left: brand as small icon chip -------- */
+    .navbar-brand-group {
+        padding: 0;
+        height: 40px;
+        width: 40px;
+        border-radius: 999px;
+        display: grid;
+        place-items: center;
+        background: hsl(var(--secondary));
+        border: 1px solid hsl(var(--border));
     }
 
+    .navbar-brand-logo-mark {
+        width: 40px;
+        height: 40px;
+    }
+
+    /* hace el logo "icon-like" (como botón circular) */
     .navbar-brand-logo-img {
-        height: 60px;
+        height: 22px;
+        width: 22px;
+        border-radius: 0;
+        object-fit: contain;
+        display: block;
     }
 
+    /* -------- Center: sucursal selector centered -------- */
     .navbar-mobile-sucursal {
         display: flex;
-        align-items: center;
         justify-content: center;
         min-width: 0;
     }
 
-    .navbar-search--desktop {
-        display: none;
+    .navbar-mobile-sucursal-select.form-select {
+        height: 40px;
+        max-width: 210px;
+        width: 100%;
+        border-radius: 999px; /* en mobile sí va pill como la captura */
+        padding: 0 38px 0 14px;
+
+        background: hsl(var(--secondary));
+        border: 1px solid hsl(var(--border));
+        color: hsl(var(--foreground));
+
+        font-size: 0.9rem;
+        font-weight: 600;
+
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+
+        /* “select” más limpio */
+        box-shadow: none;
     }
 
-    .navbar-auth-buttons {
-        display: none;
+    .navbar-mobile-sucursal-select.form-select:focus {
+        border-color: hsl(var(--primary) / 0.65);
+        box-shadow: none;
     }
 
+    /* -------- Right: icons like the screenshot (no boxed buttons) -------- */
+    .navbar-controls {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        margin-left: 0;
+    }
+
+    .navbar-icon-button {
+        width: 32px;
+        height: 32px;
+        border-radius: 999px;
+        background: transparent;
+        border: 0;
+        padding: 0;
+        color: hsl(var(--foreground));
+    }
+
+    .navbar-icon-button:hover,
+    .navbar-icon-button:focus {
+        background: hsl(var(--secondary));
+        outline: none;
+    }
+
+    .navbar-toggle.navbar-toggler {
+        width: 32px;
+        height: 32px;
+        padding: 0;
+        border-radius: 999px;
+        border: 0;
+        background: transparent;
+        box-shadow: none;
+    }
+
+    .navbar-toggle.navbar-toggler:hover {
+        background: hsl(var(--secondary));
+    }
+
+    .navbar-toggle.navbar-toggler:focus {
+        box-shadow: none;
+    }
+
+    /* -------- Collapse spacing (cuando abrís el menú) -------- */
     .navbar-collapse {
+        padding-top: 10px;
         padding-bottom: 10px;
+    }
+
+    /* desktop search/auth hidden on mobile */
+    .navbar-search--desktop,
+    .navbar-auth-buttons {
+        display: none !important;
+    }
+
+    /* drawer de búsqueda mobile: que parezca “panel” */
+    .navbar-search-wrapper {
+        top: var(--navbar-height);
+    }
+
+    .navbar-search-wrapper .container {
+        padding: 10px 12px 12px;
+    }
+
+    .navbar-search--mobile input {
+        height: 42px;
+        border-radius: 999px;
+        background: hsl(var(--secondary));
+        border: 1px solid hsl(var(--border));
+    }
+}
+/* =========================================
+   DESKTOP LAYOUT (ONLY >= 992px)
+========================================= */
+@media (min-width: 992px) {
+    .navbar-desktop-row {
+        gap: 14px;
+    }
+
+    /* Left group: sucursal cerca del logo */
+    .navbar-desktop-left {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        flex: 0 0 auto;
+    }
+
+    /* Search centrado y ancho */
+    .navbar-desktop-search {
+        flex: 1 1 520px;
+        min-width: 420px;
+        max-width: 720px;
+    }
+
+    .navbar-search.navbar-desktop-search input {
+        height: 42px;
+    }
+
+    /* Links a la derecha del buscador */
+    .navbar-desktop-links {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        flex: 0 0 auto;
+    }
+
+    .navbar-desktop-actions {
+        flex: 0 0 auto;
+        margin-left: 6px;
+    }
+
+    /* Sucursal en desktop como "chip" simple (sin label visible) */
+    .navbar-sucursal--desktop {
+        padding: 0;
+        border: 0;
+        background: transparent;
+    }
+
+    .navbar-sucursal--desktop select {
+        min-width: 220px;
+        height: 42px;
+        border-radius: 999px; /* como tu screenshot desktop */
+        background: hsl(var(--secondary));
+        border: 1px solid hsl(var(--border));
+        padding: 0 14px;
+        font-weight: 600;
+    }
+
+    .navbar-sucursal--desktop select:focus {
+        border-color: hsl(var(--primary));
+        box-shadow: none;
+    }
+
+    /* User: avatar + name alineados como screenshot */
+    .navbar-user-trigger {
+        gap: 10px;
+    }
+
+    .navbar-user-name {
+        max-width: 220px;
     }
 }
