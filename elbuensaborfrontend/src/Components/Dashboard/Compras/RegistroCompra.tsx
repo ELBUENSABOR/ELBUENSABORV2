@@ -333,7 +333,6 @@ const RegistroCompra = () => {
             </section>
         </div>
     );
-  };
 };
 
 export default RegistroCompra;

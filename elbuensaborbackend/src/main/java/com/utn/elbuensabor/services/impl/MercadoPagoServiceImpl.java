@@ -60,15 +60,21 @@ public class MercadoPagoServiceImpl implements MercadoPagoService {
                 .email(pedido.getCliente().getEmail())
                 .build();
 
-        PreferenceRequest request = PreferenceRequest.builder()
+        PreferenceRequest.PreferenceRequestBuilder requestBuilder = PreferenceRequest.builder()
                 .items(items)
                 .payer(payer)
                 .externalReference(String.valueOf(pedido.getId())) // clave para mapear pedido en webhook
                 .backUrls(backUrls)
                 .notificationUrl(notifUrl) // debe apuntar al NGROK del BACKEND
-                .autoReturn("approved") // siempre, sandbox y prod
-                .binaryMode(true) // opcional: reduce estados "intermedios"
-                .build();
+                .binaryMode(true); // opcional: reduce estados "intermedios"
+
+        // Mercado Pago valida auto_return + back_urls con mayor rigurosidad.
+        // En local (http://localhost) suele rechazar auto_return("approved").
+        if (isHttpsUrl(pedidoUrl)) {
+            requestBuilder.autoReturn("approved");
+        }
+
+        PreferenceRequest request = requestBuilder.build();
 
         Preference preference = new PreferenceClient().create(request);
 
@@ -97,5 +103,9 @@ public class MercadoPagoServiceImpl implements MercadoPagoService {
             url = url.substring(0, url.length() - 1);
         }
         return url;
+    }
+
+    private boolean isHttpsUrl(String url) {
+        return url != null && url.startsWith("https://");
     }
 }

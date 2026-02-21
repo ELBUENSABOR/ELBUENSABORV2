@@ -3,6 +3,7 @@ package com.utn.elbuensabor.services.impl;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -37,6 +38,9 @@ public class FacturaServiceImpl implements FacturaService {
         factura.setDescuento(pedido.getDescuento());
         factura.setGastosEnvio(pedido.getGastosEnvio());
         factura.setTotalVenta(pedido.getTotal());
+        if (pedido.getDatosMercadoPago() != null && pedido.getDatosMercadoPago().getPaymentId() != null) {
+            factura.setPaymentId(pedido.getDatosMercadoPago().getPaymentId());
+        }
 
         for (PedidoVentaDetalle detalle : pedido.getDetalles()) {
             FacturaVentaDetalle detalleFactura = new FacturaVentaDetalle();

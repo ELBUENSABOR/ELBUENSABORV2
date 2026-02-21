@@ -180,6 +180,7 @@ public class MercadoPagoController {
         datos.setDateApproved(toLocalDateTime(payment.getDateApproved()));
         datos.setDateLastUpdated(toLocalDateTime(payment.getDateLastUpdated()));
         datosMercadoPagoRepository.save(datos);
+        pedido.setDatosMercadoPago(datos);
 
         if ("approved".equalsIgnoreCase(payment.getStatus())) {
             pedido.setPagado(true);

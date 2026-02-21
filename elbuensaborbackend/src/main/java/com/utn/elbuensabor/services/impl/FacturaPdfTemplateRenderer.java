@@ -79,7 +79,8 @@ public class FacturaPdfTemplateRenderer {
                               float left,
                               float right,
                               float startY) throws IOException {
-        float boxH = 60f;
+        boolean hasPaymentId = factura.getPaymentId() != null && !factura.getPaymentId().isBlank();
+        float boxH = hasPaymentId ? 78f : 60f;
         content.setNonStrokingColor(new java.awt.Color(245, 246, 248));
         content.addRect(left, startY - boxH, right - left, boxH);
         content.fill();
@@ -93,6 +94,11 @@ public class FacturaPdfTemplateRenderer {
         writeText(content,
                 factura.getFormaPago().name().equals("MP") ? "Mercado Pago" : "Efectivo",
                 right - 170, startY - 38, PDType1Font.HELVETICA_BOLD, 12f, new java.awt.Color(0, 102, 153));
+
+        if (hasPaymentId) {
+            writeText(content, "ID DE PAGO", right - 170, startY - 56, PDType1Font.HELVETICA, 9f, GRAY);
+            writeText(content, factura.getPaymentId(), right - 170, startY - 72, PDType1Font.HELVETICA_BOLD, 10f, BLACK);
+        }
 
         content.setStrokingColor(new java.awt.Color(218, 218, 218));
         content.moveTo(left, startY - boxH);
