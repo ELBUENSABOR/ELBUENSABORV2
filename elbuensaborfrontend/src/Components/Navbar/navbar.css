@@ -7,8 +7,6 @@
     --navbar-height: 64px;
     --navbar-gap: 10px;
     --navbar-padding-x: 24px;
-
-    /* nuevo: radios modernos (no pills) */
     --radius-sm: 10px;
     --radius-md: 12px;
     --radius-lg: 14px;
@@ -40,7 +38,7 @@
 }
 
 /* =========================
-   BRAND (LOGO)
+   LOGO
 ========================= */
 .navbar-brand-group {
     display: inline-flex;
@@ -96,7 +94,6 @@
     color: hsl(var(--foreground));
 }
 
-/* admin como chip moderno (no pill) */
 .navbar-admin-link {
     border-radius: var(--radius-md);
     padding: 9px 10px;
@@ -111,9 +108,6 @@
     border-color: hsl(var(--primary) / 0.55);
 }
 
-/* =========================
-   CONTROLS (CARRITO, SEARCH, TOGGLE)
-========================= */
 .navbar-controls {
     display: none;
     align-items: center;
@@ -175,7 +169,7 @@
    SEARCH (DESKTOP)
 ========================= */
 .navbar-search {
-    min-width: 320px; /* un poco más premium */
+    min-width: 320px;
     width: 100%;
 }
 
@@ -194,7 +188,7 @@
 }
 
 .navbar-search input {
-    border-radius: var(--radius-lg); /* NO pill */
+    border-radius: var(--radius-lg);
     border: 1px solid hsl(var(--border));
     padding: 10px 14px 10px 42px;
     background: hsl(var(--secondary));
@@ -254,7 +248,7 @@
 }
 
 .navbar-auth-buttons .btn {
-    border-radius: var(--radius-lg); /* no pill */
+    border-radius: var(--radius-lg);
     font-weight: 700;
     padding: 9px 14px;
 }
@@ -300,7 +294,7 @@
 .navbar-user-avatar {
     width: 38px;
     height: 38px;
-    border-radius: var(--radius-lg); /* más moderno que círculo perfecto */
+    border-radius: var(--radius-lg);
     border: 2px solid hsl(var(--primary) / 0.9);
     object-fit: cover;
     background: hsl(var(--secondary));
@@ -324,7 +318,7 @@
     gap: 10px;
 
     padding: 6px 10px;
-    border-radius: var(--radius-lg); /* no pill */
+    border-radius: var(--radius-lg);
     background: hsl(var(--secondary));
     border: 1px solid hsl(var(--border));
 }
@@ -338,7 +332,7 @@
 
 .navbar-sucursal select {
     min-width: 210px;
-    border-radius: var(--radius-md); /* clave: no pill */
+    border-radius: var(--radius-md);
     border: 1px solid hsl(var(--border));
     background: hsl(var(--card));
     padding: 8px 10px;
@@ -398,35 +392,29 @@
 
 
 /* =========================================
-   MOBILE: look like screenshot (no JSX changes)
+   MOBILE
 ========================================= */
 @media (max-width: 991px) {
     .navbar-container {
         --navbar-height: 56px;
         --navbar-padding-x: 12px;
         --navbar-gap: 10px;
-
-        /* si querés más “crema” como la captura */
         background: hsl(var(--card));
     }
 
     .navbar-main {
         min-height: var(--navbar-height);
         padding: 8px var(--navbar-padding-x);
-
-        /* 3 zonas: izquierda (logo), centro (select), derecha (iconos) */
         display: grid;
         grid-template-columns: auto 1fr auto;
         align-items: center;
         gap: var(--navbar-gap);
     }
 
-    /* -------- Left: brand as small icon chip -------- */
     .navbar-brand-group {
         padding: 0;
         height: 40px;
         width: 40px;
-        border-radius: 999px;
         display: grid;
         place-items: center;
         background: hsl(var(--secondary));
@@ -438,16 +426,6 @@
         height: 40px;
     }
 
-    /* hace el logo "icon-like" (como botón circular) */
-    .navbar-brand-logo-img {
-        height: 22px;
-        width: 22px;
-        border-radius: 0;
-        object-fit: contain;
-        display: block;
-    }
-
-    /* -------- Center: sucursal selector centered -------- */
     .navbar-mobile-sucursal {
         display: flex;
         justify-content: center;
@@ -458,7 +436,7 @@
         height: 40px;
         max-width: 210px;
         width: 100%;
-        border-radius: 999px; /* en mobile sí va pill como la captura */
+        border-radius: var(--radius-lg);
         padding: 0 38px 0 14px;
 
         background: hsl(var(--secondary));
@@ -472,7 +450,6 @@
         overflow: hidden;
         text-overflow: ellipsis;
 
-        /* “select” más limpio */
         box-shadow: none;
     }
 
@@ -481,7 +458,6 @@
         box-shadow: none;
     }
 
-    /* -------- Right: icons like the screenshot (no boxed buttons) -------- */
     .navbar-controls {
         display: flex;
         align-items: center;
@@ -523,19 +499,16 @@
         box-shadow: none;
     }
 
-    /* -------- Collapse spacing (cuando abrís el menú) -------- */
     .navbar-collapse {
         padding-top: 10px;
         padding-bottom: 10px;
     }
 
-    /* desktop search/auth hidden on mobile */
     .navbar-search--desktop,
     .navbar-auth-buttons {
         display: none !important;
     }
 
-    /* drawer de búsqueda mobile: que parezca “panel” */
     .navbar-search-wrapper {
         top: var(--navbar-height);
     }
@@ -559,7 +532,6 @@
         gap: 14px;
     }
 
-    /* Left group: sucursal cerca del logo */
     .navbar-desktop-left {
         display: flex;
         align-items: center;
@@ -567,7 +539,6 @@
         flex: 0 0 auto;
     }
 
-    /* Search centrado y ancho */
     .navbar-desktop-search {
         flex: 1 1 520px;
         min-width: 420px;
@@ -578,7 +549,6 @@
         height: 42px;
     }
 
-    /* Links a la derecha del buscador */
     .navbar-desktop-links {
         display: flex;
         align-items: center;
@@ -591,7 +561,6 @@
         margin-left: 6px;
     }
 
-    /* Sucursal en desktop como "chip" simple (sin label visible) */
     .navbar-sucursal--desktop {
         padding: 0;
         border: 0;
@@ -601,7 +570,7 @@
     .navbar-sucursal--desktop select {
         min-width: 220px;
         height: 42px;
-        border-radius: 999px; /* como tu screenshot desktop */
+        border-radius: var(--radius-lg);
         background: hsl(var(--secondary));
         border: 1px solid hsl(var(--border));
         padding: 0 14px;
@@ -613,7 +582,6 @@
         box-shadow: none;
     }
 
-    /* User: avatar + name alineados como screenshot */
     .navbar-user-trigger {
         gap: 10px;
     }

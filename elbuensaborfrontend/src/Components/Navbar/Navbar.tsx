@@ -107,7 +107,6 @@ export default function MyNavbar({onCartOpen, isCartOpen}: MyNavbarProps) {
                             </Nav.Link>
                         )}
 
-                        {/* MOBILE: items de usuario dentro del toggler */}
                         {user && (
                             <>
                                 <Nav.Link as={Link} to="/account" className="navbar-link">
@@ -130,17 +129,18 @@ export default function MyNavbar({onCartOpen, isCartOpen}: MyNavbarProps) {
                     </Nav>
 
                     <div className="d-none d-lg-flex w-100 align-items-center navbar-desktop-row">
-                        {/* Left: Logo + Sucursal */}
                         <div className="navbar-desktop-left">
                             {showSucursalSelector && (
-                                <Form className="navbar-sucursal navbar-sucursal--desktop" role="group" aria-label="Seleccionar sucursal">
+                                <Form className="navbar-sucursal navbar-sucursal--desktop" role="group"
+                                      aria-label="Seleccionar sucursal">
                                     <Form.Select
                                         value={sucursalId ?? ""}
                                         onChange={(event) => setSucursalId(event.target.value ? Number(event.target.value) : null)}
                                         disabled={loadingSucursales || sucursales.length === 0}
                                         aria-label="Seleccionar sucursal"
                                     >
-                                        <option value="">{loadingSucursales ? "Cargando..." : "Sucursal Principal"}</option>
+                                        <option
+                                            value="">{loadingSucursales ? "Cargando..." : "Seleccionar Sucursal"}</option>
                                         {sucursales.map((sucursal) => (
                                             <option key={sucursal.id} value={sucursal.id}>
                                                 {sucursal.nombre}
@@ -151,11 +151,11 @@ export default function MyNavbar({onCartOpen, isCartOpen}: MyNavbarProps) {
                             )}
                         </div>
 
-                        {/* Center: Search */}
-                        <Form className="navbar-search navbar-search--desktop navbar-desktop-search" role="search" aria-label="Buscar">
-    <span className="navbar-search-icon" aria-hidden="true">
-      <Search size={16} />
-    </span>
+                        <Form className="navbar-search navbar-search--desktop navbar-desktop-search" role="search"
+                              aria-label="Buscar">
+                            <span className="navbar-search-icon" aria-hidden="true">
+                              <Search size={16}/>
+                            </span>
                             <Form.Control
                                 type="search"
                                 placeholder="Buscar comidas, bebidas..."
@@ -181,12 +181,11 @@ export default function MyNavbar({onCartOpen, isCartOpen}: MyNavbarProps) {
                             )}
                         </Nav>
 
-                        {/* Right actions */}
                         <Nav className="navbar-actions navbar-desktop-actions">
                             {!user ? (
                                 <div className="navbar-auth-buttons">
                                     <Link className="btn navbar-auth-btn" to="/login">
-                                        <LogIn size={18} />
+                                        <LogIn size={18}/>
                                         Ingresar
                                     </Link>
 
@@ -198,13 +197,13 @@ export default function MyNavbar({onCartOpen, isCartOpen}: MyNavbarProps) {
                                 <NavDropdown
                                     title={
                                         <span className="navbar-user-trigger">
-            {profilePhotoUrl ? (
-                <img src={profilePhotoUrl} alt="Foto de perfil" className="navbar-user-avatar" />
-            ) : (
-                <HiOutlineUserCircle className="navbar-user-avatar navbar-user-avatar--fallback" />
-            )}
+                                            {profilePhotoUrl ? (
+                                                <img src={profilePhotoUrl} alt="Foto de perfil" className="navbar-user-avatar"/>
+                                            ) : (
+                                                <HiOutlineUserCircle className="navbar-user-avatar navbar-user-avatar--fallback"/>
+                                            )}
                                             <span className="navbar-user-name">{dropdownTitle}</span>
-          </span>
+                                          </span>
                                     }
                                     id="basic-nav-dropdown"
                                     align="end"
@@ -219,7 +218,7 @@ export default function MyNavbar({onCartOpen, isCartOpen}: MyNavbarProps) {
                                         </NavDropdown.Item>
                                     )}
 
-                                    <hr />
+                                    <hr/>
                                     <NavDropdown.Item onClick={logout}>Cerrar sesión</NavDropdown.Item>
                                 </NavDropdown>
                             )}
