@@ -1,115 +1,248 @@
+/* =========================
+   NAVBAR BASE
+========================= */
 .navbar-container {
-    display: flex;
-    flex-direction: column;
-    width: 100%;
-    justify-content: space-between;
-    background-color: hsl(var(--card));
-    box-shadow: var(--shadow-sm);
-    border-bottom: 1px solid hsl(var(--border));
-    z-index: 10;
     --navbar-height: 64px;
+    --navbar-gap: 10px;
+    --navbar-padding-x: 24px;
+
+    /* nuevo: radios modernos (no pills) */
+    --radius-sm: 10px;
+    --radius-md: 12px;
+    --radius-lg: 14px;
+
+    width: 100%;
+    background-color: hsl(var(--card));
+    border-bottom: 1px solid hsl(var(--border));
+    z-index: 1030;
+}
+
+/* glass suave */
+@supports ((-webkit-backdrop-filter: blur(10px)) or (backdrop-filter: blur(10px))) {
+    .navbar-container {
+        background-color: hsl(var(--card) / 0.92);
+        -webkit-backdrop-filter: blur(10px);
+        backdrop-filter: blur(10px);
+    }
 }
 
 .navbar-main {
     display: flex;
     align-items: center;
     width: 100%;
-    padding: 12px 24px;
+    padding: 10px var(--navbar-padding-x);
     min-height: var(--navbar-height);
+    gap: var(--navbar-gap);
 }
 
-.navbar-container .navbar-brand {
-    font-weight: 700;
+/* =========================
+   BRAND (LOGO)
+========================= */
+.navbar-brand-group {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    height: var(--navbar-height);
+    min-width: 0;
+    padding: 6px 8px;
+    border-radius: var(--radius-md);
+    transition: background-color 0.2s ease;
+}
+
+.navbar-brand-group:hover {
+    background: hsl(var(--secondary));
+}
+
+.navbar-brand-logo-img {
+    height: 60px;
+    width: auto;
+    max-height: 100%;
+    object-fit: contain;
+    border-radius: 0;
+    border: none;
+    background: transparent;
+    display: block;
+}
+
+/* =========================
+   NAV LINKS (DESKTOP)
+========================= */
+.navbar-link {
+    border-radius: var(--radius-md);
+    padding: 9px 10px;           /* menos “gordito” */
+    color: hsl(var(--foreground));
+    font-weight: 600;
+    line-height: 1;
+    transition: background-color 0.2s ease, color 0.2s ease;
+}
+
+.navbar-link:hover,
+.navbar-link:focus {
+    background: hsl(var(--secondary));
     color: hsl(var(--foreground));
 }
 
+/* admin como chip moderno (no pill) */
+.navbar-admin-link {
+    border-radius: var(--radius-md);
+    padding: 9px 10px;
+    font-weight: 700;
+    line-height: 1;
+    background: hsl(var(--secondary));
+    border: 1px solid hsl(var(--border));
+}
+
+.navbar-admin-link:hover,
+.navbar-admin-link:focus {
+    border-color: hsl(var(--primary) / 0.55);
+}
+
+/* =========================
+   CONTROLS (CARRITO, SEARCH, TOGGLE)
+========================= */
 .navbar-controls {
     display: none;
+    align-items: center;
+    gap: 6px;
+    margin-left: auto;
 }
 
 .navbar-icon-button {
-    border: none;
-    background: transparent;
+    border: 0px;
+    background: hsl(var(--card));
     color: hsl(var(--foreground));
-    width: 38px;
-    height: 38px;
-    border-radius: 13px;
+    width: 40px;
+    height: 40px;
+    border-radius: var(--radius-lg);
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    transition: background-color 0.2s ease;
+    transition: background-color 0.2s ease, border-color 0.2s ease, transform 0.06s ease;
 }
 
 .navbar-icon-button:hover,
 .navbar-icon-button:focus {
     background: hsl(var(--secondary));
+    border-color: hsl(var(--primary) / 0.35);
 }
 
-.navbar-icon {
-    width: 20px;
-    height: 20px;
+.navbar-icon-button:active {
+    transform: scale(0.98);
 }
 
+.navbar-toggle.navbar-toggler {
+    padding: 0;
+    width: 40px;
+    height: 40px;
+    border-radius: var(--radius-lg);
+    border: 0px;
+    box-shadow: none;
+    background: hsl(var(--card));
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.navbar-toggle.navbar-toggler:hover {
+    background: hsl(var(--secondary));
+    border-color: hsl(var(--primary) / 0.35);
+}
+
+.navbar-toggle.navbar-toggler:focus {
+    box-shadow: none;
+}
+
+.navbar-toggle  .navbar-toggler-icon {
+    width: 40px;
+    height: 40px;
+}
+
+/* =========================
+   SEARCH (DESKTOP)
+========================= */
 .navbar-search {
-    min-width: 280px;
+    min-width: 320px; /* un poco más premium */
     width: 100%;
 }
 
+.navbar-search--desktop {
+    display: block;
+    position: relative;
+}
+
+.navbar-search-icon {
+    position: absolute;
+    left: 14px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: hsl(var(--muted-foreground));
+    pointer-events: none;
+}
+
 .navbar-search input {
-    border-radius: 13px;
+    border-radius: var(--radius-lg); /* NO pill */
     border: 1px solid hsl(var(--border));
-    padding: 8px 16px;
+    padding: 10px 14px 10px 42px;
     background: hsl(var(--secondary));
+    transition: border-color 0.2s ease, background-color 0.2s ease;
 }
 
 .navbar-search input:hover,
 .navbar-search input:focus {
     border-color: hsl(var(--primary));
     box-shadow: none;
-    background: hsl(var(--secondary));
+    background: hsl(var(--secondary) / 0.9);
 }
 
+/* =========================
+   MOBILE SEARCH DRAWER
+========================= */
+.navbar-search-wrapper {
+    position: sticky;
+    top: var(--navbar-height);
+    z-index: 1029;
+    background: hsl(var(--card));
+    border-bottom: 1px solid hsl(var(--border));
+
+    max-height: 0;
+    overflow: hidden;
+    opacity: 0;
+    transform: translateY(-6px);
+    transition: max-height 220ms ease, opacity 160ms ease, transform 220ms ease;
+}
+
+.navbar-search-wrapper.is-open {
+    max-height: 92px;
+    opacity: 1;
+    transform: translateY(0);
+}
+
+.navbar-search-wrapper .container {
+    max-width: 100%;
+    padding: 12px;
+}
+
+.navbar-search--mobile {
+    display: block;
+}
+
+/* =========================
+   DESKTOP ACTIONS (RIGHT)
+========================= */
 .navbar-actions {
     margin-left: auto;
 }
 
-.navbar-sucursal {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-}
-
-.navbar-sucursal-label {
-    margin-bottom: 0;
-    color: hsl(var(--muted-foreground));
-    font-size: 0.85rem;
-}
-
-.navbar-sucursal select {
-    min-width: 200px;
-    border-radius: 12px;
-    border: 1px solid hsl(var(--border));
-    background: hsl(var(--secondary));
-}
-
-.navbar-sucursal select:focus {
-    border-color: hsl(var(--primary));
-    box-shadow: none;
-}
-
-.navbar-admin-link {
-    white-space: nowrap;
-}
-
 .navbar-auth-buttons {
     display: flex;
-    gap: 12px;
+    gap: 10px;
+    align-items: center;
 }
 
 .navbar-auth-buttons .btn {
-    border-radius: 13px;
-    font-weight: 600;
-    padding: 8px 18px;
+    border-radius: var(--radius-lg); /* no pill */
+    font-weight: 700;
+    padding: 9px 14px;
 }
 
 .navbar-auth-buttons .btn-light {
@@ -120,231 +253,177 @@
 
 .navbar-auth-btn {
     background: hsl(var(--card));
+    border: 1px solid hsl(var(--border));
     color: hsl(var(--foreground));
-}
-
-.navbar-auth-btn:hover,
-.navbar-auth-btn:focus {
-    background: hsl(var(--secondary));
-    border-color: hsl(var(--secondary));
-    color: hsl(var(--foreground));
-}
-
-.navbar-auth-buttons .btn-outline-light {
-    border: none;
-    background: transparent;
-    color: hsl(var(--foreground));
-}
-
-.navbar-auth-buttons .btn-outline-light:hover,
-.navbar-auth-buttons .btn-outline-light:focus {
-    background: hsl(var(--secondary));
-    color: hsl(var(--foreground));
-}
-
-.navbar-auth-buttons .btn-light:hover,
-.navbar-auth-buttons .btn-light:focus {
-    background: hsl(var(--primary));
-    border-color: hsl(var(--primary));
-    color: hsl(var(--primary-foreground));
-}
-
-.navbar-auth-btn {
     display: inline-flex;
     align-items: center;
     gap: 8px;
 }
 
-.navbar-auth-icon {
-    width: 18px;
-    height: 18px;
-    display: inline-block;
-    vertical-align: middle;
+.navbar-auth-btn:hover,
+.navbar-auth-btn:focus {
+    background: hsl(var(--secondary));
+    border-color: hsl(var(--primary) / 0.35);
 }
 
-.navbar-search-wrapper {
-    position: sticky;
-    top: var(--navbar-height);
-    z-index: 9;
+/* =========================
+   USER DROPDOWN
+========================= */
+.navbar-user-trigger {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.navbar-user-name {
+    font-weight: 700;
+    max-width: 160px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.navbar-user-avatar {
+    width: 38px;
+    height: 38px;
+    border-radius: var(--radius-lg); /* más moderno que círculo perfecto */
+    border: 2px solid hsl(var(--primary) / 0.9);
+    object-fit: cover;
+    background: hsl(var(--secondary));
+}
+
+.navbar-user-avatar--fallback {
+    padding: 2px;
+    color: hsl(var(--primary));
+}
+
+.navbar-actions .dropdown-toggle::after {
+    margin-left: 0.5rem;
+}
+
+/* =========================
+   SUCURSAL (DESKTOP)
+========================= */
+.navbar-sucursal {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+
+    padding: 6px 10px;
+    border-radius: var(--radius-lg); /* no pill */
+    background: hsl(var(--secondary));
+    border: 1px solid hsl(var(--border));
+}
+
+.navbar-sucursal-label {
+    margin-bottom: 0;
+    color: hsl(var(--muted-foreground));
+    font-size: 0.82rem;
+    font-weight: 700;
+}
+
+.navbar-sucursal select {
+    min-width: 210px;
+    border-radius: var(--radius-md); /* clave: no pill */
+    border: 1px solid hsl(var(--border));
     background: hsl(var(--card));
-    padding: 0 0 12px;
-    border-bottom: 1px solid hsl(var(--border));
+    padding: 8px 10px;
 }
 
-.navbar-search-wrapper .container {
-    max-width: 100%;
+.navbar-sucursal select:focus {
+    border-color: hsl(var(--primary));
+    box-shadow: none;
 }
 
-.navbar-search--mobile {
+/* =========================
+   MOBILE MENU (COLLAPSE)
+========================= */
+.navbar-mobile-menu {
+    padding: 12px 0 10px;
+    gap: 6px;
+}
+
+.navbar-mobile-menu .nav-link {
+    padding: 12px 12px;
+    border-radius: var(--radius-lg);
+    font-weight: 700;
+    color: hsl(var(--foreground));
+    transition: background-color 0.2s ease;
+}
+
+.navbar-mobile-menu .nav-link:hover {
+    background: hsl(var(--secondary));
+}
+
+/* =========================
+   MOBILE SUCURSAL
+========================= */
+.navbar-mobile-sucursal {
     display: none;
 }
 
-.navbar-search--mobile.is-open {
-    display: block;
+.navbar-mobile-sucursal-select.form-select {
+    height: 40px;
+    padding: 0 36px 0 12px;
+    border-radius: var(--radius-lg);
+    border: 1px solid hsl(var(--border));
+    background-color: hsl(var(--secondary));
+    color: hsl(var(--foreground));
+    font-size: 0.85rem;
+    line-height: 1;
+    max-width: 180px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
 }
 
-.navbar-search--desktop {
-    display: block;
+.navbar-mobile-sucursal-select.form-select:focus {
+    border-color: hsl(var(--primary));
+    box-shadow: none;
 }
 
+/* =========================
+   RESPONSIVE
+========================= */
 @media (max-width: 991px) {
+    .navbar-container {
+        --navbar-height: 60px;
+        --navbar-padding-x: 12px;
+        --navbar-gap: 8px;
+    }
+
     .navbar-main {
-        padding: 10px 12px;
+        padding: 10px var(--navbar-padding-x);
         display: grid;
         grid-template-columns: auto 1fr auto;
-        gap: 8px;
+        gap: var(--navbar-gap);
         align-items: center;
-    }
-
-    .navbar-brand-group {
-        min-width: 0;
-        gap: 8px;
-    }
-
-    .navbar-brand-logo {
-        width: 30px;
-        height: 30px;
-        border-radius: 9px;
-        font-size: 0.62rem;
-    }
-
-    .navbar-brand-name {
-        font-size: 0.82rem;
-        overflow: hidden;
-        text-overflow: ellipsis;
-        max-width: 120px;
-    }
-
-    .navbar-mobile-sucursal {
-        display: inline-block;
-        min-width: 0;
-        font-size: 0.78rem;
-        color: hsl(var(--muted-foreground));
-        text-align: center;
-        white-space: nowrap;
-        overflow: hidden;
-        text-overflow: ellipsis;
     }
 
     .navbar-controls {
         display: flex;
+    }
+
+    .navbar-brand-logo-img {
+        height: 60px;
+    }
+
+    .navbar-mobile-sucursal {
+        display: flex;
         align-items: center;
-        gap: 6px;
-        margin-left: auto;
-    }
-
-    .navbar-icon-button {
-        width: 34px;
-        height: 34px;
-        border-radius: 11px;
-    }
-
-    .navbar-search {
-        width: 100%;
-        min-width: 100%;
-        margin: 8px 0;
-    }
-
-    .navbar-search-wrapper {
-        display: none;
-        padding: 0 12px 10px;
-        width: 100%;
+        justify-content: center;
+        min-width: 0;
     }
 
     .navbar-search--desktop {
         display: none;
     }
 
-    .navbar-mobile-auth-link {
-        display: block;
-    }
-
-    .navbar-sucursal {
-        width: 100%;
-        margin-bottom: 8px;
-    }
-
-    .navbar-sucursal select {
-        width: 100%;
-    }
-
     .navbar-auth-buttons {
         display: none;
     }
 
-    .navbar-auth-btn {
-        justify-content: center;
-        background: hsl(var(--primary));
-        border-color: hsl(var(--primary));
-        color: hsl(var(--primary-foreground));
+    .navbar-collapse {
+        padding-bottom: 10px;
     }
-
-    .navbar-auth-btn:hover,
-    .navbar-auth-btn:focus {
-        background: hsl(var(--primary));
-        border-color: hsl(var(--primary));
-        color: hsl(var(--primary-foreground));
-    }
-}
-
-.navbar-user-trigger {
-    display: inline-flex;
-    align-items: center;
-    gap: 8px;
-}
-
-.navbar-user-name {
-    font-weight: 500;
-}
-
-.navbar-user-avatar {
-    width: 40px;
-    height: 40px;
-    border-radius: 50%;
-    border: 2px solid hsl(var(--primary));
-    object-fit: cover;
-    background: hsl(var(--secondary));
-}
-
-.navbar-user-avatar--fallback {
-    padding: 3px;
-    color: hsl(var(--primary));
-}
-
-.navbar-actions .dropdown-toggle::after {
-    margin-left: 0.55rem;
-}
-
-
-
-.navbar-brand-group {
-    display: inline-flex;
-    align-items: center;
-    gap: 10px;
-}
-
-.navbar-brand-logo {
-    width: 34px;
-    height: 34px;
-    border-radius: 10px;
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    background: hsl(var(--primary));
-    color: hsl(var(--primary-foreground));
-    font-size: 0.72rem;
-    font-weight: 700;
-    letter-spacing: 0.03em;
-}
-
-.navbar-brand-name {
-    white-space: nowrap;
-}
-
-.navbar-mobile-sucursal {
-    display: none;
-}
-
-.navbar-mobile-auth-link {
-    display: none;
 }
