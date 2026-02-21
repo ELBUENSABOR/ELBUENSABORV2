@@ -1,10 +1,10 @@
 package com.utn.elbuensabor.services;
 
+import java.util.List;
+
 import com.utn.elbuensabor.dtos.CategoriaRequest;
 import com.utn.elbuensabor.dtos.CategoriaResponse;
 import com.utn.elbuensabor.entities.CategoriaArticuloInsumo;
-
-import java.util.List;
 
 public interface CategoriaArticuloInsumoService {
 

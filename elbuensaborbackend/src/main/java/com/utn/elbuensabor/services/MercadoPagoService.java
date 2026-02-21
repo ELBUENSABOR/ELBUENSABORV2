@@ -5,5 +5,5 @@ import com.mercadopago.exceptions.MPException;
 import com.utn.elbuensabor.entities.PedidoVenta;
 
 public interface MercadoPagoService {
-    String crearPreference(PedidoVenta pedido) throws MPException, MPApiException;
+    public String crearPreference(PedidoVenta pedido) throws MPException, MPApiException;
 }

@@ -1,5 +1,5 @@
-import type {Sucursal} from "./Sucursal";
-import type {InsumoResponse} from "./Insumo";
+import type { Sucursal } from "./Sucursal";
+import type { InsumoResponse } from "./Insumo";
 
 export interface CompraInsumo {
     id: number;

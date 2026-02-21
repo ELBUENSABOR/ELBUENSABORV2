@@ -1,13 +1,10 @@
 package com.utn.elbuensabor.services.impl;
 
-import com.utn.elbuensabor.dtos.LocalidadDTO;
-import com.utn.elbuensabor.dtos.UserDTO;
 import com.utn.elbuensabor.dtos.UserEditRequestDTO;
 import com.utn.elbuensabor.dtos.UserRequestDTO;
 import com.utn.elbuensabor.entities.*;
 import com.utn.elbuensabor.repositories.*;
 import com.utn.elbuensabor.services.UserService;
-import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
@@ -96,7 +93,9 @@ public class UserServiceImpl implements UserService {
             cliente.setDomicilio(domicilio);
 
             clienteRepository.save(cliente);
-        } else if (dto.rolSistema() == RolSistema.EMPLEADO) {
+        }
+
+        else if (dto.rolSistema() == RolSistema.EMPLEADO) {
             Empleado empleado = new Empleado();
             empleado.setUsuario(usuario);
             empleado.setNombre(dto.nombre());
@@ -161,6 +160,7 @@ public class UserServiceImpl implements UserService {
         }
 
 
+
         usuario.setUsername(userDTO.username());
         usuario.setActivo(true);
         usuario.setFotoPerfil(userDTO.fotoPerfil());
@@ -204,16 +204,11 @@ public class UserServiceImpl implements UserService {
             empleado.setPerfilEmpleado(userDTO.perfilEmpleado());
         }
 
-        if (usuario.getRolSistema() == RolSistema.EMPLEADO) {
-            if (userDTO.sucursalId() == null) {
-                throw new RuntimeException("Debe asignar una sucursal al empleado");
-            }
+        if (userDTO.sucursalId() != null) {
             SucursalEmpresa sucursal = sucursalEmpresaRepository.findById(userDTO.sucursalId())
                     .orElseThrow(() -> new RuntimeException("Sucursal no encontrada"));
 
             usuario.setSucursal(sucursal);
-        } else {
-            usuario.setSucursal(null);
         }
 
         usuarioRepository.save(usuario);

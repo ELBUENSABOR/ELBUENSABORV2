@@ -1,4 +1,10 @@
-import {createContext, type ReactNode, useContext, useEffect, useState,} from "react";
+import {
+    createContext,
+    useContext,
+    useState,
+    useEffect,
+    type ReactNode,
+} from "react";
 import type {User} from "../models/Usuario";
 
 interface UserContextType {

@@ -1,7 +1,12 @@
 import {Link} from "react-router-dom";
 import {ChangePasswordPopup} from "./ChangePasswordPopup";
 import "./home.css";
-import {BadgePercent, Clock4, MapPinned, Phone} from 'lucide-react';
+import {
+    BadgePercent,
+    MapPinned,
+    Clock4,
+    Phone
+} from 'lucide-react';
 
 
 //Hardcodeado, tal vez podemos hacer "ofertas" con una propiedad "descuento" en los productos.
