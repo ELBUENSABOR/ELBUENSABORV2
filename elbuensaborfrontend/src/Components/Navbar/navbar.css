@@ -2,6 +2,8 @@
    NAVBAR BASE
 ========================= */
 .navbar-container {
+    margin: 0px 76px;
+    padding: 0px 48px;
     --navbar-height: 64px;
     --navbar-gap: 10px;
     --navbar-padding-x: 24px;
@@ -20,6 +22,8 @@
 /* glass suave */
 @supports ((-webkit-backdrop-filter: blur(10px)) or (backdrop-filter: blur(10px))) {
     .navbar-container {
+        margin: 0px 0px;
+        padding: 5px 20px;
         background-color: hsl(var(--card) / 0.92);
         -webkit-backdrop-filter: blur(10px);
         backdrop-filter: blur(10px);
@@ -66,7 +70,7 @@
 
 .navbar-brand-logo-mark {
     width: 30px;
-    height: 30px;
+    height: 60px;
     display: inline-flex;
     align-items: center;
     justify-content: center;
