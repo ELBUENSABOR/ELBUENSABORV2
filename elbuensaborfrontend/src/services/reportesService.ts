@@ -19,6 +19,12 @@ export interface ReporteClientesPedidosDTO {
     totalPedidos: number;
 }
 
+export interface ReporteBalanceFinancieroDTO {
+    ingresos: number;
+    costos: number;
+    ganancias: number;
+}
+
 const API_BASE = import.meta.env.VITE_API_URL ?? "";
 
 export async function fetchProductosMasVendidos(
@@ -60,6 +66,27 @@ export async function fetchClientesPorPedidos(
             desde,
             hasta,
             orden,
+        },
+    });
+    return response.data;
+}
+
+export async function fetchBalanceFinanciero(
+    desde: string,
+    hasta: string
+): Promise<ReporteBalanceFinancieroDTO> {
+    const token = sessionStorage.getItem("token");
+    const headers = token
+        ? {
+            Authorization: `Bearer ${token}`,
+        }
+        : {};
+    const response = await axios.get(`${API_BASE}/reportes/balance-financiero`, {
+        headers,
+        withCredentials: true,
+        params: {
+            desde,
+            hasta,
         },
     });
     return response.data;

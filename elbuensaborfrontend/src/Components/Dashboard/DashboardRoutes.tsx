@@ -25,6 +25,7 @@ import PedidosCocina from "./Pedidos/PedidosCocina";
 import PedidosDelivery from "./Pedidos/PedidosDelivery";
 import ProductosMasVendidos from "./Reportes/ProductosMasVendidos";
 import ClientesPorPedidos from "./Reportes/ClientesPorPedidos";
+import BalanceFinanciero from "./Reportes/BalanceFinanciero";
 import {useUser} from "../../contexts/UsuarioContext";
 
 const DashboardIndex = () => {
@@ -102,6 +103,10 @@ const DashboardRoutes = () => (
                 <Route
                     path="reportes/clientes-por-pedidos"
                     element={<ClientesPorPedidos/>}
+                />
+                <Route
+                    path="reportes/balance-financiero"
+                    element={<BalanceFinanciero/>}
                 />
             </Route>
             <Route element={<PrivateRoute roles={["ADMIN", "EMPLEADO"]}/>}>

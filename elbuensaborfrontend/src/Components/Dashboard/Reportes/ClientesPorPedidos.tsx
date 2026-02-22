@@ -1,8 +1,8 @@
 import { useEffect, useMemo, useState } from "react";
 import {
-    fetchClientesPorPedidos,
-    ReporteClientesPedidosDTO,
+    fetchClientesPorPedidos
 } from "../../../services/reportesService";
+import type {ReporteClientesPedidosDTO} from "../../../services/reportesService";
 import { getPedidosByCliente } from "../../../services/pedidoService";
 import type { PedidoResponse } from "../../../services/pedidoService";
 import OrderDetailModal from "../../Common/OrderDetailModal/OrderDetailModal";

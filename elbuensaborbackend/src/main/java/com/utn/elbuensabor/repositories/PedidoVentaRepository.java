@@ -11,6 +11,7 @@ import org.springframework.stereotype.Repository;
 
 import com.utn.elbuensabor.entities.EstadoPedido;
 import com.utn.elbuensabor.entities.PedidoVenta;
+import com.utn.elbuensabor.dtos.ReporteBalanceFinancieroDTO;
 import com.utn.elbuensabor.dtos.ReporteClientesPedidosDTO;
 
 @Repository
@@ -56,6 +57,18 @@ public interface PedidoVentaRepository extends JpaRepository<PedidoVenta, Long> 
         GROUP BY c.id, c.nombre, c.apellido, c.email
         """)
     List<ReporteClientesPedidosDTO> findReporteClientesPedidos(
+            @Param("fechaInicio") LocalDateTime fechaInicio,
+            @Param("fechaFin") LocalDateTime fechaFin);
+    @Query("""
+            SELECT new com.utn.elbuensabor.dtos.ReporteBalanceFinancieroDTO(
+                COALESCE(SUM(p.total), 0),
+                COALESCE(SUM(p.totalCosto), 0),
+                COALESCE(SUM(p.total), 0) - COALESCE(SUM(p.totalCosto), 0)
+            )
+            FROM PedidoVenta p
+            WHERE p.fechaPedido BETWEEN :fechaInicio AND :fechaFin
+            """)
+    ReporteBalanceFinancieroDTO findBalanceFinanciero(
             @Param("fechaInicio") LocalDateTime fechaInicio,
             @Param("fechaFin") LocalDateTime fechaFin);
 }

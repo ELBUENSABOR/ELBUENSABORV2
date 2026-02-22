@@ -63,6 +63,12 @@ const links = [
         icon: BarChart3,
         rol: ["ADMIN"],
     },
+    {
+        path: "/dashboard/reportes/balance-financiero",
+        label: "Balance financiero",
+        icon: BarChart3,
+        rol: ["ADMIN"],
+    },
 ];
 
 const Sidebar = ({open, close}: { open: boolean; close: () => void }) => {

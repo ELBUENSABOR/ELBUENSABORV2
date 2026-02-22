@@ -1,8 +1,8 @@
 import {useEffect, useMemo, useState} from "react";
 import {
-    fetchProductosMasVendidos,
-    ReporteProductosVendidosDTO,
+    fetchProductosMasVendidos
 } from "../../../services/reportesService";
+import type {ReporteProductosVendidosDTO} from "../../../services/reportesService";
 
 const formatDateInput = (date: Date) => {
     const year = date.getFullYear();
