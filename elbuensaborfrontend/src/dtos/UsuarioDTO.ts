@@ -12,4 +12,5 @@ export interface UsuarioDTO {
     rolSistema: RolSistema;
     activo?: boolean;
     fotoPerfil?: string | null;
+    fechaRegistro?: string;
 }

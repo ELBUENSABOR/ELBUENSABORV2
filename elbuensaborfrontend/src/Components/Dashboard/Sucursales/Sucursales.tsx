@@ -56,8 +56,6 @@ const Sucursales = () => {
 
   return (
     <div className="sucursales-container">
-      <h5>Sucursales</h5>
-      <hr />
       <div className="header-dashboard">
           <input
               name="search"

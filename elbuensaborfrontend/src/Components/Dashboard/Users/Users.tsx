@@ -1,11 +1,25 @@
-import { useEffect, useMemo, useState, type ChangeEvent } from "react";
-import { getAllUsers, deleteUserService } from "../../../services/userService";
-import type { UsuarioDTO } from "../../../dtos/UsuarioDTO";
+import {useEffect, useMemo, useState, type ChangeEvent} from "react";
+import {getAllUsers, deleteUserService} from "../../../services/userService";
+import type {UsuarioDTO} from "../../../dtos/UsuarioDTO";
 import "./users.css";
-import { useNavigate } from "react-router-dom";
+import {useNavigate} from "react-router-dom";
 import ModalConfirmAction from "../../Common/ModalConfirmAction/ModalConfirmAction";
 import Alert from "../../Alert/Alert";
-import { Users as UsersIcon } from "lucide-react";
+
+const formatRegistrationDate = (fechaRegistro?: string) => {
+    if (!fechaRegistro) {
+        return "-";
+    }
+
+    const parsedDate = new Date(fechaRegistro);
+    if (Number.isNaN(parsedDate.getTime())) {
+        return "-";
+    }
+
+    return parsedDate.toLocaleString("es-AR", {
+        timeZone: "America/Argentina/Buenos_Aires",
+    });
+};
 
 const Users = () => {
     const [originalUsers, setOriginalUsers] = useState<UsuarioDTO[]>();
@@ -106,17 +120,6 @@ const Users = () => {
 
     return (
         <div className="users-container">
-            <div className="users-header">
-                <div className="users-title">
-          <span className="users-title-icon" aria-hidden="true">
-            <UsersIcon />
-          </span>
-                    <div>
-                        <h5>Usuarios</h5>
-                        <p>Gestión de empleados y clientes</p>
-                    </div>
-                </div>
-            </div>
             <div className="users-controls">
                 <div className="users-search">
           <span className="users-search-icon" aria-hidden="true">
@@ -201,7 +204,7 @@ const Users = () => {
                         {u.activo ? "Activo" : "Inactivo"}
                       </span>
                                     </td>
-                                    <td>-</td>
+                                    <td>{formatRegistrationDate(u.fechaRegistro)}</td>
                                     <td>
                                         {u.activo && (
                                             <div className="users-actions">

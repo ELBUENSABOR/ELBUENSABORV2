@@ -1,24 +1,23 @@
 package com.utn.elbuensabor.services.impl;
 
-import java.math.BigDecimal;
-import java.time.LocalDateTime;
-
-import lombok.RequiredArgsConstructor;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
-
-import com.utn.elbuensabor.entities.FacturaVenta;
-import com.utn.elbuensabor.entities.FacturaVentaDetalle;
-import com.utn.elbuensabor.entities.PedidoVenta;
-import com.utn.elbuensabor.entities.PedidoVentaDetalle;
-import com.utn.elbuensabor.repositories.FacturaVentaRepository;
-import com.utn.elbuensabor.services.FacturaService;
-
 import java.io.IOException;
 import java.math.BigDecimal;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.time.LocalDateTime;
+
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import com.utn.elbuensabor.entities.FacturaVenta;
+import com.utn.elbuensabor.entities.FacturaVentaDetalle;
+import com.utn.elbuensabor.entities.NotaCreditoVenta;
+import com.utn.elbuensabor.entities.PedidoVenta;
+import com.utn.elbuensabor.entities.PedidoVentaDetalle;
+import com.utn.elbuensabor.repositories.FacturaVentaRepository;
+import com.utn.elbuensabor.services.FacturaService;
+
+import lombok.RequiredArgsConstructor;
 
 @Service
 @RequiredArgsConstructor
@@ -73,6 +72,56 @@ public class FacturaServiceImpl implements FacturaService {
         } catch (IOException ex) {
             throw new RuntimeException("No se pudo generar el PDF de factura", ex);
         }
+    }
+
+    public String generarPdfNotaCredito(NotaCreditoVenta notaCredito) {
+        Path dir = Path.of("uploads", "notas-credito");
+        try {
+            Files.createDirectories(dir);
+            String fileName = String.format("nota-credito-%d.pdf", notaCredito.getId());
+            Path filePath = dir.resolve(fileName);
+
+            FacturaVenta plantilla = construirPlantillaNotaCredito(notaCredito);
+            facturaPdfTemplateRenderer.render(filePath, plantilla, "NOTA DE CRÉDITO");
+
+            return "/uploads/notas-credito/" + fileName;
+        } catch (IOException ex) {
+            throw new RuntimeException("No se pudo generar el PDF de la nota de crédito", ex);
+        }
+    }
+
+    private FacturaVenta construirPlantillaNotaCredito(NotaCreditoVenta notaCredito) {
+        FacturaVenta facturaPlantilla = new FacturaVenta();
+        facturaPlantilla.setPedido(notaCredito.getPedido());
+        facturaPlantilla.setFechaFacturacion(notaCredito.getFechaEmision());
+        facturaPlantilla.setNumeroComprobante(notaCredito.getNumeroComprobante());
+        facturaPlantilla.setFormaPago(notaCredito.getPedido().getFormaPago());
+
+        FacturaVenta original = notaCredito.getFacturaOriginal();
+        if (original != null) {
+            facturaPlantilla.setSubTotal(original.getSubTotal());
+            facturaPlantilla.setDescuento(original.getDescuento());
+            facturaPlantilla.setGastosEnvio(original.getGastosEnvio());
+            facturaPlantilla.setTotalVenta(original.getTotalVenta());
+            facturaPlantilla.setPaymentId(original.getPaymentId());
+
+            for (FacturaVentaDetalle detalleOriginal : original.getDetalles()) {
+                FacturaVentaDetalle detalle = new FacturaVentaDetalle();
+                detalle.setFactura(facturaPlantilla);
+                detalle.setCantidad(detalleOriginal.getCantidad());
+                detalle.setSubTotal(detalleOriginal.getSubTotal());
+                detalle.setArticuloManufacturado(detalleOriginal.getArticuloManufacturado());
+                detalle.setArticuloInsumo(detalleOriginal.getArticuloInsumo());
+                facturaPlantilla.getDetalles().add(detalle);
+            }
+        } else {
+            facturaPlantilla.setSubTotal(notaCredito.getTotal());
+            facturaPlantilla.setDescuento(0.0);
+            facturaPlantilla.setGastosEnvio(0.0);
+            facturaPlantilla.setTotalVenta(notaCredito.getTotal());
+        }
+
+        return facturaPlantilla;
     }
 
     private String generarNumeroComprobante() {

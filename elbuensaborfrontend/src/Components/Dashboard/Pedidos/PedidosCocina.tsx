@@ -41,7 +41,7 @@ const PedidosCocina = () => {
             );
             setPedidos(filtrados);
         } catch (err) {
-            setError("No se pudieron cargar los pedidos de cocina.");
+            setError("No se pudieron cargar los pedidos de cocina: " + err);
         } finally {
             setLoading(false);
         }
@@ -85,7 +85,7 @@ const PedidosCocina = () => {
                 return next;
             });
         } catch (err) {
-            setError("No se pudieron cargar las recetas.");
+            setError("No se pudieron cargar las recetas: " + err);
         } finally {
             setDetalleLoading(false);
         }
@@ -106,7 +106,7 @@ const PedidosCocina = () => {
             }
             await cargarPedidos();
         } catch (err) {
-            setError("No se pudo marcar el pedido como listo.");
+            setError("No se pudo marcar el pedido como listo: " + err);
         } finally {
             setLoading(false);
         }
@@ -115,10 +115,11 @@ const PedidosCocina = () => {
     return (
         <div>
             <div className="d-flex flex-wrap justify-content-between align-items-center mb-3 gap-3">
-                <h3 className="mb-0">Pedidos en cocina</h3>
                 {user?.role === "ADMIN" && (
                     <div>
-                        <label className="form-label">Sucursal</label>
+                        <label className="mb-0 text-muted" htmlFor="sucursal-select">
+                            Sucursal:
+                        </label>
                         <select
                             className="form-select"
                             value={sucursalId ?? ""}

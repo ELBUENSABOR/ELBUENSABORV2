@@ -22,6 +22,7 @@ import com.utn.elbuensabor.entities.ArticuloManufacturado;
 import com.utn.elbuensabor.entities.Cliente;
 import com.utn.elbuensabor.entities.EstadoPedido;
 import com.utn.elbuensabor.entities.FormaPago;
+import com.utn.elbuensabor.entities.NotaCreditoVenta;
 import com.utn.elbuensabor.entities.PedidoVenta;
 import com.utn.elbuensabor.entities.PedidoVentaDetalle;
 import com.utn.elbuensabor.entities.RolSistema;
@@ -31,11 +32,11 @@ import com.utn.elbuensabor.entities.Usuario;
 import com.utn.elbuensabor.repositories.ArticuloInsumoRepository;
 import com.utn.elbuensabor.repositories.ArticuloManufacturadoRepository;
 import com.utn.elbuensabor.repositories.ClienteRepository;
+import com.utn.elbuensabor.repositories.NotaCreditoVentaRepository;
 import com.utn.elbuensabor.repositories.PedidoVentaRepository;
 import com.utn.elbuensabor.repositories.SucursalEmpresaRepository;
 import com.utn.elbuensabor.repositories.UsuarioRepository;
 
-import lombok.RequiredArgsConstructor;
 
 @Service
 @RequiredArgsConstructor
@@ -50,6 +51,7 @@ public class PedidoServiceImpl implements PedidoService {
     private final UsuarioRepository usuarioRepository;
     private final FacturaService facturaService;
     private final EmailService emailService;
+    private final NotaCreditoVentaRepository notaCreditoVentaRepository;
 
     @Transactional
     public PedidoResponse create(PedidoRequest request) {
@@ -416,6 +418,52 @@ public class PedidoServiceImpl implements PedidoService {
         return mapToResponse(pedido);
     }
 
+    @Transactional
+    public PedidoResponse emitirNotaCredito(Long id) {
+        PedidoVenta pedido = pedidoRepository.findByIdWithDetalles(id)
+                .orElseThrow(() -> new RuntimeException("Pedido no encontrado"));
+        validarAccesoSucursal(pedido.getSucursal());
+
+        if (pedido.getFacturaVenta() == null) {
+            throw new IllegalArgumentException("El pedido no tiene factura para anular");
+        }
+
+        if (notaCreditoVentaRepository.findByPedidoId(id).isPresent()) {
+            throw new IllegalArgumentException("El pedido ya tiene una nota de crédito emitida");
+        }
+
+        NotaCreditoVenta notaCredito = new NotaCreditoVenta();
+        notaCredito.setPedido(pedido);
+        notaCredito.setFacturaOriginal(pedido.getFacturaVenta());
+        notaCredito.setFechaEmision(LocalDateTime.now());
+        notaCredito.setNumeroComprobante(generarNumeroNotaCredito());
+        notaCredito.setTotal(pedido.getFacturaVenta().getTotalVenta());
+        notaCredito = notaCreditoVentaRepository.save(notaCredito);
+        notaCredito.setPdfUrl(facturaService.generarPdfNotaCredito(notaCredito));
+        notaCredito = notaCreditoVentaRepository.save(notaCredito);
+
+        if (Boolean.TRUE.equals(pedido.getStockDescontado())) {
+            stockService.incrementarStock(pedido);
+            pedido.setStockDescontado(false);
+        }
+
+        pedido.setEstado(EstadoPedido.CANCELADO);
+        pedidoRepository.save(pedido);
+        pedido.setNotaCreditoVenta(notaCredito);
+
+        emailService.enviarNotaCredito(notaCredito);
+
+        return mapToResponse(pedido);
+    }
+
+    private String generarNumeroNotaCredito() {
+        LocalDateTime now = LocalDateTime.now();
+        String fecha = now.format(java.time.format.DateTimeFormatter.ofPattern("yyyyMMdd"));
+        String hora = now.format(java.time.format.DateTimeFormatter.ofPattern("HHmmss"));
+        String random = String.format("%04d", (int) (Math.random() * 10000));
+        return "NC-" + fecha + "-" + hora + "-" + random;
+    }
+
     private void validarAccesoSucursal(SucursalEmpresa sucursalPedido) {
         Long sucursalId = resolveSucursalIdForEmpleado();
         if (sucursalId == null) {
@@ -529,6 +577,13 @@ public class PedidoServiceImpl implements PedidoService {
                         pedido.getFacturaVenta().getFechaFacturacion(),
                         pedido.getFacturaVenta().getTotalVenta(),
                         pedido.getFacturaVenta().getPdfUrl()
+                ) : null,
+                pedido.getNotaCreditoVenta() != null ? new PedidoResponse.NotaCreditoDTO(
+                        pedido.getNotaCreditoVenta().getId(),
+                        pedido.getNotaCreditoVenta().getNumeroComprobante(),
+                        pedido.getNotaCreditoVenta().getFechaEmision(),
+                        pedido.getNotaCreditoVenta().getTotal(),
+                        pedido.getNotaCreditoVenta().getPdfUrl()
                 ) : null,
                 pedido.getDetalles().stream()
                         .map(d -> new PedidoResponse.PedidoDetalleResponse(

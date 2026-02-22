@@ -28,6 +28,7 @@ public record PedidoResponse(
         EmpleadoDTO empleado,
         SucursalDTO sucursal,
         FacturaDTO factura,
+        NotaCreditoDTO notaCredito,
         List<PedidoDetalleResponse> detalles
 ) {
     public record ClienteDTO(Long id, String nombre, String apellido, String email) {}
@@ -38,6 +39,13 @@ public record PedidoResponse(
             String numeroComprobante,
             LocalDateTime fechaFacturacion,
             Double totalVenta,
+            String pdfUrl
+    ) {}
+    public record NotaCreditoDTO(
+            Long id,
+            String numeroComprobante,
+            LocalDateTime fechaEmision,
+            Double total,
             String pdfUrl
     ) {}
     public record PedidoDetalleResponse(

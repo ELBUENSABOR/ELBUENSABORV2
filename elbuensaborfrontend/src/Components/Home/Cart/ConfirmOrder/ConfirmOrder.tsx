@@ -1,21 +1,21 @@
-import { useEffect, useState } from "react";
-import { useCart } from "../../../../contexts/CartContext";
-import { useUser } from "../../../../contexts/UsuarioContext";
-import { useSucursal } from "../../../../contexts/SucursalContext";
-import { useNavigate } from "react-router-dom";
+import {useEffect, useState} from "react";
+import {useCart} from "../../../../contexts/CartContext";
+import {useUser} from "../../../../contexts/UsuarioContext";
+import {useSucursal} from "../../../../contexts/SucursalContext";
+import {useNavigate} from "react-router-dom";
 import "./confirmOrder.css";
-import { createPedido } from "../../../../services/pedidoService";
-import { pagarConMercadoPago } from "../../../../services/pagoService";
-import { getUserService } from "../../../../services/userService";
-import type { UsuarioDTO } from "../../../../dtos/UsuarioDTO";
+import {createPedido} from "../../../../services/pedidoService";
+import {pagarConMercadoPago} from "../../../../services/pagoService";
+import {getUserService} from "../../../../services/userService";
+import type {UsuarioDTO} from "../../../../dtos/UsuarioDTO";
 
 type TipoEnvio = "TAKE_AWAY" | "DELIVERY";
 type FormaPago = "EFECTIVO" | "MP";
 
 const ConfirmOrder = () => {
-    const { items, total, clearCart } = useCart();
-    const { user } = useUser();
-    const { sucursalId, sucursales, setSucursalId, loading } = useSucursal();
+    const {items, total, clearCart} = useCart();
+    const {user} = useUser();
+    const {sucursalId, sucursales, setSucursalId, loading} = useSucursal();
     const navigate = useNavigate();
 
     const [step, setStep] = useState<1 | 2 | 3>(1);
@@ -30,7 +30,7 @@ const ConfirmOrder = () => {
     useEffect(() => {
         if (!user) {
             navigate("/login", {
-                state: { redirectTo: "/confirm-order" },
+                state: {redirectTo: "/confirm-order"},
                 replace: true,
             });
         }
@@ -84,7 +84,11 @@ const ConfirmOrder = () => {
     const sucursalSeleccionada = sucursales.find((s) => s.id === sucursalId);
 
     if (!user || items.length === 0) {
-        return <p className="text-muted p-4">No hay productos en el carrito</p>;
+        return (
+            <div className="confirm-order-empty-state">
+                <p className="text-muted mb-0">No hay productos en el carrito</p>
+            </div>
+        );
     }
 
     const confirmarPedido = async () => {
@@ -155,8 +159,8 @@ const ConfirmOrder = () => {
 
     return (
         <div className="confirm-order-container">
-            <h3 className="mb-4">Confirmar pedido</h3>
-            <hr />
+            <h3 className="confirm-order-title">Confirmar pedido</h3>
+            <hr/>
             {step === 1 && (
                 <>
                     <h5>Forma de entrega</h5>
@@ -189,7 +193,7 @@ const ConfirmOrder = () => {
                         )}
                     </div>
 
-                    <div className="d-flex gap-2 mb-3">
+                    <div className="confirm-order-actions-row">
                         <button
                             className={`btn ${tipoEnvio === "TAKE_AWAY"
                                 ? "btn-primary"
@@ -232,7 +236,7 @@ const ConfirmOrder = () => {
                     )}
 
                     <button
-                        className="btn btn-success"
+                        className="btn btn-success confirm-order-cta"
                         disabled={!puedeContinuarStep1}
                         onClick={() => setStep(2)}
                     >
@@ -269,20 +273,22 @@ const ConfirmOrder = () => {
                         </button>
                     </div>
 
-                    <button
-                        className="btn btn-secondary me-2"
-                        onClick={() => setStep(1)}
-                    >
-                        Volver
-                    </button>
+                    <div className="confirm-order-navigation">
+                        <button
+                            className="btn btn-secondary"
+                            onClick={() => setStep(1)}
+                        >
+                            Volver
+                        </button>
 
-                    <button
-                        className="btn btn-success"
-                        disabled={!formaPago}
-                        onClick={() => setStep(3)}
-                    >
-                        Continuar
-                    </button>
+                        <button
+                            className="btn btn-success"
+                            disabled={!formaPago}
+                            onClick={() => setStep(3)}
+                        >
+                            Continuar
+                        </button>
+                    </div>
                 </>
             )}
 
@@ -291,7 +297,7 @@ const ConfirmOrder = () => {
                     <h5>Resumen del pedido</h5>
 
                     {items.map(item => (
-                        <div key={item.manufacturadoId} className="d-flex justify-content-between">
+                        <div key={item.manufacturadoId} className="confirm-order-summary-item">
                             <span>
                                 {item.denominacion} x{item.cantidad}
                             </span>
@@ -299,7 +305,7 @@ const ConfirmOrder = () => {
                         </div>
                     ))}
 
-                    <hr />
+                    <hr/>
                     <p>Subtotal: ${total}</p>
                     {descuento > 0 && <p>Descuento: -${descuento}</p>}
                     {costoEnvio > 0 && <p>Envío: ${costoEnvio}</p>}
@@ -322,9 +328,9 @@ const ConfirmOrder = () => {
                     </p>
                     <strong>Total: ${totalFinal}</strong>
 
-                    <div className="mt-3">
+                    <div className="confirm-order-navigation mt-3">
                         <button
-                            className="btn btn-secondary me-2"
+                            className="btn btn-secondary"
                             onClick={() => setStep(2)}
                         >
                             Volver

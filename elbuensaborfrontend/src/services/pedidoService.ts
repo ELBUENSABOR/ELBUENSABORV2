@@ -60,6 +60,13 @@ export interface PedidoResponse {
         totalVenta: number;
         pdfUrl?: string | null;
     } | null;
+    notaCredito?: {
+        id: number;
+        numeroComprobante: string;
+        fechaEmision: string;
+        total: number;
+        pdfUrl?: string | null;
+    } | null;
     detalles: {
         id: number;
         articulo: {
@@ -98,7 +105,7 @@ export const createPedido = async (pedido: PedidoRequest) => {
     }
 };
 
-export const getPedidoById = async (id: number) => {
+export const getPedidoById = async (id: number): Promise<PedidoResponse> => {
     try {
         const token = sessionStorage.getItem("token");
 
@@ -122,7 +129,7 @@ export const getPedidoById = async (id: number) => {
     }
 };
 
-export const getPedidosByCliente = async (clienteId: number) => {
+export const getPedidosByCliente = async (clienteId: number): Promise<PedidoResponse[]> => {
     try {
         const token = sessionStorage.getItem("token");
 
@@ -149,7 +156,7 @@ export const getPedidosByCliente = async (clienteId: number) => {
 export const getPedidosAll = async (
     estado?: string,
     sucursalId?: number | null
-) => {
+): Promise<PedidoResponse[]> => {
     try {
         const token = sessionStorage.getItem("token");
         const params: Record<string, string | number> = {};
@@ -180,7 +187,7 @@ export const getPedidosAll = async (
         throw error;
     }
 };
-export const cambiarEstadoPedido = async (pedidoId: number, estado: string) => {
+export const cambiarEstadoPedido = async (pedidoId: number, estado: string): Promise<PedidoResponse> => {
     try {
         const token = sessionStorage.getItem("token");
 
@@ -214,7 +221,7 @@ export const resolveFacturaPdfUrl = (pdfUrl?: string | null) => {
         : `${API_ORIGIN}/${pdfUrl}`;
 };
 
-export const marcarPedidoPagado = async (pedidoId: number) => {
+export const marcarPedidoPagado = async (pedidoId: number): Promise<PedidoResponse> => {
     try {
         const token = sessionStorage.getItem("token");
 
@@ -233,6 +240,30 @@ export const marcarPedidoPagado = async (pedidoId: number) => {
     } catch (error: any) {
         console.error(
             "Error al marcar pedido como pagado:",
+            error.response?.data || error.message
+        );
+        throw error;
+    }
+};
+export const emitirNotaCredito = async (pedidoId: number): Promise<PedidoResponse> => {
+    try {
+        const token = sessionStorage.getItem("token");
+
+        const res = await axios.put(
+            `${API_URL}/pedidos/${pedidoId}/nota-credito`,
+            {},
+            {
+                headers: {
+                    Authorization: `Bearer ${token}`,
+                },
+                withCredentials: true,
+            }
+        );
+
+        return res.data;
+    } catch (error: any) {
+        console.error(
+            "Error al emitir nota de crédito:",
             error.response?.data || error.message
         );
         throw error;
