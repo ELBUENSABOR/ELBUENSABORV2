@@ -1,73 +1,11 @@
 import {NavLink} from "react-router-dom";
+import {BarChart3} from "lucide-react";
+
 import {useUser} from "../../../contexts/UsuarioContext";
-import "./sidebar.css";
 import {getEmployeePanelLabel} from "../../../utils/employeePanel";
+import {SIDEBAR_ROUTES} from "./sidebarRoutes";
 
-import {
-    Home,
-    Building2,
-    Users,
-    Tags,
-    Package,
-    Boxes,
-    Factory,
-    BarChart3,
-    ClipboardList
-} from "lucide-react";
-
-const links = [
-    {
-        path: "/dashboard/home",
-        label: "Inicio",
-        icon: Home,
-        rol: ["ADMIN", "EMPLEADO", "COCINERO", "DELIVERY", "CAJERO"]
-    },
-    {path: "/dashboard/sucursales", label: "Sucursales", icon: Building2, rol: ["ADMIN"]},
-    {path: "/dashboard/usuarios", label: "Usuarios", icon: Users, rol: ["ADMIN"]},
-    {path: "/dashboard/pedidos", label: "Pedidos Caja", icon: ClipboardList, rol: ["CAJERO", "ADMIN"]},
-    {path: "/dashboard/cocina", label: "Pedidos Cocina", icon: ClipboardList, rol: ["COCINERO", "ADMIN"]},
-    {path: "/dashboard/delivery", label: "Pedidos Delivery", icon: ClipboardList, rol: ["DELIVERY", "ADMIN"]},
-    {path: "/dashboard/productos-insumos", label: "Insumos", icon: Package, rol: ["COCINERO", "ADMIN"]},
-    {
-        path: "/dashboard/productos-manufacturados",
-        label: "Productos manufacturados",
-        icon: Factory,
-        rol: ["COCINERO", "ADMIN"]
-    },
-    {path: "/dashboard/stock", label: "Stock", icon: Boxes, rol: ["COCINERO", "ADMIN"]},
-    {path: "/dashboard/compras", label: "Registro de compras", icon: ClipboardList, rol: ["COCINERO", "ADMIN"]},
-    {
-        path: "/dashboard/rubros-insumos",
-        label: "Rubros de insumos",
-        icon: Tags,
-        rol: ["COCINERO", "ADMIN"]
-    },
-    {
-        path: "/dashboard/rubros-productos",
-        label: "Rubros de productos",
-        icon: Tags,
-        rol: ["COCINERO", "ADMIN"]
-    },
-
-    {
-        path: "/dashboard/reportes/productos-mas-vendidos",
-        label: "Productos más vendidos",
-        icon: BarChart3,
-        rol: ["ADMIN"],
-    },
-    {
-        path: "/dashboard/reportes/clientes-por-pedidos",
-        label: "Clientes por pedidos",
-        icon: BarChart3,
-        rol: ["ADMIN"],
-    },
-    {
-        path: "/dashboard/reportes/balance-financiero",
-        label: "Balance financiero",
-        icon: BarChart3,
-        rol: ["ADMIN"],
-    },
-];
+import "./sidebar.css";
 
 const Sidebar = ({open, close}: { open: boolean; close: () => void }) => {
     const user = useUser();
@@ -82,7 +20,6 @@ const Sidebar = ({open, close}: { open: boolean; close: () => void }) => {
             className={`sidebar-dashboard ${open ? "open" : ""}`}
             style={{width: "240px"}}
         >
-            {/* Cerrar en mobile */}
             <button className="close-btn" onClick={close}>
                 ✕
             </button>
@@ -98,25 +35,26 @@ const Sidebar = ({open, close}: { open: boolean; close: () => void }) => {
             <div className="sidebar-section">Navegación</div>
 
             <ul className="nav nav-pills flex-column mb-auto">
-                {links.map((link) => {
+                {SIDEBAR_ROUTES.map((route) => {
                     if (!user?.user?.role) return null;
-                    const matchesRole = link.rol.includes(user.user.role);
+
+                    const matchesRole = route.roles.includes(user.user.role);
                     const matchesSubRole = user.user.subRole
-                        ? link.rol.includes(user.user.subRole)
+                        ? route.roles.includes(user.user.subRole)
                         : false;
 
                     if (!matchesRole && !matchesSubRole) return null;
 
                     return (
-                        <li className="nav-item" key={link.path} onClick={close}>
+                        <li className="nav-item" key={route.key} onClick={close}>
                             <NavLink
-                                to={link.path}
+                                to={route.fullPath}
                                 className={({isActive}) =>
                                     `nav-link ${isActive ? "active" : ""}`
                                 }
                             >
-                                <link.icon size={18} className="nav-icon"/>
-                                <span>{link.label}</span>
+                                <route.icon size={18} className="nav-icon"/>
+                                <span>{route.label}</span>
                             </NavLink>
                         </li>
                     );
