@@ -7,6 +7,21 @@ import ModalConfirmAction from "../../Common/ModalConfirmAction/ModalConfirmActi
 import Alert from "../../Alert/Alert";
 import { Users as UsersIcon } from "lucide-react";
 
+const formatRegistrationDate = (fechaRegistro?: string) => {
+    if (!fechaRegistro) {
+        return "-";
+    }
+
+    const parsedDate = new Date(fechaRegistro);
+    if (Number.isNaN(parsedDate.getTime())) {
+        return "-";
+    }
+
+    return parsedDate.toLocaleString("es-AR", {
+        timeZone: "America/Argentina/Buenos_Aires",
+    });
+};
+
 const Users = () => {
     const [originalUsers, setOriginalUsers] = useState<UsuarioDTO[]>();
     const navigate = useNavigate();
@@ -201,7 +216,7 @@ const Users = () => {
                         {u.activo ? "Activo" : "Inactivo"}
                       </span>
                                     </td>
-                                    <td>-</td>
+                                    <td>{formatRegistrationDate(u.fechaRegistro)}</td>
                                     <td>
                                         {u.activo && (
                                             <div className="users-actions">

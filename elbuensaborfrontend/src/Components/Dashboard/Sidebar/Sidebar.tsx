@@ -12,8 +12,7 @@ import {
     Boxes,
     Factory,
     BarChart3,
-    ClipboardList,
-    ShoppingBag
+    ClipboardList
 } from "lucide-react";
 
 const links = [

@@ -315,7 +315,8 @@ public class UserServiceImpl implements UserService {
                 u.getActivo(),
                 u.getSucursal() != null ? u.getSucursal().getId() : null,
                 perfilEmpleado,
-                u.getFotoPerfil());
+                u.getFotoPerfil(),
+                u.getFechaRegistro());
     }
 
 }
