@@ -74,7 +74,7 @@ public class CompraInsumoServiceImpl implements CompraInsumoService {
     private ArticuloInsumoResponse mapToInsumoResponse(ArticuloInsumo i) {
         UnidadMedidaDTO unidadMedidaDTO = null;
         if (i.getUnidadMedida() != null) {
-            unidadMedidaDTO = new UnidadMedidaDTO(i.getUnidadMedida().getId(), i.getUnidadMedida().getDenominacion());
+            unidadMedidaDTO = new UnidadMedidaDTO(i.getUnidadMedida().getId(), i.getUnidadMedida().getDenominacion(), i.getUnidadMedida().isActivo());
         }
         return new ArticuloInsumoResponse(
                 i.getId(),
@@ -82,14 +82,13 @@ public class CompraInsumoServiceImpl implements CompraInsumoService {
                 null,
                 i.getPrecioVenta(),
                 i.getPrecioCompra(),
-                null, // tiempoEstimado not present in entity
+                null,
                 mapToCategoriaResponse(i.getCategoriaArticuloInsumo()),
                 i.getEsParaElaborar(),
                 i.getActivo(),
-                new UnidadMedidaDTO(i.getUnidadMedida().getId(), i.getUnidadMedida().getDenominacion()),
+                new UnidadMedidaDTO(i.getUnidadMedida().getId(), i.getUnidadMedida().getDenominacion(), i.getUnidadMedida().isActivo()),
                 new ArrayList<>(),
-                new ArrayList<>() // stockSucursal - passing empty to avoid recursion or extra query, seeing as
-                                  // this is just for display in list
+                new ArrayList<>()
         );
     }
 

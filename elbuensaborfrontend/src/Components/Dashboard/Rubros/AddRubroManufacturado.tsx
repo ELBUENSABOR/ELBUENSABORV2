@@ -9,9 +9,10 @@ import {
 } from "../../../services/rubrosService";
 
 const initialState: Rubro = {
-  id: 0,
-  denominacion: "",
-  categoriaPadreId: null,
+    id: 0,
+    denominacion: "",
+    categoriaPadreId: null,
+    activo: true,
 };
 
 const AddRubroManufacturado = () => {
@@ -47,71 +48,97 @@ const AddRubroManufacturado = () => {
   useEffect(() => {
     if (!isEdit || !token) return;
 
-    const getData = async () => {
-      try {
-        const res = await getRubroManufacturadoById(Number(id));
-        setForm(res.data);
-      } catch (error) {
-        console.error("Error al cargar rubro", error);
-      }
+        const getData = async () => {
+            try {
+                const res = await getRubroManufacturadoById(Number(id));
+                setForm(res.data);
+            } catch (error) {
+                console.error("Error al cargar rubro", error);
+            }
+        };
+
+        getData();
+    }, [id, token, isEdit]);
+
+    const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        const { name, value, type, checked } = e.target;
+        setForm((prev) => ({
+            ...prev,
+            [name]: type === "checkbox" ? checked : value,
+        }));
     };
 
-    getData();
-  }, [id, token, isEdit]);
+    const handleSubmit = async (e: React.FormEvent) => {
+        e.preventDefault();
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const { name, value } = e.target;
-    setForm((prev) => ({ ...prev, [name]: value }));
-  };
+        try {
+            if (isEdit) {
+                await updateRubroManufacturado(Number(id), form);
+            } else {
+                await createRubroManufacturado(form);
+            }
+            navigate("/dashboard/rubros-productos");
+        } catch (error) {
+            console.error("Error al guardar rubro", error);
+        }
+    };
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
+    return (
+        <form onSubmit={handleSubmit} className="p-4 border rounded mt-4">
+            <h2 className="mb-4">
+                {isEdit
+                    ? "Editar Rubro"
+                    : isSubrubro
+                        ? "Crear Subrubro"
+                        : "Crear Nuevo Rubro"}
+            </h2>
 
-    try {
-      if (isEdit) {
-        await updateRubroManufacturado(Number(id), form);
-      } else {
-        await createRubroManufacturado(form);
-      }
-      navigate("/dashboard/rubros-productos");
-    } catch (error) {
-      console.error("Error al guardar rubro", error);
-    }
-  };
+            <div className="mb-3">
+                <label className="form-label">Denominación</label>
+                <input
+                    name="denominacion"
+                    className="form-control"
+                    value={form.denominacion}
+                    onChange={handleChange}
+                    required
+                />
+            </div>
 
-  return (
-    <form onSubmit={handleSubmit} className="p-4 border rounded mt-4">
-      <h2 className="mb-4">
-        {isEdit
-          ? "Editar Rubro"
-          : isSubrubro
-          ? "Crear Subrubro"
-          : "Crear Nuevo Rubro"}
-      </h2>
+            <div className="form-check form-switch mb-3">
+                <input
+                    className="form-check-input"
+                    type="checkbox"
+                    name="activo"
+                    id="rubro-activo-manufacturado"
+                    checked={Boolean(form.activo)}
+                    onChange={handleChange}
+                />
+                <label className="form-check-label" htmlFor="rubro-activo-manufacturado">
+                    Rubro activo
+                </label>
+            </div>
 
-      <div className="mb-3">
-        <label className="form-label">Denominación</label>
-        <input
-          name="denominacion"
-          className="form-control"
-          value={form.denominacion}
-          onChange={handleChange}
-          required
-        />
-      </div>
+            {isSubrubro && (
+                <div className="alert alert-info">
+                    Este subrubro pertenece al rubro{" "}
+                    <strong>{parentData.denominacion}</strong>
+                </div>
+            )}
 
-      {isSubrubro && (
-        <div className="alert alert-info">
-          Este subrubro pertenece al rubro{" "}
-          <strong>{parentData.denominacion}</strong>
-        </div>
-      )}
-
-      <button className="btn btn-primary mt-3" type="submit">
-        {isEdit ? "Guardar Cambios" : "Crear"}
-      </button>
-    </form>
-  );
+            <div className="mt-3 d-flex gap-2">
+                <button className="btn btn-primary" type="submit">
+                    {isEdit ? "Guardar Cambios" : "Crear"}
+                </button>
+                <button
+                    className="btn btn-outline-secondary"
+                    type="button"
+                    onClick={() => navigate("/dashboard/rubros-productos")}
+                >
+                    Cancelar
+                </button>
+            </div>
+        </form>
+    );
 };
 
 export default AddRubroManufacturado;

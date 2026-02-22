@@ -34,6 +34,7 @@ public class FacturaVenta extends BaseEntity {
     private Double descuento;
     private Double gastosEnvio;
     private Double totalVenta;
+    private String paymentId;
     private String pdfUrl;
 
     @OneToMany(mappedBy = "factura", cascade = jakarta.persistence.CascadeType.ALL, orphanRemoval = true)

@@ -1,7 +1,7 @@
 import {useEffect, useState, type ChangeEvent, type JSX} from "react";
 import "./rubros.css";
 import {useNavigate} from "react-router-dom";
-import ModalConfirmAction from "../../ModalConfirmAction/ModalConfirmAction";
+import ModalConfirmAction from "../../Common/ModalConfirmAction/ModalConfirmAction";
 import Alert from "../../Alert/Alert";
 import type {Rubro} from "../../../models/Rubro";
 import {getRubrosInsumos, deleteRubroInsumoService} from "../../../services/rubrosService";
@@ -72,6 +72,12 @@ const RubrosInsumos = () => {
                 <td style={{paddingLeft: `${level * 20}px`}}>
                     {level > 0 && "— "}
                     {node.denominacion}
+                </td>
+
+                <td>
+                    <span className={`badge ${node.activo ? "bg-success" : "bg-secondary"}`}>
+                        {node.activo ? "Activo" : "Inactivo"}
+                    </span>
                 </td>
 
                 <td>
@@ -174,9 +180,6 @@ const RubrosInsumos = () => {
 
     return (
         <div className="users-container">
-            <h5>Rubros de Insumos</h5>
-            <hr/>
-
             <div className="header-dashboard">
                 <input
                     name="search"
@@ -215,6 +218,7 @@ const RubrosInsumos = () => {
                         <tr>
                             <th>#</th>
                             <th>Denominación</th>
+                            <th>Estado</th>
                             <th style={{width: "280px"}}>Acciones</th>
                         </tr>
                         </thead>

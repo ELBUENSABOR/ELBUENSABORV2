@@ -32,6 +32,9 @@ public class PedidoVenta extends BaseEntity {
     private Double totalCosto;
     private Boolean pagado = false;
     private String observaciones;
+    private String direccionEntrega;
+    private String telefonoEntrega;
+    private Boolean stockDescontado = false;
 
     @ManyToOne
     @JoinColumn(name = "cliente_id", nullable = false)
@@ -62,4 +65,7 @@ public class PedidoVenta extends BaseEntity {
 
     @OneToOne(mappedBy = "pedido")
     private DatosMercadoPago datosMercadoPago;
+
+    @OneToOne(mappedBy = "pedido")
+    private NotaCreditoVenta notaCreditoVenta;
 }

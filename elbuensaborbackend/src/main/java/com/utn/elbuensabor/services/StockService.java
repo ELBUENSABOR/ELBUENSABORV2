@@ -13,6 +13,8 @@ public interface StockService {
 
     void decrementarStock(PedidoVenta pedido);
 
+    void incrementarStock(PedidoVenta pedido);
+
     boolean verificarStockArticuloManufacturado(Long manufacturadoId, Integer cantidad, Long sucursalId);
 
     boolean verificarStockInsumo(Long insumoId, Integer cantidad, Long sucursalId);

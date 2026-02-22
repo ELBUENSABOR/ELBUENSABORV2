@@ -1,6 +1,7 @@
 import axios from "axios";
 import type { RegisterRequest } from "../dtos/RegisterRequest";
 import type { LoginRequest } from "../dtos/LoginRequest";
+import { api } from "./api";
 
 const API_URL = import.meta.env.VITE_API_URL;
 
@@ -19,12 +20,26 @@ export const registerUser = async (data: RegisterRequest) => {
 export const loginUser = async (data: LoginRequest) => {
   try {
     const res = await axios.post(`${API_URL}/auth/login`, data, {
-      withCredentials: true,
+      //withCredentials: true,
     });
     console.log(res);
     return res;
   } catch (error) {
     console.error("Error al iniciar sesion", error);
+    throw error;
+  }
+};
+
+export const loginWithGoogle = async (credential: string) => {
+  try {
+    const res = await axios.post(
+      `${API_URL}/auth/google`,
+      { credential },
+      { withCredentials: true }
+    );
+    return res;
+  } catch (error) {
+    console.error("Error al iniciar sesión con Google", error);
     throw error;
   }
 };

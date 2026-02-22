@@ -7,7 +7,7 @@ import {getAll, deleteInsumo} from '../../../services/insumosService';
 import UnidadMedidaModal from './UnidadesMedidaModal/UnidadMedidaModal';
 import {getRubrosInsumos} from '../../../services/rubrosService';
 import type {Rubro} from '../../../models/Rubro';
-import ModalConfirmAction from '../../ModalConfirmAction/ModalConfirmAction';
+import ModalConfirmAction from '../../Common/ModalConfirmAction/ModalConfirmAction';
 
 const ProductosInsumos = () => {
     const {sucursales, sucursalId, setSucursalId, loading} = useSucursal();
@@ -110,16 +110,9 @@ const ProductosInsumos = () => {
     return (
         <div>
             <div>
-                <h5>Insumos</h5>
-                <hr/>
                 <div>
                     {user?.role === "ADMIN" && (
                         <div className="d-flex flex-wrap align-items-center justify-content-between gap-3 mb-4">
-                            <div>
-                                <p className="text-muted mb-0">
-                                    Gestioná productos y stock según la sucursal seleccionada.
-                                </p>
-                            </div>
                             <div className="d-flex align-items-center gap-2">
                                 <label className="mb-0 text-muted" htmlFor="sucursal-select">
                                     Sucursal:

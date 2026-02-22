@@ -1,12 +1,22 @@
 package com.utn.elbuensabor.services.impl;
 
 import com.utn.elbuensabor.dtos.ChangePasswordRequest;
+import com.utn.elbuensabor.dtos.GoogleAuthRequest;
 import com.utn.elbuensabor.services.AuthService;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.security.oauth2.core.OAuth2TokenValidator;
+import org.springframework.security.oauth2.core.OAuth2TokenValidatorResult;
+import org.springframework.security.oauth2.core.OAuth2Error;
+import org.springframework.security.oauth2.jwt.Jwt;
+import org.springframework.security.oauth2.jwt.JwtDecoder;
+import org.springframework.security.oauth2.jwt.JwtDecoders;
+import org.springframework.security.oauth2.jwt.JwtValidators;
+import org.springframework.security.oauth2.jwt.NimbusJwtDecoder;
 
 import com.utn.elbuensabor.dtos.AuthResponse;
 import com.utn.elbuensabor.dtos.LoginRequest;
@@ -29,6 +39,9 @@ import com.utn.elbuensabor.security.JwtUtil;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 
+import java.util.List;
+import java.util.UUID;
+
 @Service
 @RequiredArgsConstructor
 public class AuthServiceImpl implements AuthService {
@@ -43,6 +56,12 @@ public class AuthServiceImpl implements AuthService {
     private final PasswordEncoder encoder;
     private final AuthenticationManager authManager;
     private final JwtUtil jwt;
+
+    @Value("${google.oauth.client-id:}")
+    private String googleClientId;
+
+    @Value("${google.oauth.issuer:https://accounts.google.com}")
+    private String googleIssuer;
 
     @Transactional
     public AuthResponse register(RegisterRequest req) {
@@ -101,7 +120,8 @@ public class AuthServiceImpl implements AuthService {
                 null,
                 u.getId().toString(),
                 Boolean.TRUE.equals(u.getMustChangePassword()),
-                null); // Los clientes no tienen sucursal asignada
+                null,
+                u.getFotoPerfil()); // Los clientes no tienen sucursal asignada
     }
 
     public AuthResponse login(LoginRequest req) {
@@ -145,7 +165,70 @@ public class AuthServiceImpl implements AuthService {
                 u.getRolSistema() == RolSistema.EMPLEADO ? u.getEmpleado().getPerfilEmpleado().toString() : null,
                 u.getId().toString(),
                 Boolean.TRUE.equals(u.getMustChangePassword()),
-                sucursalId); // Usar la variable ya calculada que maneja el null
+                sucursalId,
+                u.getFotoPerfil()); // Usar la variable ya calculada que maneja el null
+    }
+
+    public AuthResponse loginWithGoogle(GoogleAuthRequest req) {
+        if (googleClientId == null || googleClientId.isBlank()) {
+            throw new IllegalArgumentException("Google Client ID no configurado");
+        }
+
+        Jwt jwtToken = verifyGoogleToken(req.credential());
+
+        if (jwtToken == null) {
+            throw new IllegalArgumentException("Token de Google inválido");
+        }
+
+        String email = jwtToken.getClaimAsString("email");
+        Boolean emailVerified = jwtToken.getClaim("email_verified");
+        String picture = jwtToken.getClaimAsString("picture");
+
+        if (!Boolean.TRUE.equals(emailVerified)) {
+            throw new IllegalArgumentException("El email de Google no está verificado");
+        }
+
+        String subject = jwtToken.getSubject();
+        String auth0Id = "google:" + subject;
+
+        Usuario u = usuarioRepo.findByAuth0Id(auth0Id).orElse(null);
+
+        if (u == null) {
+            u = clienteRepo.findByEmail(email)
+                    .map(Cliente::getUsuario)
+                    .orElseGet(() -> empleadoRepo.findByEmail(email)
+                            .map(empleado -> empleado.getUsuario())
+                            .orElse(null));
+        }
+
+        if (u == null) {
+            u = createGoogleCliente(jwtToken, auth0Id);
+        } else if (u.getAuth0Id() == null || u.getAuth0Id().isBlank()) {
+            u.setAuth0Id(auth0Id);
+            if (u.getFotoPerfil() == null || u.getFotoPerfil().isBlank()) {
+                u.setFotoPerfil(picture);
+            }
+            usuarioRepo.save(u);
+        }
+
+        if (Boolean.FALSE.equals(u.getActivo())) {
+            throw new IllegalArgumentException("El usuario se encuentra dado de baja");
+        }
+
+        String token = jwt.generateToken(u.getUsername());
+        String sucursalId = (u.getSucursal() != null)
+                ? u.getSucursal().getId().toString()
+                : null;
+
+        return new AuthResponse(
+                token,
+                u.getUsername(),
+                u.getRolSistema().name(),
+                u.getRolSistema() == RolSistema.EMPLEADO ? u.getEmpleado().getPerfilEmpleado().toString() : null,
+                u.getId().toString(),
+                Boolean.TRUE.equals(u.getMustChangePassword()),
+                sucursalId,
+                u.getFotoPerfil());
     }
 
     public void changePassword(String username, ChangePasswordRequest req) {
@@ -166,6 +249,84 @@ public class AuthServiceImpl implements AuthService {
         u.setMustChangePassword(false); // ya no necesita cambiarla
 
         usuarioRepo.save(u);
+    }
+
+    private Jwt verifyGoogleToken(String credential) {
+        try {
+            JwtDecoder decoder = buildGoogleJwtDecoder();
+            return decoder.decode(credential);
+        } catch (Exception ex) {
+            return null;
+        }
+    }
+
+    private JwtDecoder buildGoogleJwtDecoder() {
+        NimbusJwtDecoder decoder = (NimbusJwtDecoder) JwtDecoders.fromIssuerLocation(googleIssuer);
+        OAuth2TokenValidator<Jwt> withIssuer = JwtValidators.createDefaultWithIssuer(googleIssuer);
+        OAuth2TokenValidator<Jwt> withAudience = jwt -> {
+            List<String> audience = jwt.getAudience();
+            if (audience != null && audience.contains(googleClientId)) {
+                return OAuth2TokenValidatorResult.success();
+            }
+            return OAuth2TokenValidatorResult.failure(
+                    new OAuth2Error("invalid_token", "El token no pertenece a este cliente", null));
+        };
+        decoder.setJwtValidator(token -> {
+            OAuth2TokenValidatorResult issuerResult = withIssuer.validate(token);
+            if (issuerResult.hasErrors()) {
+                return issuerResult;
+            }
+            OAuth2TokenValidatorResult audienceResult = withAudience.validate(token);
+            if (audienceResult.hasErrors()) {
+                return audienceResult;
+            }
+            return OAuth2TokenValidatorResult.success();
+        });
+        return decoder;
+    }
+
+    private Usuario createGoogleCliente(Jwt jwtToken, String auth0Id) {
+        String email = jwtToken.getClaimAsString("email");
+        String givenName = jwtToken.getClaimAsString("given_name");
+        String familyName = jwtToken.getClaimAsString("family_name");
+        String username = generateUniqueUsername(email);
+        String picture = jwtToken.getClaimAsString("picture");
+
+        Usuario u = new Usuario();
+        u.setUsername(username);
+        u.setPassword(encoder.encode(UUID.randomUUID().toString()));
+        u.setRolSistema(RolSistema.CLIENTE);
+        u.setActivo(true);
+        u.setAuth0Id(auth0Id);
+        u.setFotoPerfil(picture);
+
+        Cliente c = new Cliente();
+        String safeGivenName = givenName == null ? "" : givenName;
+        String safeFamilyName = familyName == null ? "" : familyName;
+        c.setNombre(safeGivenName.isBlank() ? "Google" : safeGivenName);
+        c.setApellido(safeFamilyName.isBlank() ? "User" : safeFamilyName);
+        c.setEmail(email);
+        c.setUsuario(u);
+
+        usuarioRepo.save(u);
+        clienteRepo.save(c);
+
+        return u;
+    }
+
+    private String generateUniqueUsername(String email) {
+        String base = email.split("@")[0].replaceAll("[^a-zA-Z0-9._-]", "");
+        if (base.isBlank()) {
+            base = "googleuser";
+        }
+
+        String candidate = base;
+        int counter = 1;
+        while (usuarioRepo.existsByUsername(candidate)) {
+            candidate = base + counter;
+            counter++;
+        }
+        return candidate;
     }
 
 }

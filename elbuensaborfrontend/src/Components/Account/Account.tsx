@@ -1,12 +1,23 @@
-import React, { useEffect, useState } from "react";
-import { useUser } from "../../contexts/UsuarioContext";
-import { getUserService, updateUser } from "../../services/userService";
-import type { UsuarioDTO } from "../../dtos/UsuarioDTO";
-import { getLocalidades } from "../../services/authService";
-import { HiOutlineUserCircle } from "react-icons/hi";
-import type { UserEditRequestDTO } from "../../dtos/UserEditRequestDTO";
+import React, {useEffect, useState} from "react";
+import {useUser} from "../../contexts/UsuarioContext";
+import {getUserService, updateUser, uploadProfilePhoto} from "../../services/userService";
+import type {UsuarioDTO} from "../../dtos/UsuarioDTO";
+import {getLocalidades} from "../../services/authService";
+import {HiOutlineUserCircle} from "react-icons/hi";
+import type {UserEditRequestDTO} from "../../dtos/UserEditRequestDTO";
+import {getImageUrl} from "../../utils/image";
 
 import "./account.css";
+
+const getEmptyDomicilio = () => ({
+    calle: "",
+    numero: "",
+    codigoPostal: 0,
+    localidad: {
+        id: 0,
+        nombre: "",
+    },
+});
 
 const Account = () => {
     const [userData, setUserData] = useState<UsuarioDTO | null>(null);
@@ -18,11 +29,9 @@ const Account = () => {
         },
     ]);
 
-    const { user, logout } = useUser();
+    const {user, logout, setUser} = useUser();
 
     const isEmpleado = user?.role === "EMPLEADO";
-    const isCliente = user?.role === "CLIENTE";
-    const isAdministrador = user?.role === "ADMINISTRADOR";
 
     const [editMode, setEditMode] = useState(false);
     const [password, setPassword] = useState("");
@@ -40,6 +49,29 @@ const Account = () => {
     const validatePassword = (pass: string) => {
         const regex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*[\W_]).{8,}$/;
         return regex.test(pass);
+    };
+
+
+    const handleProfilePhotoChange = async (event: React.ChangeEvent<HTMLInputElement>) => {
+        const file = event.target.files?.[0];
+
+        if (!file || !userData) return;
+
+        try {
+            const updated = await uploadProfilePhoto(userData.id, file);
+            setUserData(updated);
+            if (user) {
+                setUser({...user, fotoPerfil: updated.fotoPerfil ?? null});
+            }
+            setMsg({type: "success", text: "Foto de perfil actualizada correctamente."});
+        } catch (error: any) {
+            setMsg({
+                type: "error",
+                text: error?.response?.data?.message || "No se pudo actualizar la foto de perfil.",
+            });
+        }
+
+        event.target.value = "";
     };
 
     const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
@@ -98,6 +130,7 @@ const Account = () => {
                     (userData as any).sucursalId ??
                     (userData as any).sucursal?.id ??
                     1,
+                fotoPerfil: userData.fotoPerfil ?? null,
             };
 
             if (password.trim() !== "") {
@@ -115,6 +148,10 @@ const Account = () => {
             if (user && user.username !== userData.username) {
                 logout();
             } else {
+                if (user) {
+                    setUser({...user, username: userData.username, fotoPerfil: updated.fotoPerfil ?? null});
+                }
+                setUserData(updated);
                 setEditMode(false);
                 setPassword("");
                 setConfirmPassword("");
@@ -135,7 +172,10 @@ const Account = () => {
         setMsg({ type: "", text: "" });
         const resp = await getUserService(user?.userId || "");
         console.log("resp", resp);
-        setUserData(resp.data);
+        setUserData({
+            ...resp.data,
+            domicilio: resp.data.domicilio ?? getEmptyDomicilio(),
+        });
 
         const localidadesData = await getLocalidades();
         if (localidadesData) {
@@ -157,20 +197,22 @@ const Account = () => {
             if (!prev) return prev;
 
             if (name === "calle" || name === "numero") {
+                const domicilio = prev.domicilio ?? getEmptyDomicilio();
                 return {
                     ...prev,
                     domicilio: {
-                        ...prev.domicilio,
+                        ...domicilio,
                         [name]: value,
                     },
                 } as UsuarioDTO;
             }
 
             if (name === "codigoPostal") {
+                const domicilio = prev.domicilio ?? getEmptyDomicilio();
                 return {
                     ...prev,
                     domicilio: {
-                        ...prev.domicilio,
+                        ...domicilio,
                         codigoPostal: Number(value) || 0,
                     },
                 } as UsuarioDTO;
@@ -270,6 +312,30 @@ const Account = () => {
                             onChange={handleChange}
                             disabled={!editMode}
                         />
+                    </div>
+
+                    <div className="account-photo-section">
+                        {userData.fotoPerfil ? (
+                            <img
+                                src={getImageUrl(userData.fotoPerfil)}
+                                alt="Foto de perfil"
+                                className="account-photo-preview"
+                            />
+                        ) : (
+                            <HiOutlineUserCircle className="account-photo-preview account-photo-preview--fallback"/>
+                        )}
+                        <div className="account-photo-actions">
+                            <label htmlFor="fotoPerfil" className="btn btn-outline-primary btn-sm">
+                                Cambiar foto
+                            </label>
+                            <input
+                                id="fotoPerfil"
+                                type="file"
+                                accept="image/*"
+                                onChange={handleProfilePhotoChange}
+                                style={{display: "none"}}
+                            />
+                        </div>
                     </div>
 
                     <div className="row-account">

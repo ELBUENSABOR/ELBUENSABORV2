@@ -2,9 +2,11 @@ import {Link, useNavigate} from "react-router-dom";
 import "./auth.css";
 import type { LoginRequest } from "../../dtos/LoginRequest";
 import { useState } from "react";
-import { loginUser } from "../../services/authService";
+import { loginUser, loginWithGoogle } from "../../services/authService";
 import { useUser } from "../../contexts/UsuarioContext";
 import { useLocation } from "react-router-dom";
+import {getEmployeeDashboardRoute} from "../../utils/employeePanel";
+import GoogleAuthButton from "./GoogleAuthButton";
 
 const Login = () => {
     const { state } = useLocation();
@@ -29,6 +31,22 @@ const Login = () => {
         setForm((prev) => ({...prev, [name]: value}));
     };
 
+    const resolvePostLoginRoute = (role: string, subRole?: string | null) => {
+        if (role === "EMPLEADO") {
+            return getEmployeeDashboardRoute(role, subRole);
+        }
+        if (role === "ADMIN") {
+            return "/dashboard/home";
+        }
+        if (state?.redirectTo) {
+            return state.redirectTo;
+        }
+        if (state?.from === "cart") {
+            return "/confirm-order";
+        }
+        return "/";
+    };
+
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
         setLoading(true);
@@ -51,23 +69,22 @@ const Login = () => {
                 msg: "¡Login exitoso!",
             });
 
-            const { token, username, role, subRole, userId, mustChangePassword } = resp.data;
-
-            setUser({
+            const {token, username, role, subRole, userId, mustChangePassword, sucursalId, fotoPerfil} = resp.data;
+            const nextUser = {
                 token,
                 username,
                 role,
                 subRole,
                 userId,
                 mustChangePassword,
-            });
+                sucursalId: sucursalId ? Number(sucursalId) : null,
+                fotoPerfil: fotoPerfil ?? null,
+            };
+
+            setUser(nextUser);
 
             setTimeout(() => {
-                if (state?.from === "cart") {
-                    navigate("/confirm-order");
-                } else {
-                    navigate("/");
-                }
+                navigate(resolvePostLoginRoute(role, subRole));
             }, 500);
 
         } catch (err: any) {
@@ -79,6 +96,37 @@ const Login = () => {
             });
         }
 
+        setLoading(false);
+    };
+
+    const handleGoogleLogin = async (credential: string) => {
+        setLoading(true);
+        setMsg({state: "", msg: ""});
+        try {
+            const resp = await loginWithGoogle(credential);
+            const {token, username, role, subRole, userId, mustChangePassword, sucursalId, fotoPerfil} = resp.data;
+            const nextUser = {
+                token,
+                username,
+                role,
+                subRole,
+                userId,
+                mustChangePassword,
+                sucursalId: sucursalId ? Number(sucursalId) : null,
+                fotoPerfil: fotoPerfil ?? null,
+            };
+
+            setUser(nextUser);
+
+            navigate(resolvePostLoginRoute(role, subRole));
+        } catch (err: any) {
+            setMsg({
+                state: "error",
+                msg:
+                    err.response?.data?.message ||
+                    "Error al iniciar sesión con Google.",
+            });
+        }
         setLoading(false);
     };
 
@@ -114,6 +162,11 @@ const Login = () => {
                 <button type="submit" disabled={loading}>
                     {loading ? "Iniciando sesión..." : "Iniciar sesión"}
                 </button>
+
+                <div className="auth-divider">
+                    <span>o</span>
+                </div>
+                <GoogleAuthButton onSuccess={handleGoogleLogin} text="signin_with" />
 
                 {msg.msg && (
                     <p

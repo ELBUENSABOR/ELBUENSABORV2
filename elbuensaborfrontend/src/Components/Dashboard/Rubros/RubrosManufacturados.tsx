@@ -1,10 +1,13 @@
 import { useEffect, useState, type ChangeEvent, type JSX } from "react";
 import "./rubros.css";
 import { useNavigate } from "react-router-dom";
-import ModalConfirmAction from "../../ModalConfirmAction/ModalConfirmAction";
+import ModalConfirmAction from "../../Common/ModalConfirmAction/ModalConfirmAction";
 import Alert from "../../Alert/Alert";
-import type { Rubro } from "../../../models/Rubro";
-import { getRubrosManufacturados } from "../../../services/rubrosService";
+import type {Rubro} from "../../../models/Rubro";
+import {
+    deleteRubroManufacturadoService,
+    getRubrosManufacturados,
+} from "../../../services/rubrosService";
 
 const RubrosManufacturados = () => {
   const [rubrosTree, setRubrosTree] = useState<any[]>([]);
@@ -18,11 +21,13 @@ const RubrosManufacturados = () => {
   const [showAlert, setShowAlert] = useState(false);
   const [alertMessage, setAlertMessage] = useState("");
   const [alertStatus, setAlertStatus] = useState<"success" | "error">(
-    "success"
+    "success",
   );
 
   const [filterValue, setFilterValue] = useState("");
-  const [statusFilter, setStatusFilter] = useState<"todos" | "activo" | "inactivo">("activo");
+  const [statusFilter, setStatusFilter] = useState<
+    "todos" | "activo" | "inactivo"
+  >("activo");
   const buildTree = (rubros: Rubro[]) => {
     const map = new Map<number, any>();
     const roots: any[] = [];
@@ -43,31 +48,39 @@ const RubrosManufacturados = () => {
     return roots;
   };
 
-  useEffect(() => {
-    const getData = async () => {
-      try {
-        const res = await getRubrosManufacturados();
-        setOriginalRubros(res.data);
+    useEffect(() => {
+        const getData = async () => {
+            try {
+                const res = await getRubrosManufacturados();
+                setOriginalRubros(res.data);
 
-        const tree = buildTree(res.data);
-        setRubrosTree(tree);
-        console.log("tree", tree);
-      } catch (error) {
-        console.error("Error al obtener rubros", error);
-      }
-    };
+                const tree = buildTree(res.data);
+                setRubrosTree(tree);
+                console.log("tree", tree);
+            } catch (error) {
+                console.error("Error al obtener rubros", error);
+            }
+        };
 
-    getData();
-  }, [refresh]);
+        getData();
+    }, [refresh]);
 
-  const renderRows = (nodes: any[], level = 0): JSX.Element[] => {
-    return nodes.flatMap((node) => [
-      <tr key={node.id}>
-        <td>{node.id}</td>
+    const renderRows = (nodes: any[], level = 0): JSX.Element[] => {
+        return nodes.flatMap((node) => [
+            <tr key={node.id}>
+                <td>{node.id}</td>
 
         <td style={{ paddingLeft: `${level * 20}px` }}>
           {level > 0 && "— "}
           {node.denominacion}
+        </td>
+
+        <td>
+          <span
+            className={`badge ${node.activo ? "bg-success" : "bg-secondary"}`}
+          >
+            {node.activo ? "Activo" : "Inactivo"}
+          </span>
         </td>
 
         <td>
@@ -105,38 +118,43 @@ const RubrosManufacturados = () => {
     ]);
   };
 
-    useEffect(() => {
-        if (!filterValue.trim() && statusFilter === "todos") {
+  useEffect(() => {
+    if (!filterValue.trim() && statusFilter === "todos") {
       setRubrosTree(buildTree(originalRubros));
       return;
     }
 
-        const filteredTree = filterTree(originalRubros, filterValue, statusFilter);
+    const filteredTree = filterTree(originalRubros, filterValue, statusFilter);
     setRubrosTree(filteredTree);
-    }, [filterValue, statusFilter, originalRubros]);
+  }, [filterValue, statusFilter, originalRubros]);
 
-    const filterData = (e: ChangeEvent<HTMLInputElement>) => {
-        setFilterValue(e.target.value);
+  const filterData = (e: ChangeEvent<HTMLInputElement>) => {
+    setFilterValue(e.target.value);
   };
 
-    const filterTree = (
-        nodes: Rubro[],
-        text: string,
-        status: "todos" | "activo" | "inactivo"
-    ): Rubro[] => {
-        const search = text.trim().toLowerCase();
+  const filterTree = (
+    nodes: Rubro[],
+    text: string,
+    status: "todos" | "activo" | "inactivo",
+  ): Rubro[] => {
+    const search = text.trim().toLowerCase();
 
     const recursiveFilter = (node: Rubro): Rubro | null => {
-        const matchesSearch = !search || node.denominacion.toLowerCase().includes(search);
-        const matchesStatus =
-            status === "todos" ? true : status === "activo" ? node.activo : !node.activo;
+      const matchesSearch =
+        !search || node.denominacion.toLowerCase().includes(search);
+      const matchesStatus =
+        status === "todos"
+          ? true
+          : status === "activo"
+            ? node.activo
+            : !node.activo;
 
       const children = originalRubros
         .filter((r) => r.categoriaPadreId === node.id)
         .map(recursiveFilter)
         .filter(Boolean) as Rubro[];
 
-        if ((matchesSearch && matchesStatus) || children.length > 0) {
+      if ((matchesSearch && matchesStatus) || children.length > 0) {
         return { ...node, children };
       }
 
@@ -144,62 +162,59 @@ const RubrosManufacturados = () => {
     };
 
     const roots = originalRubros.filter(
-      (r) => !r.categoriaPadreId || r.categoriaPadreId === 0
+      (r) => !r.categoriaPadreId || r.categoriaPadreId === 0,
     );
 
-    return roots.map(recursiveFilter).filter(Boolean) as Rubro[];
-  };
+        return roots.map(recursiveFilter).filter(Boolean) as Rubro[];
+    };
 
-  const deleteRubro = async (id: number) => {
-    try {
-      const res = await deleteRubroService(id);
-      if (res) {
-        setRefresh(!refresh);
-        setAlertMessage("Rubro eliminado con éxito!");
-        setAlertStatus("success");
-        setShowAlert(true);
-      }
-    } catch (error) {
-      console.error("Error", error);
-      setAlertMessage("Error al eliminar el rubro");
-      setAlertStatus("error");
-      setShowAlert(true);
-    }
-  };
+    const deleteRubro = async (id: number) => {
+        try {
+            const res = await deleteRubroManufacturadoService(id);
+            if (res) {
+                setRefresh(!refresh);
+                setAlertMessage("Rubro eliminado con éxito!");
+                setAlertStatus("success");
+                setShowAlert(true);
+            }
+        } catch (error) {
+            console.error("Error", error);
+            setAlertMessage("Error al eliminar el rubro");
+            setAlertStatus("error");
+            setShowAlert(true);
+        }
+    };
 
-    return (
-        <div className="users-container">
-            <h5>Rubros de Manufacturados</h5>
-            <hr />
+  return (
+    <div className="users-container">
+      <div className="header-dashboard">
+        <input
+          name="search"
+          type="text"
+          placeholder="Buscar rubros..."
+          className="form-control"
+          value={filterValue}
+          onChange={filterData}
+        />
+        <select
+          className="form-select"
+          value={statusFilter}
+          onChange={(e) =>
+            setStatusFilter(e.target.value as "todos" | "activo" | "inactivo")
+          }
+        >
+          <option value="todos">Todos</option>
+          <option value="activo">Activo</option>
+          <option value="inactivo">Inactivo</option>
+        </select>
 
-            <div className="header-dashboard">
-                <input
-                    name="search"
-                    type="text"
-                    placeholder="Buscar rubros..."
-                    className="form-control"
-                    value={filterValue}
-                    onChange={filterData}
-                />
-                <select
-                    className="form-select"
-                    value={statusFilter}
-                    onChange={(e) =>
-                        setStatusFilter(e.target.value as "todos" | "activo" | "inactivo")
-                    }
-                >
-                    <option value="todos">Todos</option>
-                    <option value="activo">Activo</option>
-                    <option value="inactivo">Inactivo</option>
-                </select>
-
-                <button
-                    className="btn btn-success"
-                    onClick={() => navigate("/dashboard/manufacturados/rubros/add")}
-                >
-                    + Nuevo Rubro
-                </button>
-            </div>
+        <button
+          className="btn btn-success"
+          onClick={() => navigate("/dashboard/manufacturados/rubros/add")}
+        >
+          + Nuevo Rubro
+        </button>
+      </div>
 
             <div className="dashboard-table-card">
                 <div className="dashboard-table-header">Lista de Rubros</div>
@@ -209,36 +224,37 @@ const RubrosManufacturados = () => {
                         <tr>
                             <th>#</th>
                             <th>Denominación</th>
-                            <th style={{ width: "280px" }}>Acciones</th>
+                            <th>Estado</th>
+                            <th style={{width: "280px"}}>Acciones</th>
                         </tr>
                         </thead>
 
-                        <tbody className="table-group-divider">
-                        {renderRows(rubrosTree)}
-                        </tbody>
-                    </table>
-                </div>
-            </div>
-
-            {showModal && (
-                <ModalConfirmAction
-                    show={showModal}
-                    setShowModal={setShowModal}
-                    headerText="¿Deseas eliminar este rubro?"
-                    bodyText="Esta acción no se puede deshacer"
-                    onClick={() => deleteRubro(currentId)}
-                />
-            )}
-
-            {showAlert && (
-                <Alert
-                    message={alertMessage}
-                    status={alertStatus}
-                    onClose={() => setShowAlert(false)}
-                />
-            )}
+            <tbody className="table-group-divider">
+              {renderRows(rubrosTree)}
+            </tbody>
+          </table>
         </div>
-    );
+      </div>
+
+      {showModal && (
+        <ModalConfirmAction
+          show={showModal}
+          setShowModal={setShowModal}
+          headerText="¿Deseas eliminar este rubro?"
+          bodyText="Esta acción no se puede deshacer"
+          onClick={() => deleteRubro(currentId)}
+        />
+      )}
+
+      {showAlert && (
+        <Alert
+          message={alertMessage}
+          status={alertStatus}
+          onClose={() => setShowAlert(false)}
+        />
+      )}
+    </div>
+  );
 };
 
 export default RubrosManufacturados;

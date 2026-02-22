@@ -8,6 +8,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import com.utn.elbuensabor.dtos.UserDTO;
 import com.utn.elbuensabor.services.UserService;
@@ -52,5 +53,11 @@ public class UserController {
     public ResponseEntity<UserDTO> deleteUser(@PathVariable Long id){
         UserDTO dto = userService.deleteUser(id);
         return ResponseEntity.ok(dto);
+    }
+
+    @PostMapping("/{id}/foto-perfil")
+    public ResponseEntity<UserDTO> uploadProfilePhoto(@PathVariable Long id,
+                                                      @RequestParam("file") MultipartFile file) {
+        return ResponseEntity.ok(userService.updateProfilePhoto(id, file));
     }
 }

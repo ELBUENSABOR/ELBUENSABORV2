@@ -19,17 +19,35 @@ public record PedidoResponse(
         Double totalCosto,
         Boolean pagado,
         String observaciones,
+        String direccionEntrega,
+        String telefonoEntrega,
         EstadoPedido estado,
         TipoEnvio tipoEnvio,
         FormaPago formaPago,
         ClienteDTO cliente,
         EmpleadoDTO empleado,
         SucursalDTO sucursal,
+        FacturaDTO factura,
+        NotaCreditoDTO notaCredito,
         List<PedidoDetalleResponse> detalles
 ) {
     public record ClienteDTO(Long id, String nombre, String apellido, String email) {}
     public record EmpleadoDTO(Long id, String nombre, String apellido) {}
     public record SucursalDTO(Long id, String nombre) {}
+    public record FacturaDTO(
+            Long id,
+            String numeroComprobante,
+            LocalDateTime fechaFacturacion,
+            Double totalVenta,
+            String pdfUrl
+    ) {}
+    public record NotaCreditoDTO(
+            Long id,
+            String numeroComprobante,
+            LocalDateTime fechaEmision,
+            Double total,
+            String pdfUrl
+    ) {}
     public record PedidoDetalleResponse(
             Long id,
             ArticuloDTO articulo,
