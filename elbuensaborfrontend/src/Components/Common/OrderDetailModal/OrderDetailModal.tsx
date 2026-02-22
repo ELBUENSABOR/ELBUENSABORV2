@@ -84,6 +84,23 @@ const OrderDetailModal = ({ pedido, onClose, children }: OrderDetailModalProps) 
                                 )}
                                 <h6 className="mb-0">Total: ${pedido.total}</h6>
                             </div>
+                            {pedido.notaCredito && (
+                                <p>
+                                    <strong>Nota de crédito:</strong> {pedido.notaCredito.numeroComprobante}
+                                </p>
+                            )}
+                            {resolveFacturaPdfUrl(pedido.notaCredito?.pdfUrl) && (
+                                <div className="mt-2">
+                                    <a
+                                        href={resolveFacturaPdfUrl(pedido.notaCredito?.pdfUrl)!}
+                                        target="_blank"
+                                        rel="noreferrer"
+                                        className="btn btn-outline-danger"
+                                    >
+                                        Ver nota de crédito (PDF)
+                                    </a>
+                                </div>
+                            )}
                             {resolveFacturaPdfUrl(pedido.factura?.pdfUrl) && (
                                 <div className="mt-3">
                                     <a

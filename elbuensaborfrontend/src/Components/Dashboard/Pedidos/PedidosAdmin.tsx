@@ -1,7 +1,8 @@
 import {useEffect, useState} from "react";
 import type {PedidoResponse} from "../../../services/pedidoService";
-import {cambiarEstadoPedido, getPedidoById, getPedidosAll, marcarPedidoPagado} from "../../../services/pedidoService";
+import {cambiarEstadoPedido, emitirNotaCredito, getPedidoById, getPedidosAll, marcarPedidoPagado} from "../../../services/pedidoService";
 import OrderDetailModal from "../../Common/OrderDetailModal/OrderDetailModal.tsx";
+import ModalConfirmAction from "../../Common/ModalConfirmAction/ModalConfirmAction";
 import { useSucursal } from "../../../contexts/SucursalContext";
 import { useUser } from "../../../contexts/UsuarioContext";
 
@@ -35,6 +36,8 @@ const PedidosAdmin = () => {
     const [selectedPedido, setSelectedPedido] = useState<PedidoResponse | null>(null);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState("");
+    const [showConfirmNotaCredito, setShowConfirmNotaCredito] = useState(false);
+    const [pedidoAAnular, setPedidoAAnular] = useState<PedidoResponse | null>(null);
 
     const cargarPedidos = async (estadoFiltro?: string) => {
         setLoading(true);
@@ -120,6 +123,24 @@ const PedidosAdmin = () => {
             await cargarPedidos(estado);
         } catch (err) {
             setError("No se pudo marcar el pedido como pagado.");
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    const puedeEmitirNotaCredito = (pedido: PedidoResponse) =>
+        !!pedido.factura &&
+        !pedido.notaCredito &&
+        pedido.estado !== "CANCELADO";
+
+    const anularFactura = async (pedido: PedidoResponse) => {
+        setLoading(true);
+        setError("");
+        try {
+            await emitirNotaCredito(pedido.id);
+            await cargarPedidos(estado);
+        } catch (err) {
+            setError("No se pudo emitir la nota de crédito.");
         } finally {
             setLoading(false);
         }
@@ -279,6 +300,14 @@ const PedidosAdmin = () => {
                                                     Marcar pagado
                                                 </button>
                                             )}
+                                            {puedeEmitirNotaCredito(pedido) && (
+                                                <button
+                                                    className="btn btn-sm btn-outline-danger"
+                                                    onClick={() => { setPedidoAAnular(pedido); setShowConfirmNotaCredito(true); }}
+                                                >
+                                                    Emitir nota de crédito
+                                                </button>
+                                            )}
                                         </div>
                                     </td>
                                 </tr>
@@ -288,6 +317,20 @@ const PedidosAdmin = () => {
                     </table>
                 </div>
             )}
+            <ModalConfirmAction
+                show={showConfirmNotaCredito}
+                setShowModal={setShowConfirmNotaCredito}
+                headerText="Confirmar emisión de nota de crédito"
+                bodyText={pedidoAAnular
+                    ? `¿Confirmás la anulación de la factura del pedido ${pedidoAAnular.numero}? Se devolverá el stock asociado.`
+                    : "¿Confirmás la emisión de nota de crédito?"}
+                onClick={() => {
+                    if (pedidoAAnular) {
+                        anularFactura(pedidoAAnular);
+                        setPedidoAAnular(null);
+                    }
+                }}
+            />
             <OrderDetailModal
                 pedido={selectedPedido}
                 onClose={() => setSelectedPedido(null)}

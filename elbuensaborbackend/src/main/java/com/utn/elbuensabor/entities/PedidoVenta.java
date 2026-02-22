@@ -65,4 +65,7 @@ public class PedidoVenta extends BaseEntity {
 
     @OneToOne(mappedBy = "pedido")
     private DatosMercadoPago datosMercadoPago;
+
+    @OneToOne(mappedBy = "pedido")
+    private NotaCreditoVenta notaCreditoVenta;
 }
