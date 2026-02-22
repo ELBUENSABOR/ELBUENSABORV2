@@ -50,7 +50,6 @@ const links = [
         rol: ["COCINERO", "ADMIN"]
     },
 
-    {path: "/dashboard/productos-venta", label: "Productos a la venta", icon: ShoppingBag, rol: ["ADMIN"]},
     {
         path: "/dashboard/reportes/productos-mas-vendidos",
         label: "Productos más vendidos",
