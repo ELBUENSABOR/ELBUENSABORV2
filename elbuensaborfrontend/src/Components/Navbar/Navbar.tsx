@@ -129,42 +129,6 @@ export default function MyNavbar({onCartOpen, isCartOpen}: MyNavbarProps) {
                     </Nav>
 
                     <div className="d-none d-lg-flex w-100 align-items-center navbar-desktop-row">
-                        <div className="navbar-desktop-left">
-                            {showSucursalSelector && (
-                                <Form className="navbar-sucursal navbar-sucursal--desktop" role="group"
-                                      aria-label="Seleccionar sucursal">
-                                    <Form.Select
-                                        value={sucursalId ?? ""}
-                                        onChange={(event) => setSucursalId(event.target.value ? Number(event.target.value) : null)}
-                                        disabled={loadingSucursales || sucursales.length === 0}
-                                        aria-label="Seleccionar sucursal"
-                                    >
-                                        <option
-                                            value="">{loadingSucursales ? "Cargando..." : "Seleccionar Sucursal"}</option>
-                                        {sucursales.map((sucursal) => (
-                                            <option key={sucursal.id} value={sucursal.id}>
-                                                {sucursal.nombre}
-                                            </option>
-                                        ))}
-                                    </Form.Select>
-                                </Form>
-                            )}
-                        </div>
-
-                        <Form className="navbar-search navbar-search--desktop navbar-desktop-search" role="search"
-                              aria-label="Buscar">
-                            <span className="navbar-search-icon" aria-hidden="true">
-                              <Search size={16}/>
-                            </span>
-                            <Form.Control
-                                type="search"
-                                placeholder="Buscar comidas, bebidas..."
-                                value={searchTerm}
-                                onChange={(event) => setSearchTerm(event.target.value)}
-                            />
-                        </Form>
-
-                        {/* Links */}
                         <Nav className="navbar-desktop-links">
                             <Nav.Link as={Link} to="/" className="navbar-link">
                                 Inicio
@@ -180,6 +144,37 @@ export default function MyNavbar({onCartOpen, isCartOpen}: MyNavbarProps) {
                                 </Nav.Link>
                             )}
                         </Nav>
+
+                        <Form className="navbar-search navbar-search--desktop navbar-desktop-search" role="search" aria-label="Buscar">
+                            <span className="navbar-search-icon" aria-hidden="true">
+                              <Search size={16}/>
+                            </span>
+                            <Form.Control
+                                type="search"
+                                placeholder="Buscar comidas, bebidas..."
+                                value={searchTerm}
+                                onChange={(event) => setSearchTerm(event.target.value)}
+                            />
+                        </Form>
+
+                        {showSucursalSelector && (
+                            <Form className="navbar-sucursal navbar-sucursal--desktop" role="group"
+                                  aria-label="Seleccionar sucursal">
+                                <Form.Select
+                                    value={sucursalId ?? ""}
+                                    onChange={(event) => setSucursalId(event.target.value ? Number(event.target.value) : null)}
+                                    disabled={loadingSucursales || sucursales.length === 0}
+                                    aria-label="Seleccionar sucursal"
+                                >
+                                    <option value="">{loadingSucursales ? "Cargando..." : "Seleccionar Sucursal"}</option>
+                                    {sucursales.map((sucursal) => (
+                                        <option key={sucursal.id} value={sucursal.id}>
+                                            {sucursal.nombre}
+                                        </option>
+                                    ))}
+                                </Form.Select>
+                            </Form>
+                        )}
 
                         <Nav className="navbar-actions navbar-desktop-actions">
                             {!user ? (

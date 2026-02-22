@@ -2,8 +2,8 @@
    NAVBAR BASE
 ========================= */
 .navbar-container {
-    margin: 0px 76px;
-    padding: 0px 48px;
+    margin: 0;
+    padding: 0;
     --navbar-height: 64px;
     --navbar-gap: 10px;
     --navbar-padding-x: 24px;
@@ -20,7 +20,7 @@
 /* glass suave */
 @supports ((-webkit-backdrop-filter: blur(10px)) or (backdrop-filter: blur(10px))) {
     .navbar-container {
-        margin: 0px 0px;
+        margin: 0;
         padding: 5px 20px;
         background-color: hsl(var(--card) / 0.92);
         -webkit-backdrop-filter: blur(10px);
@@ -67,7 +67,7 @@
 }
 
 .navbar-brand-logo-mark {
-    width: 30px;
+    width: auto;
     height: 60px;
     display: inline-flex;
     align-items: center;
@@ -81,7 +81,7 @@
 ========================= */
 .navbar-link {
     border-radius: var(--radius-md);
-    padding: 9px 10px;           /* menos “gordito” */
+    padding: 9px 10px;
     color: hsl(var(--foreground));
     font-weight: 600;
     line-height: 1;
@@ -206,6 +206,8 @@
    MOBILE SEARCH DRAWER
 ========================= */
 .navbar-search-wrapper {
+    flex-basis: 100%;
+    width: 100%;
     position: sticky;
     top: var(--navbar-height);
     z-index: 1029;
@@ -528,21 +530,37 @@
    DESKTOP LAYOUT (ONLY >= 992px)
 ========================================= */
 @media (min-width: 992px) {
-    .navbar-desktop-row {
-        gap: 14px;
+    .navbar-main {
+        width: min(100%, 1300px) !important;
+        max-width: none !important;
+        margin-left: 0 !important;
+        margin-right: 0 !important;
+        position: relative;
+        left: 50%;
+        transform: translateX(-50%);
+        padding-inline: 48px !important;
+        column-gap: 20px;
     }
 
-    .navbar-desktop-left {
-        display: flex;
-        align-items: center;
-        gap: 12px;
-        flex: 0 0 auto;
+    .navbar-search-wrapper {
+        display: none !important;
+    }
+
+    .navbar-desktop-row {
+        gap: 14px;
+        min-width: 0;
+    }
+
+    .navbar-brand-group {
+        padding-left: 0;
+        padding-right: 0;
+        margin-right: 2px;
     }
 
     .navbar-desktop-search {
-        flex: 1 1 520px;
-        min-width: 420px;
-        max-width: 720px;
+        flex: 1 1 480px;
+        min-width: 320px;
+        max-width: 580px;
     }
 
     .navbar-search.navbar-desktop-search input {
@@ -554,11 +572,12 @@
         align-items: center;
         gap: 6px;
         flex: 0 0 auto;
+        margin-right: 4px;
     }
 
     .navbar-desktop-actions {
         flex: 0 0 auto;
-        margin-left: 6px;
+        margin-left: auto;
     }
 
     .navbar-sucursal--desktop {
