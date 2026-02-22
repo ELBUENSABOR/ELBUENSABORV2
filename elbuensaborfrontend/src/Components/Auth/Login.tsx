@@ -31,6 +31,22 @@ const Login = () => {
         setForm((prev) => ({...prev, [name]: value}));
     };
 
+    const resolvePostLoginRoute = (role: string, subRole?: string | null) => {
+        if (role === "EMPLEADO") {
+            return getEmployeeDashboardRoute(role, subRole);
+        }
+        if (role === "ADMIN") {
+            return "/dashboard/home";
+        }
+        if (state?.redirectTo) {
+            return state.redirectTo;
+        }
+        if (state?.from === "cart") {
+            return "/confirm-order";
+        }
+        return "/";
+    };
+
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
         setLoading(true);
@@ -68,15 +84,7 @@ const Login = () => {
             setUser(nextUser);
 
             setTimeout(() => {
-                if (role === "EMPLEADO") {
-                    navigate(getEmployeeDashboardRoute(role, subRole));
-                } else if (state?.redirectTo) {
-                    navigate(state.redirectTo);
-                } else if (state?.from === "cart") {
-                    navigate("/confirm-order");
-                } else {
-                    navigate("/");
-                }
+                navigate(resolvePostLoginRoute(role, subRole));
             }, 500);
 
         } catch (err: any) {
@@ -110,15 +118,7 @@ const Login = () => {
 
             setUser(nextUser);
 
-            if (role === "EMPLEADO") {
-                navigate(getEmployeeDashboardRoute(role, subRole));
-            } else if (state?.redirectTo) {
-                navigate(state.redirectTo);
-            } else if (state?.from === "cart") {
-                navigate("/confirm-order");
-            } else {
-                navigate("/");
-            }
+            navigate(resolvePostLoginRoute(role, subRole));
         } catch (err: any) {
             setMsg({
                 state: "error",

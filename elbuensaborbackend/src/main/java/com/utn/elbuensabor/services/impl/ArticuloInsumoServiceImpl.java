@@ -142,7 +142,8 @@ public class ArticuloInsumoServiceImpl implements ArticuloInsumoService {
         if (unidadMedida != null) {
             unidadMedidaDTO = new UnidadMedidaDTO(
                     unidadMedida.getId(),
-                    unidadMedida.getDenominacion()
+                    unidadMedida.getDenominacion(),
+                    unidadMedida.isActivo()
             );
         }
 
