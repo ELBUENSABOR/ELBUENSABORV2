@@ -187,9 +187,6 @@ const RubrosManufacturados = () => {
 
   return (
     <div className="users-container">
-      <h5>Rubros de Manufacturados</h5>
-      <hr />
-
       <div className="header-dashboard">
         <input
           name="search"

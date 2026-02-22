@@ -7,6 +7,7 @@ import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.stereotype.Service;
 
 import com.utn.elbuensabor.entities.FacturaVenta;
+import com.utn.elbuensabor.entities.NotaCreditoVenta;
 import com.utn.elbuensabor.services.EmailService;
 
 import jakarta.mail.MessagingException;
@@ -65,6 +66,48 @@ public class EmailServiceImpl implements EmailService {
             log.info("Enviando mail a {} por factura {}", destinatario, factura.getNumeroComprobante());
         } catch (MailException | MessagingException ex) {
             log.warn("No se pudo enviar la factura por email: {}", ex.getMessage());
+        }
+    }
+
+    public void enviarNotaCredito(NotaCreditoVenta notaCredito) {
+        if (notaCredito == null || notaCredito.getPedido() == null || notaCredito.getPedido().getCliente() == null) {
+            return;
+        }
+
+        String destinatario = notaCredito.getPedido().getCliente().getEmail();
+        if (destinatario == null || destinatario.isBlank()) {
+            return;
+        }
+
+        String cuerpo = String.format(
+                "Hola %s,\n\nSe emitió la nota de crédito %s para anular la factura %s.\nTotal: $%.2f\nPedido: %s\n\nAdjuntamos el comprobante en PDF.",
+                notaCredito.getPedido().getCliente().getNombre(),
+                notaCredito.getNumeroComprobante(),
+                notaCredito.getFacturaOriginal() != null ? notaCredito.getFacturaOriginal().getNumeroComprobante() : "-",
+                notaCredito.getTotal(),
+                notaCredito.getPedido().getNumero()
+        );
+
+        try {
+            Path pdfPath = resolvePdfPath(notaCredito.getPdfUrl());
+            if (pdfPath != null && Files.exists(pdfPath)) {
+                var mimeMessage = mailSender.createMimeMessage();
+                var helper = new MimeMessageHelper(mimeMessage, true, "UTF-8");
+                helper.setTo(destinatario);
+                helper.setSubject("Nota de crédito " + notaCredito.getNumeroComprobante());
+                helper.setText(cuerpo);
+                helper.addAttachment(pdfPath.getFileName().toString(), pdfPath.toFile());
+                mailSender.send(mimeMessage);
+            } else {
+                SimpleMailMessage message = new SimpleMailMessage();
+                message.setTo(destinatario);
+                message.setSubject("Nota de crédito " + notaCredito.getNumeroComprobante());
+                message.setText(cuerpo);
+                mailSender.send(message);
+            }
+            log.info("Enviando mail a {} por nota de crédito {}", destinatario, notaCredito.getNumeroComprobante());
+        } catch (MailException | MessagingException ex) {
+            log.warn("No se pudo enviar la nota de crédito por email: {}", ex.getMessage());
         }
     }
 

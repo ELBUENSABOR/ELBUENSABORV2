@@ -38,28 +38,7 @@ public class StockServiceImpl implements StockService {
         List<String> errores = new ArrayList<>();
         Long sucursalId = pedido.getSucursal().getId();
 
-        // Agrupar requerimientos de insumos por insumo
-        Map<Long, Double> requerimientosInsumos = new HashMap<>();
-
-        for (PedidoVentaDetalle detalle : pedido.getDetalles()) {
-            if (detalle.getManufacturado() != null) {
-                // Es un artículo manufacturado, necesitamos calcular los insumos de su receta
-                ArticuloManufacturado manufacturado = detalle.getManufacturado();
-                List<ArticuloManufacturadoDetalle> receta = manufacturadoDetalleRepository
-                        .findByArticuloManufacturadoId(manufacturado.getId());
-
-                for (ArticuloManufacturadoDetalle detalleReceta : receta) {
-                    Long insumoId = detalleReceta.getArticuloInsumo().getId();
-                    Double cantidadNecesaria = detalleReceta.getCantidad() * detalle.getCantidad();
-                    requerimientosInsumos.merge(insumoId, cantidadNecesaria, Double::sum);
-                }
-            } else if (detalle.getInsumo() != null) {
-                // Es un insumo directo (bebida, etc.)
-                Long insumoId = detalle.getInsumo().getId();
-                Double cantidadNecesaria = detalle.getCantidad().doubleValue();
-                requerimientosInsumos.merge(insumoId, cantidadNecesaria, Double::sum);
-            }
-        }
+        Map<Long, Double> requerimientosInsumos = calcularRequerimientosInsumos(pedido);
 
         // Verificar stock disponible para cada insumo requerido
         for (Map.Entry<Long, Double> entry : requerimientosInsumos.entrySet()) {
@@ -98,28 +77,7 @@ public class StockServiceImpl implements StockService {
     public void decrementarStock(PedidoVenta pedido) {
         Long sucursalId = pedido.getSucursal().getId();
 
-        // Agrupar requerimientos de insumos por insumo
-        Map<Long, Double> requerimientosInsumos = new HashMap<>();
-
-        for (PedidoVentaDetalle detalle : pedido.getDetalles()) {
-            if (detalle.getManufacturado() != null) {
-                // Es un artículo manufacturado
-                ArticuloManufacturado manufacturado = detalle.getManufacturado();
-                List<ArticuloManufacturadoDetalle> receta = manufacturadoDetalleRepository
-                        .findByArticuloManufacturadoId(manufacturado.getId());
-
-                for (ArticuloManufacturadoDetalle detalleReceta : receta) {
-                    Long insumoId = detalleReceta.getArticuloInsumo().getId();
-                    Double cantidadNecesaria = detalleReceta.getCantidad() * detalle.getCantidad();
-                    requerimientosInsumos.merge(insumoId, cantidadNecesaria, Double::sum);
-                }
-            } else if (detalle.getInsumo() != null) {
-                // Es un insumo directo
-                Long insumoId = detalle.getInsumo().getId();
-                Double cantidadNecesaria = detalle.getCantidad().doubleValue();
-                requerimientosInsumos.merge(insumoId, cantidadNecesaria, Double::sum);
-            }
-        }
+        Map<Long, Double> requerimientosInsumos = calcularRequerimientosInsumos(pedido);
 
         // Decrementar stock para cada insumo
         for (Map.Entry<Long, Double> entry : requerimientosInsumos.entrySet()) {
@@ -148,6 +106,49 @@ public class StockServiceImpl implements StockService {
             stock.setStockActual(nuevoStock);
             sucursalInsumoRepository.save(stock);
         }
+    }
+
+    @Transactional
+    public void incrementarStock(PedidoVenta pedido) {
+        Long sucursalId = pedido.getSucursal().getId();
+        Map<Long, Double> requerimientosInsumos = calcularRequerimientosInsumos(pedido);
+
+        for (Map.Entry<Long, Double> entry : requerimientosInsumos.entrySet()) {
+            Long insumoId = entry.getKey();
+            Double cantidadAReponer = entry.getValue();
+
+            SucursalInsumo stock = sucursalInsumoRepository
+                    .findBySucursalIdAndInsumoId(sucursalId, insumoId)
+                    .orElseThrow(() -> new IllegalStateException(
+                            "No existe registro de stock para el insumo ID: " + insumoId));
+
+            stock.setStockActual(stock.getStockActual() + cantidadAReponer);
+            sucursalInsumoRepository.save(stock);
+        }
+    }
+
+    private Map<Long, Double> calcularRequerimientosInsumos(PedidoVenta pedido) {
+        Map<Long, Double> requerimientosInsumos = new HashMap<>();
+
+        for (PedidoVentaDetalle detalle : pedido.getDetalles()) {
+            if (detalle.getManufacturado() != null) {
+                ArticuloManufacturado manufacturado = detalle.getManufacturado();
+                List<ArticuloManufacturadoDetalle> receta = manufacturadoDetalleRepository
+                        .findByArticuloManufacturadoId(manufacturado.getId());
+
+                for (ArticuloManufacturadoDetalle detalleReceta : receta) {
+                    Long insumoId = detalleReceta.getArticuloInsumo().getId();
+                    Double cantidadNecesaria = detalleReceta.getCantidad() * detalle.getCantidad();
+                    requerimientosInsumos.merge(insumoId, cantidadNecesaria, Double::sum);
+                }
+            } else if (detalle.getInsumo() != null) {
+                Long insumoId = detalle.getInsumo().getId();
+                Double cantidadNecesaria = detalle.getCantidad().doubleValue();
+                requerimientosInsumos.merge(insumoId, cantidadNecesaria, Double::sum);
+            }
+        }
+
+        return requerimientosInsumos;
     }
 
     /**

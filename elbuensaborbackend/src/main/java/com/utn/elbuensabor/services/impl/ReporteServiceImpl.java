@@ -10,6 +10,7 @@ import java.util.Comparator;
 import org.springframework.stereotype.Service;
 
 import com.utn.elbuensabor.dtos.ProductoVendidoDTO;
+import com.utn.elbuensabor.dtos.ReporteBalanceFinancieroDTO;
 import com.utn.elbuensabor.dtos.ReporteClientesPedidosDTO;
 import com.utn.elbuensabor.dtos.ReporteProductosVendidosDTO;
 import com.utn.elbuensabor.repositories.PedidoVentaRepository;
@@ -71,5 +72,19 @@ public class ReporteServiceImpl implements ReporteService {
                 .thenComparing(ReporteClientesPedidosDTO::getNombre, String.CASE_INSENSITIVE_ORDER));
 
         return reportes;
+    }
+    @Override
+    public ReporteBalanceFinancieroDTO obtenerBalanceFinanciero(LocalDate desde, LocalDate hasta) {
+        LocalDate fechaInicio = desde;
+        LocalDate fechaFin = hasta;
+        if (fechaInicio.isAfter(fechaFin)) {
+            fechaInicio = hasta;
+            fechaFin = desde;
+        }
+
+        LocalDateTime inicio = fechaInicio.atStartOfDay();
+        LocalDateTime fin = fechaFin.atTime(LocalTime.MAX);
+
+        return pedidoVentaRepository.findBalanceFinanciero(inicio, fin);
     }
 }

@@ -128,11 +128,6 @@ const DashboardHome = () => {
 
     return (
         <div className="dashboard-home">
-            <div className="dashboard-heading">
-                <h1>Dashboard</h1>
-                <p>Bienvenido al panel de administración</p>
-            </div>
-
             <section className="dashboard-summary">
                 {cards.map((card) => (
                     <article className="summary-card" key={card.label}>

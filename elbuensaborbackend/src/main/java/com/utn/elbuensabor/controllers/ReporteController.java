@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.utn.elbuensabor.dtos.ReporteProductosVendidosDTO;
+import com.utn.elbuensabor.dtos.ReporteBalanceFinancieroDTO;
 import com.utn.elbuensabor.dtos.ReporteClientesPedidosDTO;
 import com.utn.elbuensabor.services.ReporteService;
 
@@ -36,5 +37,12 @@ public class ReporteController {
             @RequestParam("hasta") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate hasta,
             @RequestParam(value = "orden", defaultValue = "PEDIDOS") String orden) {
         return ResponseEntity.ok(reporteService.obtenerClientesPorPedidos(desde, hasta, orden));
+    }
+
+    @GetMapping("/balance-financiero")
+    public ResponseEntity<ReporteBalanceFinancieroDTO> balanceFinanciero(
+            @RequestParam("desde") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate desde,
+            @RequestParam("hasta") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate hasta) {
+        return ResponseEntity.ok(reporteService.obtenerBalanceFinanciero(desde, hasta));
     }
 }

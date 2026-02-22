@@ -1,4 +1,4 @@
-import { Link, Outlet } from "react-router-dom";
+import { Link, Outlet, useLocation } from "react-router-dom";
 import { useState } from "react";
 import { FaRegArrowAltCircleRight } from "react-icons/fa";
 import { FiExternalLink, FiGrid } from "react-icons/fi";
@@ -10,6 +10,7 @@ import {useUser} from "../../contexts/UsuarioContext";
 import {getEmployeePanelLabel} from "../../utils/employeePanel";
 import {ChangePasswordPopup} from "../Home/ChangePasswordPopup";
 import {getImageUrl} from "../../utils/image";
+import {SIDEBAR_ROUTES} from "./Sidebar/sidebarRoutes";
 
 const DashboardLayout = () => {
     const [open, setOpen] = useState(false);
@@ -20,6 +21,8 @@ const DashboardLayout = () => {
         : "Panel de Administración";
 
     const profilePhotoUrl = user?.fotoPerfil ? getImageUrl(user.fotoPerfil) : "";
+    const {pathname} = useLocation();
+    const currentRoute = SIDEBAR_ROUTES.find((route) => pathname.startsWith(route.fullPath));
 
   return (
     <div className="d-flex layout-dashboard">
@@ -79,7 +82,17 @@ const DashboardLayout = () => {
                     </div>
                 </header>
                 <main className="flex-grow-1 p-4 main-dashboard">
-                    <Outlet/>
+                    <section className="dashboard-section-layout">
+                        <header className="dashboard-section-header">
+                            <h1>{currentRoute?.label ?? "Panel"}</h1>
+                            {currentRoute?.description && <p>{currentRoute.description}</p>}
+                        </header>
+                        <hr className="dashboard-section-divider"/>
+                        <div className="dashboard-section-filters"/>
+                        <div className="dashboard-section-content">
+                            <Outlet/>
+                        </div>
+                    </section>
                 </main>
             </div>
         </div>

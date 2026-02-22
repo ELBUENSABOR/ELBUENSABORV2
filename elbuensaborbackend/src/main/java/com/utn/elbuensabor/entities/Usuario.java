@@ -3,6 +3,9 @@ package com.utn.elbuensabor.entities;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
+import org.hibernate.annotations.CreationTimestamp;
+
+import java.time.LocalDateTime;
 
 @Entity
 @Table(name = "usuario")
@@ -19,6 +22,10 @@ public class Usuario extends BaseEntity {
 
     @Column(name = "must_change_password")
     private Boolean mustChangePassword = false;
+
+    @CreationTimestamp
+    @Column(name = "fecha_registro", updatable = false)
+    private LocalDateTime fechaRegistro;
 
     @Enumerated(EnumType.STRING)
     private RolSistema rolSistema;

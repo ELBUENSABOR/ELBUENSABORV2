@@ -1,8 +1,8 @@
 import { useEffect, useMemo, useState } from "react";
 import {
-    fetchClientesPorPedidos,
-    ReporteClientesPedidosDTO,
+    fetchClientesPorPedidos
 } from "../../../services/reportesService";
+import type {ReporteClientesPedidosDTO} from "../../../services/reportesService";
 import { getPedidosByCliente } from "../../../services/pedidoService";
 import type { PedidoResponse } from "../../../services/pedidoService";
 import OrderDetailModal from "../../Common/OrderDetailModal/OrderDetailModal";
@@ -120,9 +120,6 @@ const ClientesPorPedidos = () => {
             <div className="dashboard-table-header d-flex flex-column flex-md-row align-items-md-center gap-3 justify-content-between">
                 <div>
                     <h5 className="mb-1">Clientes por pedidos</h5>
-                    <small className="text-muted">
-                        Consultá los clientes con más pedidos o mayor facturación por período.
-                    </small>
                 </div>
                 <button
                     type="button"

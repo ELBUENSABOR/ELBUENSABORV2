@@ -122,6 +122,19 @@ public class PedidoController {
             return ResponseEntity.notFound().build();
         }
     }
+
+    @PutMapping("/{id}/nota-credito")
+    public ResponseEntity<PedidoResponse> emitirNotaCredito(@PathVariable Long id) {
+        try {
+            PedidoResponse response = pedidoService.emitirNotaCredito(id);
+            return ResponseEntity.ok(response);
+        } catch (IllegalArgumentException ex) {
+            return ResponseEntity.badRequest().build();
+        } catch (RuntimeException ex) {
+            return ResponseEntity.notFound().build();
+        }
+    }
+
     @PutMapping("/{id}/pagado")
     public ResponseEntity<PedidoResponse> marcarPagado(@PathVariable Long id) {
         try {

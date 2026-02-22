@@ -33,6 +33,8 @@ public interface PedidoService {
 
     PedidoResponse marcarPagado(Long id);
 
+    PedidoResponse emitirNotaCredito(Long id);
+
     String generarNumeroPedido();
 
     Double calcularGastosEnvio();

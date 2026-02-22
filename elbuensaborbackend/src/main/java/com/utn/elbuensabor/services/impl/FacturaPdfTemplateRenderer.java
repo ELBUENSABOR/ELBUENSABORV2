@@ -29,6 +29,10 @@ public class FacturaPdfTemplateRenderer {
     private String facturaLogoPath;
 
     public void render(Path filePath, FacturaVenta factura) throws IOException {
+        render(filePath, factura, "FACTURA");
+    }
+
+    public void render(Path filePath, FacturaVenta factura, String tipoComprobante) throws IOException {
         try (PDDocument document = new PDDocument()) {
             PDPage page = new PDPage();
             document.addPage(page);
@@ -39,7 +43,7 @@ public class FacturaPdfTemplateRenderer {
                 float left = 32f;
                 float right = pageWidth - 32f;
 
-                drawHeader(content, document, factura, left, right, topY);
+                drawHeader(content, document, factura, left, right, topY, tipoComprobante);
 
                 float y = topY - 120f;
                 y = drawMetaBox(content, factura, left, right, y);
@@ -59,7 +63,8 @@ public class FacturaPdfTemplateRenderer {
                             FacturaVenta factura,
                             float left,
                             float right,
-                            float topY) throws IOException {
+                            float topY,
+                            String tipoComprobante) throws IOException {
         float headerHeight = 84f;
         content.setNonStrokingColor(new java.awt.Color(28, 30, 36));
         content.addRect(0, topY - headerHeight, right + left, headerHeight);
@@ -69,7 +74,7 @@ public class FacturaPdfTemplateRenderer {
 
         writeText(content, "El Buen Sabor", left + logoTextOffset, topY - 35, PDType1Font.HELVETICA_BOLD, 14f, WHITE);
         writeText(content, "Comida artesanal", left + logoTextOffset, topY - 52, PDType1Font.HELVETICA, 10f, LIGHT_GRAY);
-        writeText(content, "FACTURA", right - 120, topY - 34, PDType1Font.HELVETICA, 10f, LIGHT_GRAY);
+        writeText(content, tipoComprobante, right - 180, topY - 34, PDType1Font.HELVETICA, 10f, LIGHT_GRAY);
         writeRightText(content, "#" + factura.getNumeroComprobante(), right, topY - 53, PDType1Font.HELVETICA_BOLD, 16f, WHITE);
     }
 
