@@ -17,7 +17,7 @@ public class UnidadMedidaServiceImpl implements UnidadMedidaService {
 
     @Override
     public List<UnidadMedidaDTO> getAll() {
-        return unidadMedidaRepository.findAll().stream().map(this::toResponse).toList();
+        return unidadMedidaRepository.findAllByActivoTrue().stream().map(this::toResponse).toList();
     }
 
     @Override
@@ -57,6 +57,7 @@ public class UnidadMedidaServiceImpl implements UnidadMedidaService {
     public UnidadMedidaDTO toResponse(UnidadMedida unidadMedida) {
         return new UnidadMedidaDTO(
                 unidadMedida.getId(),
-                unidadMedida.getDenominacion());
+                unidadMedida.getDenominacion(),
+                unidadMedida.isActivo());
     }
 }
