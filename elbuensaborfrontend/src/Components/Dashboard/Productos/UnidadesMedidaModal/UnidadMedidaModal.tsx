@@ -17,7 +17,7 @@ const UnidadMedidaModal = ({ showModal, setShowModal }: { showModal: boolean, se
     useEffect(() => {
         const load = async () => {
             const unidades = await getAllUnidadesMedida();
-            const actives = unidades.filter((u: { activo: any; }) => !u.activo);
+            const actives = unidades.filter((u: { activo: boolean; }) => u.activo);
             setUnidadesMedida(actives);
         };
         load();
@@ -45,9 +45,7 @@ const UnidadMedidaModal = ({ showModal, setShowModal }: { showModal: boolean, se
     const handleEditSubmit = async () => {
         const unidad = await editUnidadMedida(editUnidadId, newUnidad);
         console.log(unidad);
-        const unidadIndex = unidadesMedida.findIndex((u) => u.id === editUnidadId);
-        unidadesMedida[unidadIndex] = unidad;
-        setUnidadesMedida(unidadesMedida);
+        setUnidadesMedida((prev) => prev.map((u) => (u.id === editUnidadId ? unidad : u)));
         setEditUnidad(false);
         setEditUnidadId(undefined);
         setNewUnidad({
@@ -60,9 +58,7 @@ const UnidadMedidaModal = ({ showModal, setShowModal }: { showModal: boolean, se
     const handleDelete = async (id: number | undefined) => {
         const unidad = await deleteUnidadMedida(id);
         console.log(unidad);
-        const unidadIndex = unidadesMedida.findIndex((u) => u.id === id);
-        unidadesMedida.splice(unidadIndex, 1);
-        setUnidadesMedida(unidadesMedida);
+        setUnidadesMedida((prev) => prev.filter((u) => u.id !== id));
         setRefresh(!refresh);
     };
 

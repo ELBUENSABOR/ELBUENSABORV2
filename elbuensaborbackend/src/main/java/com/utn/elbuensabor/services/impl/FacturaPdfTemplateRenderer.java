@@ -7,10 +7,13 @@ import org.apache.pdfbox.pdmodel.PDPage;
 import org.apache.pdfbox.pdmodel.PDPageContentStream;
 import org.apache.pdfbox.pdmodel.font.PDFont;
 import org.apache.pdfbox.pdmodel.font.PDType1Font;
+import org.apache.pdfbox.pdmodel.graphics.image.LosslessFactory;
 import org.apache.pdfbox.pdmodel.graphics.image.PDImageXObject;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
+import javax.imageio.ImageIO;
+import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -62,16 +65,71 @@ public class FacturaPdfTemplateRenderer {
         content.addRect(0, topY - headerHeight, right + left, headerHeight);
         content.fill();
 
-        Path logoPath = resolveLogoPath();
-        if (Files.exists(logoPath)) {
-            PDImageXObject logo = PDImageXObject.createFromFileByContent(logoPath.toFile(), document);
-            content.drawImage(logo, left - 2, topY - 66, 92, 46);
-        }
+        float logoTextOffset = drawLogo(content, document, left, topY);
 
-        writeText(content, "El Buen Sabor", left + 96, topY - 35, PDType1Font.HELVETICA_BOLD, 14f, WHITE);
-        writeText(content, "Comida artesanal", left + 96, topY - 52, PDType1Font.HELVETICA, 10f, LIGHT_GRAY);
+        writeText(content, "El Buen Sabor", left + logoTextOffset, topY - 35, PDType1Font.HELVETICA_BOLD, 14f, WHITE);
+        writeText(content, "Comida artesanal", left + logoTextOffset, topY - 52, PDType1Font.HELVETICA, 10f, LIGHT_GRAY);
         writeText(content, "FACTURA", right - 120, topY - 34, PDType1Font.HELVETICA, 10f, LIGHT_GRAY);
         writeRightText(content, "#" + factura.getNumeroComprobante(), right, topY - 53, PDType1Font.HELVETICA_BOLD, 16f, WHITE);
+    }
+
+    private float drawLogo(PDPageContentStream content,
+                           PDDocument document,
+                           float left,
+                           float topY) throws IOException {
+        Path logoPath = resolveLogoPath();
+        if (!Files.exists(logoPath)) {
+            return 96f;
+        }
+
+        BufferedImage rawLogo = ImageIO.read(logoPath.toFile());
+        if (rawLogo == null) {
+            return 96f;
+        }
+
+        BufferedImage trimmedLogo = trimTransparentBorders(rawLogo);
+        PDImageXObject logo = LosslessFactory.createFromImage(document, trimmedLogo);
+
+        float maxWidth = 92f;
+        float maxHeight = 46f;
+        float scale = Math.min(maxWidth / logo.getWidth(), maxHeight / logo.getHeight());
+
+        float drawWidth = logo.getWidth() * scale;
+        float drawHeight = logo.getHeight() * scale;
+
+        float logoX = left - 2 + (maxWidth - drawWidth) / 2f;
+        float logoY = topY - 66 + (maxHeight - drawHeight) / 2f;
+
+        content.drawImage(logo, logoX, logoY, drawWidth, drawHeight);
+        return Math.max(logoX + drawWidth - left + 8f, 96f);
+    }
+
+    private BufferedImage trimTransparentBorders(BufferedImage image) {
+        int width = image.getWidth();
+        int height = image.getHeight();
+
+        int minX = width;
+        int minY = height;
+        int maxX = -1;
+        int maxY = -1;
+
+        for (int y = 0; y < height; y++) {
+            for (int x = 0; x < width; x++) {
+                int alpha = (image.getRGB(x, y) >>> 24) & 0xFF;
+                if (alpha > 0) {
+                    minX = Math.min(minX, x);
+                    minY = Math.min(minY, y);
+                    maxX = Math.max(maxX, x);
+                    maxY = Math.max(maxY, y);
+                }
+            }
+        }
+
+        if (maxX < minX || maxY < minY) {
+            return image;
+        }
+
+        return image.getSubimage(minX, minY, maxX - minX + 1, maxY - minY + 1);
     }
 
     private float drawMetaBox(PDPageContentStream content,
@@ -79,7 +137,8 @@ public class FacturaPdfTemplateRenderer {
                               float left,
                               float right,
                               float startY) throws IOException {
-        float boxH = 60f;
+        boolean hasPaymentId = factura.getPaymentId() != null && !factura.getPaymentId().isBlank();
+        float boxH = hasPaymentId ? 78f : 60f;
         content.setNonStrokingColor(new java.awt.Color(245, 246, 248));
         content.addRect(left, startY - boxH, right - left, boxH);
         content.fill();
@@ -93,6 +152,11 @@ public class FacturaPdfTemplateRenderer {
         writeText(content,
                 factura.getFormaPago().name().equals("MP") ? "Mercado Pago" : "Efectivo",
                 right - 170, startY - 38, PDType1Font.HELVETICA_BOLD, 12f, new java.awt.Color(0, 102, 153));
+
+        if (hasPaymentId) {
+            writeText(content, "ID DE PAGO", right - 170, startY - 56, PDType1Font.HELVETICA, 9f, GRAY);
+            writeText(content, factura.getPaymentId(), right - 170, startY - 72, PDType1Font.HELVETICA_BOLD, 10f, BLACK);
+        }
 
         content.setStrokingColor(new java.awt.Color(218, 218, 218));
         content.moveTo(left, startY - boxH);

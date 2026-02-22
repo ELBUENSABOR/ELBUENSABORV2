@@ -9,6 +9,16 @@ import {getImageUrl} from "../../utils/image";
 
 import "./account.css";
 
+const getEmptyDomicilio = () => ({
+    calle: "",
+    numero: "",
+    codigoPostal: 0,
+    localidad: {
+        id: 0,
+        nombre: "",
+    },
+});
+
 const Account = () => {
     const [userData, setUserData] = useState<UsuarioDTO | null>(null);
 
@@ -162,7 +172,10 @@ const Account = () => {
         setMsg({ type: "", text: "" });
         const resp = await getUserService(user?.userId || "");
         console.log("resp", resp);
-        setUserData(resp.data);
+        setUserData({
+            ...resp.data,
+            domicilio: resp.data.domicilio ?? getEmptyDomicilio(),
+        });
 
         const localidadesData = await getLocalidades();
         if (localidadesData) {
@@ -184,20 +197,22 @@ const Account = () => {
             if (!prev) return prev;
 
             if (name === "calle" || name === "numero") {
+                const domicilio = prev.domicilio ?? getEmptyDomicilio();
                 return {
                     ...prev,
                     domicilio: {
-                        ...prev.domicilio,
+                        ...domicilio,
                         [name]: value,
                     },
                 } as UsuarioDTO;
             }
 
             if (name === "codigoPostal") {
+                const domicilio = prev.domicilio ?? getEmptyDomicilio();
                 return {
                     ...prev,
                     domicilio: {
-                        ...prev.domicilio,
+                        ...domicilio,
                         codigoPostal: Number(value) || 0,
                     },
                 } as UsuarioDTO;

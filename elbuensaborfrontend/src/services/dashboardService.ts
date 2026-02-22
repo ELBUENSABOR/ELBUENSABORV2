@@ -7,11 +7,12 @@ export async function fetchSucursales(): Promise<Sucursal[]> {
     try {
         const token = sessionStorage.getItem("token");
         const headers = token ? {
+            "ngrok-skip-browser-warning": "true",
             Authorization: `Bearer ${token}`,
         } : {};
         const res = await axios.get(`${API_BASE}/sucursales`, {
             headers,
-            withCredentials: true,
+            //withCredentials: true,
         });
         return res.data;
     } catch (error: any) {
@@ -35,6 +36,7 @@ export const createSucursal = async (data: Sucursal) => {
 export const getSucursalById = async (id: number) => {
     const token = sessionStorage.getItem("token");
     const headers = token ? {
+        "ngrok-skip-browser-warning": "true",
         Authorization: `Bearer ${token}`,
     } : {};
     return axios.get(`${API_BASE}/sucursales/${id}`, {

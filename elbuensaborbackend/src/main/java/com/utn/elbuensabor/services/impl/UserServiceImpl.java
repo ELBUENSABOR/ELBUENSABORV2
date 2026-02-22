@@ -1,10 +1,13 @@
 package com.utn.elbuensabor.services.impl;
 
+import com.utn.elbuensabor.dtos.LocalidadDTO;
+import com.utn.elbuensabor.dtos.UserDTO;
 import com.utn.elbuensabor.dtos.UserEditRequestDTO;
 import com.utn.elbuensabor.dtos.UserRequestDTO;
 import com.utn.elbuensabor.entities.*;
 import com.utn.elbuensabor.repositories.*;
 import com.utn.elbuensabor.services.UserService;
+import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
