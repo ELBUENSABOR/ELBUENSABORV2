@@ -19,6 +19,7 @@ export type SidebarRoute = {
     dashboardPath: string;
     fullPath: string;
     label: string;
+    description: string;
     icon: LucideIcon;
     roles: SidebarRole[];
 };
@@ -30,6 +31,7 @@ const createSidebarRoute = (
     key: string,
     path: string,
     label: string,
+    description: string,
     icon: LucideIcon,
     roles: SidebarRole[]
 ): SidebarRoute => ({
@@ -37,34 +39,37 @@ const createSidebarRoute = (
     dashboardPath: path,
     fullPath: buildFullPath(path),
     label,
+    description,
     icon,
     roles,
 });
 
 export const SIDEBAR_ROUTES: SidebarRoute[] = [
-    createSidebarRoute("home", "home", "Inicio", Home, ["ADMIN", "EMPLEADO", "COCINERO", "DELIVERY", "CAJERO"]),
-    createSidebarRoute("sucursales", "sucursales", "Sucursales", Building2, ["ADMIN"]),
-    createSidebarRoute("usuarios", "usuarios", "Usuarios", Users, ["ADMIN"]),
-    createSidebarRoute("pedidos", "pedidos", "Pedidos Caja", ClipboardList, ["CAJERO", "ADMIN"]),
-    createSidebarRoute("cocina", "cocina", "Pedidos Cocina", ClipboardList, ["COCINERO", "ADMIN"]),
-    createSidebarRoute("delivery", "delivery", "Pedidos Delivery", ClipboardList, ["DELIVERY", "ADMIN"]),
-    createSidebarRoute("productos-insumos", "productos-insumos", "Insumos", Package, ["COCINERO", "ADMIN"]),
+    createSidebarRoute("home", "home", "Inicio", "Resumen general del panel y actividad reciente.", Home, ["ADMIN", "EMPLEADO", "COCINERO", "DELIVERY", "CAJERO"]),
+    createSidebarRoute("sucursales", "sucursales", "Sucursales", "Administración de sucursales y su configuración.", Building2, ["ADMIN"]),
+    createSidebarRoute("usuarios", "usuarios", "Usuarios", "Gestión de empleados y clientes registrados.", Users, ["ADMIN"]),
+    createSidebarRoute("pedidos", "pedidos", "Pedidos Caja", "Seguimiento y gestión de pedidos para caja.", ClipboardList, ["CAJERO", "ADMIN"]),
+    createSidebarRoute("cocina", "cocina", "Pedidos Cocina", "Control del estado de pedidos en cocina.", ClipboardList, ["COCINERO", "ADMIN"]),
+    createSidebarRoute("delivery", "delivery", "Pedidos Delivery", "Asignación y control de entregas en curso.", ClipboardList, ["DELIVERY", "ADMIN"]),
+    createSidebarRoute("productos-insumos", "productos-insumos", "Insumos", "Catálogo de insumos disponibles para producción.", Package, ["COCINERO", "ADMIN"]),
     createSidebarRoute(
         "productos-manufacturados",
         "productos-manufacturados",
         "Productos manufacturados",
+        "Administración de productos elaborados y recetas.",
         Factory,
         ["COCINERO", "ADMIN"]
     ),
-    createSidebarRoute("stock", "stock", "Stock", Boxes, ["COCINERO", "ADMIN"]),
-    createSidebarRoute("compras", "compras", "Registro de compras", ClipboardList, ["COCINERO", "ADMIN"]),
-    createSidebarRoute("rubros-insumos", "rubros-insumos", "Rubros de insumos", Tags, ["COCINERO", "ADMIN"]),
-    createSidebarRoute("rubros-productos", "rubros-productos", "Rubros de productos", Tags, ["COCINERO", "ADMIN"]),
-    createSidebarRoute("productos-venta", "productos-venta", "Productos a la venta", ShoppingBag, ["ADMIN"]),
+    createSidebarRoute("stock", "stock", "Stock", "Monitoreo de stock mínimo y alertas por sucursal.", Boxes, ["COCINERO", "ADMIN"]),
+    createSidebarRoute("compras", "compras", "Registro de compras", "Alta y consulta de compras de insumos.", ClipboardList, ["COCINERO", "ADMIN"]),
+    createSidebarRoute("rubros-insumos", "rubros-insumos", "Rubros de insumos", "Clasificación y mantenimiento de rubros de insumos.", Tags, ["COCINERO", "ADMIN"]),
+    createSidebarRoute("rubros-productos", "rubros-productos", "Rubros de productos", "Clasificación y mantenimiento de rubros de productos.", Tags, ["COCINERO", "ADMIN"]),
+    createSidebarRoute("productos-venta", "productos-venta", "Productos a la venta", "Definición de productos publicados para venta.", ShoppingBag, ["ADMIN"]),
     createSidebarRoute(
         "reportes-productos-mas-vendidos",
         "reportes/productos-mas-vendidos",
         "Productos más vendidos",
+        "Reporte de productos con mayor volumen de ventas.",
         BarChart3,
         ["ADMIN"]
     ),
@@ -72,6 +77,7 @@ export const SIDEBAR_ROUTES: SidebarRoute[] = [
         "reportes-clientes-por-pedidos",
         "reportes/clientes-por-pedidos",
         "Clientes por pedidos",
+        "Ranking de clientes según cantidad de pedidos.",
         BarChart3,
         ["ADMIN"]
     ),
@@ -79,6 +85,7 @@ export const SIDEBAR_ROUTES: SidebarRoute[] = [
         "reportes-balance-financiero",
         "reportes/balance-financiero",
         "Balance financiero",
+        "Análisis de ingresos y egresos consolidados.",
         BarChart3,
         ["ADMIN"]
     ),
@@ -95,6 +102,7 @@ export const DASHBOARD_PATHS = {
     stock: "stock",
     compras: "compras",
     comprasList: "compras/list",
+    productosVenta: "productos-venta",
     reportesProductosMasVendidos: "reportes/productos-mas-vendidos",
     reportesClientesPorPedidos: "reportes/clientes-por-pedidos",
     reportesBalanceFinanciero: "reportes/balance-financiero",

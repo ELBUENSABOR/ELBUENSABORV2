@@ -72,9 +72,6 @@ const ProductosMasVendidos = () => {
             <div className="dashboard-table-header d-flex flex-column flex-md-row align-items-md-center gap-3 justify-content-between">
                 <div>
                     <h5 className="mb-1">Productos más vendidos</h5>
-                    <small className="text-muted">
-                        Consultá los productos más vendidos por rango de fechas.
-                    </small>
                 </div>
                 <button
                     type="button"

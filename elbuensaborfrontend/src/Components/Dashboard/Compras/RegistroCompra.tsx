@@ -138,12 +138,6 @@ const RegistroCompra = () => {
 
     return (
         <div className="registro-compra">
-            <header className="registro-compra__header">
-                <div>
-                    <p className="registro-compra__kicker">Registro de Compra</p>
-                    <h4>Registrar compras de ingredientes y actualizar stock</h4>
-                </div>
-            </header>
 
             <section className="registro-compra__card">
                 <div className="registro-compra__card-header">

@@ -121,17 +121,6 @@ const Users = () => {
 
     return (
         <div className="users-container">
-            <div className="users-header">
-                <div className="users-title">
-          <span className="users-title-icon" aria-hidden="true">
-            <UsersIcon />
-          </span>
-                    <div>
-                        <h5>Usuarios</h5>
-                        <p>Gestión de empleados y clientes</p>
-                    </div>
-                </div>
-            </div>
             <div className="users-controls">
                 <div className="users-search">
           <span className="users-search-icon" aria-hidden="true">

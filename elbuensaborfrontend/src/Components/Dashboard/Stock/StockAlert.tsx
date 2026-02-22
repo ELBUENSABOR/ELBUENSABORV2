@@ -133,12 +133,6 @@ const StockAlert = () => {
     return (
         <div>
             <div className="d-flex flex-wrap align-items-center justify-content-between gap-3 mb-3">
-                <div>
-                    <h5 className="mb-1">Control de stock de ingredientes</h5>
-                    <p className="text-muted mb-0">
-                        Se muestran los ingredientes con stock por debajo del mínimo o cercanos al mínimo.
-                    </p>
-                </div>
                 <div className="d-flex flex-wrap align-items-center gap-3">
                     <div className="d-flex align-items-center gap-2">
                         <label className="mb-0 text-muted" htmlFor="sucursal-select">

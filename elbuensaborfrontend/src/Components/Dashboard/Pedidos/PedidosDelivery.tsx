@@ -35,7 +35,7 @@ const PedidosDelivery = () => {
             );
             setPedidos(data);
         } catch (err) {
-            setError("No se pudieron cargar los pedidos en delivery.");
+            setError("No se pudieron cargar los pedidos en delivery: " + err);
         } finally {
             setLoading(false);
         }
@@ -64,7 +64,7 @@ const PedidosDelivery = () => {
             }
             await cargarPedidos();
         } catch (err) {
-            setError("No se pudo marcar el pedido como entregado.");
+            setError("No se pudo marcar el pedido como entregado: " + err);
         } finally {
             setLoading(false);
         }
@@ -73,10 +73,11 @@ const PedidosDelivery = () => {
     return (
         <div>
             <div className="d-flex flex-wrap justify-content-between align-items-center mb-3 gap-3">
-                <h3 className="mb-0">Pedidos en delivery</h3>
                 {user?.role === "ADMIN" && (
                     <div>
-                        <label className="form-label">Sucursal</label>
+                        <label className="mb-0 text-muted" htmlFor="sucursal-select">
+                            Sucursal:
+                        </label>
                         <select
                             className="form-select"
                             value={sucursalId ?? ""}
