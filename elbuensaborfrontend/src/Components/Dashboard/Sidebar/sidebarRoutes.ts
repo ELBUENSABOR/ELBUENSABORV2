@@ -64,7 +64,6 @@ export const SIDEBAR_ROUTES: SidebarRoute[] = [
     createSidebarRoute("compras", "compras", "Registro de compras", "Alta y consulta de compras de insumos.", ClipboardList, ["COCINERO", "ADMIN"]),
     createSidebarRoute("rubros-insumos", "rubros-insumos", "Rubros de insumos", "Clasificación y mantenimiento de rubros de insumos.", Tags, ["COCINERO", "ADMIN"]),
     createSidebarRoute("rubros-productos", "rubros-productos", "Rubros de productos", "Clasificación y mantenimiento de rubros de productos.", Tags, ["COCINERO", "ADMIN"]),
-    createSidebarRoute("productos-venta", "productos-venta", "Productos a la venta", "Definición de productos publicados para venta.", ShoppingBag, ["ADMIN"]),
     createSidebarRoute(
         "reportes-productos-mas-vendidos",
         "reportes/productos-mas-vendidos",
