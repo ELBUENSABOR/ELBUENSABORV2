@@ -1,11 +1,13 @@
 import "./catalog.css";
-import {Link} from "react-router-dom";
-import {useCatalogData} from "../../../contexts/CatalogDataContext";
-import {useCatalogFilters} from "../../../contexts/CatalogFiltersContext";
-import {useCart} from "../../../contexts/CartContext";
-import {useSucursal} from "../../../contexts/SucursalContext";
-import type {Manufacturado} from "../../../models/Manufacturado";
-import {getImageUrl} from "../../../utils/image";
+import { Link } from "react-router-dom";
+import { useCatalogData } from "../../../contexts/CatalogDataContext";
+import { useCatalogFilters } from "../../../contexts/CatalogFiltersContext";
+import { useCart } from "../../../contexts/CartContext";
+import { useSucursal } from "../../../contexts/SucursalContext";
+import type { Manufacturado } from "../../../models/Manufacturado";
+import { getImageUrl } from "../../../utils/image";
+import { useLocation } from "react-router-dom";
+import { useEffect } from "react";
 
 
 const formatCurrency = (value: number) =>
@@ -26,18 +28,18 @@ const buildGroups = (products: Manufacturado[]) => {
         if (existing) {
             existing.items.push(product);
         } else {
-            grouped.set(key, {label, items: [product]});
+            grouped.set(key, { label, items: [product] });
         }
     });
     return Array.from(grouped.entries());
 };
 
 const Catalog = () => {
-    const {products, isLoading, error, categories} = useCatalogData();
-    const {searchTerm, selectedCategoryId, setSelectedCategoryId} =
+    const { products, isLoading, error, categories } = useCatalogData();
+    const { searchTerm, selectedCategoryId, setSelectedCategoryId, setSearchTerm } =
         useCatalogFilters();
-    const {addItem} = useCart();
-    const {sucursalId} = useSucursal();
+    const { addItem } = useCart();
+    const { sucursalId } = useSucursal();
 
     const normalizedSearch = searchTerm.trim().toLowerCase();
     const activeProducts = products.filter((product) => product.activo);
@@ -52,6 +54,15 @@ const Catalog = () => {
     });
 
     const groupedProducts = buildGroups(filteredProducts);
+
+    const location = useLocation();
+    const searchTermUrl: string | null = location.state?.searchTerm || null;
+
+    useEffect(() => {
+        if (searchTermUrl) {
+            setSearchTerm(searchTermUrl);
+        }
+    }, [searchTermUrl]);
 
     return (
         <div className="app-shell">
@@ -69,9 +80,8 @@ const Catalog = () => {
                     <button
 
                         type="button"
-                        className={`catalog-pill${
-                            selectedCategoryId === null ? " is-active" : ""
-                        }`}
+                        className={`catalog-pill${selectedCategoryId === null ? " is-active" : ""
+                            }`}
                         onClick={() => setSelectedCategoryId(null)}
                     >
                         Todos
@@ -80,9 +90,8 @@ const Catalog = () => {
                         <button
                             key={category.id}
                             type="button"
-                            className={`catalog-pill${
-                                selectedCategoryId === category.id ? " is-active" : ""
-                            }`}
+                            className={`catalog-pill${selectedCategoryId === category.id ? " is-active" : ""
+                                }`}
                             onClick={() => setSelectedCategoryId(category.id)}
                         >
                             {category.name}
@@ -120,9 +129,8 @@ const Catalog = () => {
                                     return (
                                         <article
                                             key={product.id}
-                                            className={`product-card${
-                                                !isAvailable ? " product-card--disabled" : ""
-                                            }`}
+                                            className={`product-card${!isAvailable ? " product-card--disabled" : ""
+                                                }`}
                                         >
                                             <div className="product-card__image">
                                                 {product.imagenes?.[0] ? (
@@ -137,16 +145,16 @@ const Catalog = () => {
                                                 )}
                                                 {!isAvailable && (
                                                     <span className="product-card__overlay">
-                            No disponible
-                          </span>
+                                                        No disponible
+                                                    </span>
                                                 )}
                                             </div>
                                             <div className="product-card__body">
                                                 <div>
                                                     <h6>{product.denominacion}</h6>
                                                     <span className="product-card__price">
-                            {formatCurrency(product.precioVenta)}
-                          </span>
+                                                        {formatCurrency(product.precioVenta)}
+                                                    </span>
                                                 </div>
                                                 {!isAvailable && (
                                                     <p className="product-card__note">
