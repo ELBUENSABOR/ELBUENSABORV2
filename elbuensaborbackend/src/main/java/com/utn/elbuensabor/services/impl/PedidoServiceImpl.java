@@ -341,6 +341,34 @@ public class PedidoServiceImpl implements PedidoService {
                 .orElseThrow(() -> new RuntimeException("Pedido no encontrado"));
         validarAccesoSucursal(pedido.getSucursal());
 
+        Usuario usuario = resolveUsuarioAutenticado();
+
+        if (nuevoEstado == EstadoPedido.CANCELADO) {
+            if (usuario != null && usuario.getRolSistema() == RolSistema.CLIENTE) {
+                Long usuarioClientePedidoId = pedido.getCliente() != null && pedido.getCliente().getUsuario() != null
+                        ? pedido.getCliente().getUsuario().getId()
+                        : null;
+                if (usuarioClientePedidoId == null || !usuarioClientePedidoId.equals(usuario.getId())) {
+                    throw new RuntimeException("Pedido no encontrado");
+                }
+                if (pedido.getEstado() != EstadoPedido.A_CONFIRMAR) {
+                    throw new IllegalArgumentException("El cliente solo puede cancelar pedidos en estado A_CONFIRMAR");
+                }
+            } else if (usuario == null || usuario.getRolSistema() != RolSistema.ADMIN) {
+                if (!esTransicionValida(pedido.getEstado(), nuevoEstado)) {
+                    throw new IllegalArgumentException("No se puede cambiar el estado de " + pedido.getEstado() + " a " + nuevoEstado);
+                }
+            }
+
+            if (Boolean.TRUE.equals(pedido.getPagado())) {
+                return emitirNotaCredito(id);
+            }
+
+            pedido.setEstado(EstadoPedido.CANCELADO);
+            pedido = pedidoRepository.save(pedido);
+            return mapToResponse(pedido);
+        }
+
         // Validar transición de estado
         if (!esTransicionValida(pedido.getEstado(), nuevoEstado)) {
             throw new IllegalArgumentException("No se puede cambiar el estado de " + pedido.getEstado() + " a " + nuevoEstado);
@@ -424,10 +452,15 @@ public class PedidoServiceImpl implements PedidoService {
                 .orElseThrow(() -> new RuntimeException("Pedido no encontrado"));
         validarAccesoSucursal(pedido.getSucursal());
 
-        if (pedido.getFacturaVenta() == null) {
+        if (Boolean.TRUE.equals(pedido.getPagado()) && pedido.getFormaPago() == FormaPago.MP) {
+            var factura = facturaService.generarFactura(pedido);
+            pedido.setFacturaVenta(factura);
+            pedido = pedidoRepository.save(pedido);
+            emailService.enviarFactura(factura);
+        } else {
             throw new IllegalArgumentException("El pedido no tiene factura para anular");
         }
-
+        
         if (notaCreditoVentaRepository.findByPedidoId(id).isPresent()) {
             throw new IllegalArgumentException("El pedido ya tiene una nota de crédito emitida");
         }
