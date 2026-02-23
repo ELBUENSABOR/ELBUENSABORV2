@@ -10,7 +10,7 @@ description = 'PROYECTO EL BUEN SABOR'
 
 java {
 	toolchain {
-		languageVersion = JavaLanguageVersion.of(21)
+		languageVersion = JavaLanguageVersion.of(24)
 	}
 }
 
@@ -44,6 +44,10 @@ dependencies {
 	runtimeOnly 'io.jsonwebtoken:jjwt-jackson:0.11.5'
 	implementation("com.mercadopago:sdk-java:2.8.0")
 	implementation 'org.apache.pdfbox:pdfbox:2.0.31'
+}
+
+jar {
+	enabled = false
 }
 
 tasks.named('test') {
