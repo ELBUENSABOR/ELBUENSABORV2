@@ -16,6 +16,24 @@ interface UserContextType {
 const UserContext = createContext<UserContextType | undefined>(undefined);
 
 const INACTIVITY_LIMIT_MINUTES = 45;
+const USER_STORAGE_KEYS = [
+    "token",
+    "username",
+    "role",
+    "subRole",
+    "userId",
+    "mustChangePassword",
+    "fotoPerfil",
+    "sucursalId",
+    "lastActivity",
+] as const;
+
+const clearUserStorage = () => {
+    USER_STORAGE_KEYS.forEach((key) => {
+        sessionStorage.removeItem(key);
+        localStorage.removeItem(key);
+    });
+};
 
 export const UserProvider = ({children}: { children: ReactNode }) => {
     const [user, setUserState] = useState<User | null>(() => {
@@ -43,18 +61,17 @@ export const UserProvider = ({children}: { children: ReactNode }) => {
             const limitMs = INACTIVITY_LIMIT_MINUTES * 60 * 1000;
 
             if (diffMs > limitMs) {
-                // sesión expirada → limpio y arranco sin usuario
-                sessionStorage.removeItem("token");
-                sessionStorage.removeItem("username");
-                sessionStorage.removeItem("role");
-                sessionStorage.removeItem("subRole");
-                sessionStorage.removeItem("userId");
-                sessionStorage.removeItem("mustChangePassword");
-                sessionStorage.removeItem("fotoPerfil");
-                sessionStorage.removeItem("lastActivity");
+                clearUserStorage();
                 return null;
             }
         }
+
+        USER_STORAGE_KEYS.forEach((key) => {
+            const value = getStoredItem(key);
+            if (value !== null) {
+                sessionStorage.setItem(key, value);
+            }
+        });
 
         return {
             token,
@@ -70,42 +87,49 @@ export const UserProvider = ({children}: { children: ReactNode }) => {
 
     const setUser = (user: User) => {
         sessionStorage.setItem("token", user.token);
+        localStorage.setItem("token", user.token);
         sessionStorage.setItem("username", user.username);
+        localStorage.setItem("username", user.username);
         sessionStorage.setItem("role", user.role);
+        localStorage.setItem("role", user.role);
         if (user.subRole) {
             sessionStorage.setItem("subRole", user.subRole);
+            localStorage.setItem("subRole", user.subRole);
         } else {
             sessionStorage.removeItem("subRole");
+            localStorage.removeItem("subRole");
         }
         sessionStorage.setItem("userId", user.userId.toString());
+        localStorage.setItem("userId", user.userId.toString());
         sessionStorage.setItem(
+            "mustChangePassword",
+            user.mustChangePassword ? "true" : "false"
+        );
+        localStorage.setItem(
             "mustChangePassword",
             user.mustChangePassword ? "true" : "false"
         );
         if (user.fotoPerfil) {
             sessionStorage.setItem("fotoPerfil", user.fotoPerfil);
+            localStorage.setItem("fotoPerfil", user.fotoPerfil);
         } else {
             sessionStorage.removeItem("fotoPerfil");
+            localStorage.removeItem("fotoPerfil");
         }
         if (user.sucursalId !== undefined && user.sucursalId !== null) {
             sessionStorage.setItem("sucursalId", user.sucursalId.toString());
+            localStorage.setItem("sucursalId", user.sucursalId.toString());
         } else {
             sessionStorage.removeItem("sucursalId");
+            localStorage.removeItem("sucursalId");
         }
         sessionStorage.setItem("lastActivity", Date.now().toString());
+        localStorage.setItem("lastActivity", Date.now().toString());
         setUserState(user);
     };
 
     const logout = () => {
-        sessionStorage.removeItem("token");
-        sessionStorage.removeItem("username");
-        sessionStorage.removeItem("role");
-        sessionStorage.removeItem("subRole");
-        sessionStorage.removeItem("userId");
-        sessionStorage.removeItem("mustChangePassword");
-        sessionStorage.removeItem("fotoPerfil");
-        sessionStorage.removeItem("sucursalId");
-        sessionStorage.removeItem("lastActivity");
+        clearUserStorage();
         setUserState(null);
     };
 
@@ -114,6 +138,7 @@ export const UserProvider = ({children}: { children: ReactNode }) => {
 
         const updateActivity = () => {
             sessionStorage.setItem("lastActivity", Date.now().toString());
+            localStorage.setItem("lastActivity", Date.now().toString());
         };
 
         const checkInactivity = () => {
