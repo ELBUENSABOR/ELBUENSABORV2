@@ -69,7 +69,9 @@ const IngredientesModal = ({
             </Modal.Header>
             <Modal.Body>
                 <div className="ingrediente-container">
-                    {ingredientes.map((ingrediente, index) => {
+                    {ingredientes
+                        .filter((ingrediente) => ingrediente.activo)
+                        .map((ingrediente, index) => {
                         const seleccionado = ingredientesSelected.find(
                             i => i.insumoId === ingrediente.insumoId
                         );
