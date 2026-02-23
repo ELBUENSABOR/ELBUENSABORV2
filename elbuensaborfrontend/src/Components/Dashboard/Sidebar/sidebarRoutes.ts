@@ -6,7 +6,6 @@ import {
     Factory,
     Home,
     Package,
-    ShoppingBag,
     Tags,
     Users,
 } from "lucide-react";
