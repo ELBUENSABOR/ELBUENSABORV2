@@ -1,8 +1,8 @@
-import { useEffect, useMemo, useState } from "react";
+import {useEffect, useMemo, useState} from "react";
 import {
     fetchBalanceFinanciero,
-    type ReporteBalanceFinancieroDTO,
 } from "../../../services/reportesService";
+import type {ReporteBalanceFinancieroDTO} from "../../../services/reportesService";
 
 const formatDateInput = (date: Date) => {
     const year = date.getFullYear();
@@ -16,19 +16,30 @@ const formatCurrency = (value: number) =>
         style: "currency",
         currency: "ARS",
         maximumFractionDigits: 2,
-    }).format(value);
+    }).format(value ?? 0);
+
+const buildCsv = (
+    desde: string,
+    hasta: string,
+    data: ReporteBalanceFinancieroDTO
+) => {
+    const lines: string[] = [];
+    lines.push("Desde,Hasta,Ingresos,Costos,Ganancias");
+    lines.push(`${desde},${hasta},${data.ingresos},${data.costos},${data.ganancias}`);
+    return lines.join("\n");
+};
 
 const BalanceFinanciero = () => {
     const today = useMemo(() => formatDateInput(new Date()), []);
     const [desde, setDesde] = useState(today);
     const [hasta, setHasta] = useState(today);
-    const [isLoading, setIsLoading] = useState(false);
-    const [error, setError] = useState<string | null>(null);
     const [data, setData] = useState<ReporteBalanceFinancieroDTO>({
         ingresos: 0,
         costos: 0,
         ganancias: 0,
     });
+    const [isLoading, setIsLoading] = useState(false);
+    const [error, setError] = useState<string | null>(null);
 
     const loadData = async () => {
         if (!desde || !hasta) return;
@@ -38,7 +49,7 @@ const BalanceFinanciero = () => {
             const response = await fetchBalanceFinanciero(desde, hasta);
             setData(response);
         } catch (err: any) {
-            setError(err.response?.data?.message ?? "No se pudo cargar el balance financiero.");
+            setError(err.response?.data?.message ?? "No se pudo cargar el reporte.");
         } finally {
             setIsLoading(false);
         }
@@ -48,10 +59,34 @@ const BalanceFinanciero = () => {
         loadData();
     }, []);
 
+    const handleExport = () => {
+        const csv = buildCsv(desde, hasta, data);
+        const blob = new Blob([csv], {type: "text/csv;charset=utf-8;"});
+        const url = window.URL.createObjectURL(blob);
+        const link = document.createElement("a");
+        link.href = url;
+        link.download = `balance-financiero-${desde}-${hasta}.csv`;
+        link.click();
+        window.URL.revokeObjectURL(url);
+    };
+
     return (
         <div className="dashboard-table-card">
             <div className="dashboard-table-header d-flex flex-column flex-md-row align-items-md-center gap-3 justify-content-between">
-                <h5 className="mb-1">Balance financiero</h5>
+                <div>
+                    <h5 className="mb-1">Ingresos, costos y ganancias</h5>
+                    <small className="text-muted">
+                        Revisá los totales monetarios del local entre dos fechas.
+                    </small>
+                </div>
+                <button
+                    type="button"
+                    className="btn btn-outline-danger"
+                    onClick={handleExport}
+                    disabled={isLoading}
+                >
+                    Exportar a Excel
+                </button>
             </div>
 
             <div className="row g-3 mb-4">
@@ -89,21 +124,21 @@ const BalanceFinanciero = () => {
 
             <div className="row g-3">
                 <div className="col-12 col-md-4">
-                    <div className="border rounded p-3 h-100">
-                        <p className="text-muted mb-1">Ingresos</p>
-                        <h4 className="mb-0">{formatCurrency(data.ingresos)}</h4>
+                    <div className="border rounded-3 p-3 h-100">
+                        <small className="text-muted d-block">Ingresos</small>
+                        <h4 className="mb-0 mt-2">{formatCurrency(data.ingresos)}</h4>
                     </div>
                 </div>
                 <div className="col-12 col-md-4">
-                    <div className="border rounded p-3 h-100">
-                        <p className="text-muted mb-1">Costos</p>
-                        <h4 className="mb-0">{formatCurrency(data.costos)}</h4>
+                    <div className="border rounded-3 p-3 h-100">
+                        <small className="text-muted d-block">Costos</small>
+                        <h4 className="mb-0 mt-2">{formatCurrency(data.costos)}</h4>
                     </div>
                 </div>
                 <div className="col-12 col-md-4">
-                    <div className="border rounded p-3 h-100">
-                        <p className="text-muted mb-1">Ganancias</p>
-                        <h4 className="mb-0">{formatCurrency(data.ganancias)}</h4>
+                    <div className="border rounded-3 p-3 h-100">
+                        <small className="text-muted d-block">Ganancias</small>
+                        <h4 className="mb-0 mt-2">{formatCurrency(data.ganancias)}</h4>
                     </div>
                 </div>
             </div>
