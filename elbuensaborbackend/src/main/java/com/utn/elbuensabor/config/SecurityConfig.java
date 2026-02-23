@@ -4,6 +4,7 @@ import java.util.Arrays;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.actuate.autoconfigure.security.servlet.EndpointRequest;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
@@ -85,7 +86,8 @@ public class SecurityConfig {
         http.authorizeHttpRequests(auth -> auth
                 .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll() // preflight
                 .requestMatchers("/", "/health", "/actuator/health").permitAll()
-                .requestMatchers("/", "/health", "/actuator/health", "/actuator/health/**").permitAll()
+                .requestMatchers("/", "/health").permitAll()
+                .requestMatchers(EndpointRequest.toAnyEndpoint()).permitAll()
                 .requestMatchers("/api/auth/login").permitAll()
                 .requestMatchers("/api/auth/google").permitAll()
                 .requestMatchers("/api/localidad/**").permitAll()
