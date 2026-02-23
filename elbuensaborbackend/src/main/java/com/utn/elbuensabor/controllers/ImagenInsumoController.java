@@ -1,11 +1,10 @@
 package com.utn.elbuensabor.controllers;
 
 import com.utn.elbuensabor.entities.ArticuloInsumo;
-import com.utn.elbuensabor.entities.ArticuloManufacturado;
-import com.utn.elbuensabor.entities.ImagenArticuloManufacturado;
 import com.utn.elbuensabor.entities.ImagenInsumo;
 import com.utn.elbuensabor.repositories.ArticuloInsumoRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
@@ -24,7 +23,8 @@ import java.util.UUID;
 public class ImagenInsumoController {
     private final ArticuloInsumoRepository insumoRepository;
 
-    private static final String UPLOAD_DIR = "uploads/insumos";
+    @Value("${app.upload-dir:./uploads}")
+    private String uploadDir;
 
     @PostMapping("/{id}/imagenes")
     public ResponseEntity<List<String>> uploadImagenes(
@@ -36,17 +36,19 @@ public class ImagenInsumoController {
                 .orElseThrow(() -> new RuntimeException("Insumo no encontrado"));
 
         List<String> urls = new ArrayList<>();
+        Path uploadPath = Paths.get(uploadDir, "insumos").toAbsolutePath().normalize();
 
-        Files.createDirectories(Paths.get(UPLOAD_DIR));
+        Files.createDirectories(uploadPath);
 
         for (MultipartFile file : files) {
-            String filename = UUID.randomUUID() + "_" + file.getOriginalFilename();
-            Path path = Paths.get(UPLOAD_DIR, filename);
+            String originalName = file.getOriginalFilename() == null ? "imagen" : file.getOriginalFilename();
+            String filename = UUID.randomUUID() + "_" + originalName;
+            Path path = uploadPath.resolve(filename);
 
             Files.write(path, file.getBytes());
 
             ImagenInsumo imagen = new ImagenInsumo();
-            imagen.setDenominacion("/" + UPLOAD_DIR + "/" + filename);
+            imagen.setDenominacion("/uploads/insumos/" + filename);
             imagen.setArticuloInsumo(insumo);
 
             insumo.getImagenes().add(imagen);
