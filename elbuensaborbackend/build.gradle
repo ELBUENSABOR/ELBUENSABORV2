@@ -9,9 +9,8 @@ version = '0.0.1-SNAPSHOT'
 description = 'PROYECTO EL BUEN SABOR'
 
 java {
-	toolchain {
-		languageVersion = JavaLanguageVersion.of(24)
-	}
+	sourceCompatibility = JavaVersion.VERSION_21
+	targetCompatibility = JavaVersion.VERSION_21
 }
 
 configurations {
