@@ -33,7 +33,14 @@ public class JwtFilter extends OncePerRequestFilter {
 
         String path = request.getServletPath();
         // Solo permitir acceso público a register, login y localidad
-        if (path.startsWith("/uploads/") || path.equals("/api/auth/register") ||
+        if (path.equals("/") ||
+                path.equals("/health") ||
+                path.startsWith("/actuator/") ||
+                path.startsWith("/uploads/") ||
+                path.startsWith("/api/uploads/") ||
+                path.equals("/error") ||
+                path.startsWith("/error/") ||
+                path.equals("/api/auth/register") ||
                 path.equals("/api/auth/login") ||
                 path.equals("/api/auth/google") ||
                 path.startsWith("/api/localidad/") ||

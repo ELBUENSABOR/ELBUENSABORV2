@@ -2,7 +2,7 @@ import {useEffect, useMemo, useState} from "react";
 import {useNavigate} from "react-router-dom";
 import {useUser} from "../../../contexts/UsuarioContext";
 import type {PedidoResponse} from "../../../services/pedidoService";
-import {getPedidosByCliente, resolveFacturaPdfUrl} from "../../../services/pedidoService";
+import {cambiarEstadoPedido, getPedidosByCliente, resolveFacturaPdfUrl} from "../../../services/pedidoService";
 import OrderDetailModal from "../../Common/OrderDetailModal/OrderDetailModal.tsx";
 
 const formatDate = (value: string) => {
@@ -45,6 +45,25 @@ const OrdersHistory = () => {
             .catch(() => setError("No se pudieron cargar los pedidos."))
             .finally(() => setLoading(false));
     }, [user?.userId]);
+
+    const cancelarPedido = async (pedidoId: number) => {
+        if (!user?.userId) return;
+
+        setLoading(true);
+        setError("");
+        try {
+            await cambiarEstadoPedido(pedidoId, "CANCELADO");
+            const pedidosActualizados = await getPedidosByCliente(Number(user.userId));
+            setOrders(pedidosActualizados);
+            setSelectedPedido((prev) =>
+                prev ? pedidosActualizados.find((pedido) => pedido.id === prev.id) ?? null : null
+            );
+        } catch {
+            setError("No se pudo cancelar el pedido.");
+        } finally {
+            setLoading(false);
+        }
+    };
 
     const rows = useMemo(() => {
         return orders.map((pedido) => ({
@@ -98,6 +117,15 @@ const OrdersHistory = () => {
                                     >
                                         Ver detalle
                                     </button>
+                                    {pedido.estado === "A_CONFIRMAR" && (
+                                        <button
+                                            className="btn btn-sm btn-outline-danger me-2"
+                                            type="button"
+                                            onClick={() => cancelarPedido(pedido.id)}
+                                        >
+                                            Cancelar pedido
+                                        </button>
+                                    )}
                                     {resolveFacturaPdfUrl(pedido.factura?.pdfUrl) ? (
                                         <a
                                             className="btn btn-sm btn-outline-success"

@@ -93,18 +93,31 @@ const PedidosAdmin = () => {
             (detalle) => detalle.articulo.tipo === "MANUFACTURADO"
         );
 
+        let opciones: string[];
         switch (pedido.estado) {
             case "A_CONFIRMAR":
-                return requiereCocina ? ["A_COCINA"] : ["LISTO"];
+                opciones = requiereCocina ? ["A_COCINA"] : ["LISTO"];
+                break;
             case "A_COCINA":
-                return ["LISTO"];
+                opciones = ["LISTO"];
+                break;
             case "LISTO":
-                return pedido.tipoEnvio === "DELIVERY" ? ["EN_DELIVERY"] : ["ENTREGADO"];
+                opciones = pedido.tipoEnvio === "DELIVERY" ? ["EN_DELIVERY"] : ["ENTREGADO"];
+                break;
             case "EN_DELIVERY":
-                return ["ENTREGADO"];
+                opciones = ["ENTREGADO"];
+                break;
+            case "ENTREGADO":
+                opciones = ["FACTURADO"];
+                break;
             default:
-                return [];
+                opciones = [];
         }
+        if (user?.role === "ADMIN" && pedido.estado !== "CANCELADO" && !opciones.includes("CANCELADO")) {
+            opciones.push("CANCELADO");
+        }
+
+        return opciones;
     };
 
     const puedeEntregar = (pedido: PedidoResponse) => pedido.pagado;

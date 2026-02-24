@@ -12,6 +12,7 @@ import type { Sucursal } from "../../../models/Sucursal";
 import { useNavigate, useParams } from "react-router-dom";
 import { Alert } from "react-bootstrap";
 import type { Imagen } from "../../../models/Imagen";
+import { getImageUrl } from "../../../utils/image";
 
 const initialState: Manufacturado = {
     id: 0,
@@ -27,8 +28,6 @@ const initialState: Manufacturado = {
     ingredientes: [],
     imagenes: []
 }
-
-const BACKEND_URL = "http://localhost:8080";
 
 const ManufacturadoForm = () => {
     const [manufacturado, setManufacturado] = useState<Manufacturado>(initialState);
@@ -259,7 +258,9 @@ const ManufacturadoForm = () => {
                 <select className="form-select" id="categoriaId" value={manufacturado.categoriaId} onChange={(e) => setManufacturado({ ...manufacturado, categoriaId: Number(e.target.value) })} required>
                     <option value="">Seleccione</option>
                     {
-                        rubrosManufacturados.map((rubro) => (
+                        rubrosManufacturados
+                            .filter((rubro) => isEdit || rubro.activo)
+                            .map((rubro) => (
                             <option key={rubro.id} value={rubro.id} disabled={!rubro.activo}>
                                 {rubro.denominacion}{!rubro.activo ? " (inactivo)" : ""}
                             </option>
@@ -302,7 +303,7 @@ const ManufacturadoForm = () => {
                             {imagenesActuales.map((img, index) => (
                                 <div key={index} className="position-relative">
                                     <img
-                                        src={`${BACKEND_URL}${img.url}`}
+                                        src={getImageUrl(img.url)}
                                         alt="Imagen producto"
                                         style={{
                                             width: 150,

@@ -9,9 +9,8 @@ version = '0.0.1-SNAPSHOT'
 description = 'PROYECTO EL BUEN SABOR'
 
 java {
-	toolchain {
-		languageVersion = JavaLanguageVersion.of(24)
-	}
+	sourceCompatibility = JavaVersion.VERSION_21
+	targetCompatibility = JavaVersion.VERSION_21
 }
 
 configurations {
@@ -31,6 +30,7 @@ dependencies {
 	implementation 'org.springframework.boot:spring-boot-starter-security'
 	implementation 'org.springframework.boot:spring-boot-starter-validation'
 	implementation 'org.springframework.boot:spring-boot-starter-web'
+	implementation 'org.springframework.boot:spring-boot-starter-actuator'
 	implementation 'org.springframework.boot:spring-boot-starter-oauth2-client'
 	implementation 'org.springframework.boot:spring-boot-starter-oauth2-authorization-server'
 	compileOnly 'org.projectlombok:lombok'
@@ -44,6 +44,10 @@ dependencies {
 	runtimeOnly 'io.jsonwebtoken:jjwt-jackson:0.11.5'
 	implementation("com.mercadopago:sdk-java:2.8.0")
 	implementation 'org.apache.pdfbox:pdfbox:2.0.31'
+}
+
+jar {
+	enabled = false
 }
 
 tasks.named('test') {
