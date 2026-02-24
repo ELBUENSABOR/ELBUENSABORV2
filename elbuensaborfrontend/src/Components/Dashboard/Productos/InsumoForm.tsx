@@ -292,9 +292,11 @@ const InsumoForm = () => {
                     required
                 >
                     <option value="">Seleccione</option>
-                    {categorias.map((c) => (
-                        <option key={c.id} value={c.id}>
-                            {c.denominacion}
+                    {categorias
+                        .filter((c) => isEdit || c.activo)
+                        .map((c) => (
+                        <option key={c.id} value={c.id} disabled={!c.activo}>
+                            {c.denominacion}{!c.activo ? " (inactivo)" : ""}
                         </option>
                     ))}
                 </select>
