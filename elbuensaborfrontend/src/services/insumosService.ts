@@ -40,7 +40,6 @@ export const deleteInsumo = async (id: number) => {
             headers: buildAuthHeaders(),
             withCredentials: true,
         });
-        console.log(res.data);
         return res.data;
     } catch (error) {
         console.error("Error al eliminar insumo", error);
