@@ -258,7 +258,9 @@ const ManufacturadoForm = () => {
                 <select className="form-select" id="categoriaId" value={manufacturado.categoriaId} onChange={(e) => setManufacturado({ ...manufacturado, categoriaId: Number(e.target.value) })} required>
                     <option value="">Seleccione</option>
                     {
-                        rubrosManufacturados.map((rubro) => (
+                        rubrosManufacturados
+                            .filter((rubro) => isEdit || rubro.activo)
+                            .map((rubro) => (
                             <option key={rubro.id} value={rubro.id} disabled={!rubro.activo}>
                                 {rubro.denominacion}{!rubro.activo ? " (inactivo)" : ""}
                             </option>
