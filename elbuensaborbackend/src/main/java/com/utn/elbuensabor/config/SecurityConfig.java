@@ -1,7 +1,9 @@
 package com.utn.elbuensabor.config;
 
+import java.util.Arrays;
 import java.util.List;
 
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
@@ -23,6 +25,9 @@ import com.utn.elbuensabor.security.JwtUtil;
 
 @Configuration
 public class SecurityConfig {
+
+    @Value("${app.cors.allowed-origin-patterns:http://localhost:5173,http://127.0.0.1:5173,https://*.ngrok-free.app,https://*.ngrok.app,https://*.up.railway.app}")
+    private String allowedOriginPatterns;
 
     @Bean
     public UserDetailsService userDetailsService(UsuarioRepository usuarioRepo) {
@@ -55,12 +60,10 @@ public class SecurityConfig {
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration config = new CorsConfiguration();
 
-        config.setAllowedOriginPatterns(List.of(
-                "http://localhost:5173",
-                "http://127.0.0.1:5173",
-                "https://*.ngrok-free.app",
-                "https://*.ngrok.app"
-        ));
+        config.setAllowedOriginPatterns(Arrays.stream(allowedOriginPatterns.split(","))
+                .map(String::trim)
+                .filter(origin -> !origin.isEmpty())
+                .toList());
 
         config.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS"));
         config.setAllowedHeaders(List.of("*"));
