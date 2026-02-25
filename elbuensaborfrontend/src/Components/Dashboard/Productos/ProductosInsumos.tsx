@@ -1,17 +1,17 @@
-import {useEffect, useState, type ChangeEvent} from 'react'
-import {useUser} from '../../../contexts/UsuarioContext';
-import {useSucursal} from '../../../contexts/SucursalContext';
-import {useNavigate} from 'react-router-dom';
-import type {InsumoResponse} from '../../../models/Insumo';
-import {getAll, deleteInsumo} from '../../../services/insumosService';
+import { useEffect, useState, type ChangeEvent } from 'react'
+import { useUser } from '../../../contexts/UsuarioContext';
+import { useSucursal } from '../../../contexts/SucursalContext';
+import { useNavigate } from 'react-router-dom';
+import type { InsumoResponse } from '../../../models/Insumo';
+import { getAll, deleteInsumo } from '../../../services/insumosService';
 import UnidadMedidaModal from './UnidadesMedidaModal/UnidadMedidaModal';
-import {getRubrosInsumos} from '../../../services/rubrosService';
-import type {Rubro} from '../../../models/Rubro';
+import { getRubrosInsumos } from '../../../services/rubrosService';
+import type { Rubro } from '../../../models/Rubro';
 import ModalConfirmAction from '../../Common/ModalConfirmAction/ModalConfirmAction';
 
 const ProductosInsumos = () => {
-    const {sucursales, sucursalId, setSucursalId, loading} = useSucursal();
-    const {user} = useUser();
+    const { sucursales, sucursalId, setSucursalId, loading } = useSucursal();
+    const { user } = useUser();
     const [insumos, setInsumos] = useState<InsumoResponse[]>();
     const [rubros, setRubros] = useState<Rubro[]>();
     const [originalInsumos, setOriginalInsumos] =
@@ -25,6 +25,7 @@ const ProductosInsumos = () => {
     const [showModalUnidadMedida, setShowModalUnidadMedida] = useState(false);
 
     const [currentId, setCurrentId] = useState(0);
+    const [refreshData, setRefreshData] = useState(false);
 
 
     const navigate = useNavigate();
@@ -76,7 +77,7 @@ const ProductosInsumos = () => {
         }
 
         setInsumos(filtered);
-    }, [filterValue, filterRubroValue, filterStatusValue, originalInsumos]);
+    }, [filterValue, filterRubroValue, filterStatusValue, originalInsumos, refreshData]);
 
     const filterData = (e: ChangeEvent<HTMLInputElement>) => {
         setFilterValue(e.target.value);
@@ -99,6 +100,7 @@ const ProductosInsumos = () => {
     const deleteInsumoConfirm = async () => {
         await deleteInsumo(currentId);
         setShowModal(false);
+        setRefreshData(!refreshData);
     };
 
     const getImagenUrl = (imagenes: InsumoResponse["imagenes"]) => {
@@ -192,68 +194,68 @@ const ProductosInsumos = () => {
                     <div className="table-responsive">
                         <table className="table table-hover dashboard-table">
                             <thead>
-                            <tr>
-                                <th>#</th>
-                                <th>Imagen</th>
-                                <th>Denominación</th>
-                                <th>Precio de costo</th>
-                                <th>Precio de venta</th>
-                                <th>Categoría</th>
-                                <th>Stock actual</th>
-                                <th>Acciones</th>
-                            </tr>
+                                <tr>
+                                    <th>#</th>
+                                    <th>Imagen</th>
+                                    <th>Denominación</th>
+                                    <th>Precio de costo</th>
+                                    <th>Precio de venta</th>
+                                    <th>Categoría</th>
+                                    <th>Stock actual</th>
+                                    <th>Acciones</th>
+                                </tr>
                             </thead>
                             <tbody className="table-group-divider">
-                            {insumos?.map((m, index) => (
-                                <tr key={index} className={m.activo ? "" : "deleted-row"}>
-                                    <td>{m.id}</td>
-                                    <td>
-                                        {getImagenUrl(m.imagenes) ? (
-                                            <img
-                                                src={getImagenUrl(m.imagenes)}
-                                                alt={m.denominacion}
-                                                style={{
-                                                    width: "36px",
-                                                    height: "36px",
-                                                    objectFit: "cover",
-                                                    borderRadius: "6px",
-                                                }}
-                                            />
-                                        ) : (
-                                            <span className="text-muted small">Sin imagen</span>
-                                        )}
-                                    </td>
-                                    <td>{m.denominacion}</td>
-                                    <td>${m.precioCompra}</td>
-                                    <td>${m.precioVenta}</td>
-                                    <td>{m.categoria.denominacion}</td>
-                                    <td>
-                                        {m.stockSucursal.find((s) => s.sucursalId === sucursalId)
-                                            ?.stockActual ?? 0} {m.unidadMedida.denominacion}
-                                    </td>
-                                    <td>
-                                        {
-                                            m.activo && (
-                                                <>
-                                                    <button className="btn btn-primary"
+                                {insumos?.map((m, index) => (
+                                    <tr key={index} className={m.activo ? "" : "deleted-row"}>
+                                        <td>{m.id}</td>
+                                        <td>
+                                            {getImagenUrl(m.imagenes) ? (
+                                                <img
+                                                    src={getImagenUrl(m.imagenes)}
+                                                    alt={m.denominacion}
+                                                    style={{
+                                                        width: "36px",
+                                                        height: "36px",
+                                                        objectFit: "cover",
+                                                        borderRadius: "6px",
+                                                    }}
+                                                />
+                                            ) : (
+                                                <span className="text-muted small">Sin imagen</span>
+                                            )}
+                                        </td>
+                                        <td>{m.denominacion}</td>
+                                        <td>${m.precioCompra}</td>
+                                        <td>${m.precioVenta}</td>
+                                        <td>{m.categoria.denominacion}</td>
+                                        <td>
+                                            {m.stockSucursal.find((s) => s.sucursalId === sucursalId)
+                                                ?.stockActual ?? 0} {m.unidadMedida.denominacion}
+                                        </td>
+                                        <td>
+                                            {
+                                                m.activo && (
+                                                    <>
+                                                        <button className="btn btn-primary"
                                                             onClick={() => navigate(`/dashboard/insumos/edit/${m.id}`)}>Editar
-                                                    </button>
-                                                    <button className="btn btn-danger"
+                                                        </button>
+                                                        <button className="btn btn-danger"
                                                             onClick={() => handleDeleteInsumo(m.id ?? 0)}>Eliminar
-                                                    </button>
-                                                </>
-                                            )
-                                        }
-                                    </td>
+                                                        </button>
+                                                    </>
+                                                )
+                                            }
+                                        </td>
 
-                                </tr>
-                            ))}
+                                    </tr>
+                                ))}
                             </tbody>
                         </table>
                     </div>
                 </div>
             </div>
-            <UnidadMedidaModal showModal={showModalUnidadMedida} setShowModal={setShowModalUnidadMedida}/>
+            <UnidadMedidaModal showModal={showModalUnidadMedida} setShowModal={setShowModalUnidadMedida} />
             {showModal && (
                 <ModalConfirmAction
                     show={showModal}
