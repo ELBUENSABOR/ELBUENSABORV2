@@ -3,6 +3,7 @@ import {
     Boxes,
     Building2,
     ClipboardList,
+    ShoppingBasket,
     Factory,
     Home,
     Package,
@@ -60,7 +61,7 @@ export const SIDEBAR_ROUTES: SidebarRoute[] = [
         ["COCINERO", "ADMIN"]
     ),
     createSidebarRoute("stock", "stock", "Stock", "Monitoreo de stock mínimo y alertas por sucursal.", Boxes, ["COCINERO", "ADMIN"]),
-    createSidebarRoute("compras", "compras", "Registro de compras", "Alta y consulta de compras de insumos.", ClipboardList, ["COCINERO", "ADMIN"]),
+    createSidebarRoute("compras", "compras", "Registro de compras", "Alta y consulta de compras de insumos.", ShoppingBasket, ["COCINERO", "ADMIN"]),
     createSidebarRoute("rubros-insumos", "rubros-insumos", "Rubros de insumos", "Clasificación y mantenimiento de rubros de insumos.", Tags, ["COCINERO", "ADMIN"]),
     createSidebarRoute("rubros-productos", "rubros-productos", "Rubros de productos", "Clasificación y mantenimiento de rubros de productos.", Tags, ["COCINERO", "ADMIN"]),
     createSidebarRoute(
