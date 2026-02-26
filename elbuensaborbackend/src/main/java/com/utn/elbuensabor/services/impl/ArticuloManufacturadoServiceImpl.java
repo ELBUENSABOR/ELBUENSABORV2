@@ -17,6 +17,8 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class ArticuloManufacturadoServiceImpl implements ArticuloManufacturadoService {
 
+    private static final String MANUFACTURADO_UPLOADS_PREFIX = "/uploads/manufacturados/";
+
     private final ArticuloManufacturadoRepository manufacturadoRepo;
     private final CategoriaArticuloManufacturadoRepository categoriaRepo;
     private final ArticuloInsumoRepository insumoRepo;
@@ -92,8 +94,11 @@ public class ArticuloManufacturadoServiceImpl implements ArticuloManufacturadoSe
 
         if (request.imagenes() != null) {
             for (String url : request.imagenes()) {
+                if (!isPersistableImagePath(url)) {
+                    continue;
+                }
                 ImagenArticuloManufacturado imagen = new ImagenArticuloManufacturado();
-                imagen.setDenominacion(url);
+                imagen.setDenominacion(normalizeManufacturadoImagePath(url));
                 imagen.setArticuloManufacturado(manufacturado);
                 manufacturado.getImagenes().add(imagen);
             }
@@ -135,6 +140,8 @@ public class ArticuloManufacturadoServiceImpl implements ArticuloManufacturadoSe
                         .toList(),
                 manufacturado.getImagenes().stream()
                         .map(ImagenArticuloManufacturado::getDenominacion)
+                        .filter(this::isPersistableImagePath)
+                        .map(this::normalizeManufacturadoImagePath)
                         .toList(),
                 true // disponibilidad no se evalúa acá
         );
@@ -188,8 +195,26 @@ public class ArticuloManufacturadoServiceImpl implements ArticuloManufacturadoSe
                 ingredientes,
                 manufacturado.getImagenes().stream()
                         .map(ImagenArticuloManufacturado::getDenominacion)
+                        .filter(this::isPersistableImagePath)
+                        .map(this::normalizeManufacturadoImagePath)
                         .toList(),
                 disponible
         );
+    }
+
+    private boolean isPersistableImagePath(String value) {
+        if (value == null) {
+            return false;
+        }
+        String trimmed = value.trim();
+        return !trimmed.isBlank() && !trimmed.startsWith("data:image/");
+    }
+
+    private String normalizeManufacturadoImagePath(String rawPath) {
+        String path = rawPath.trim();
+        if (path.startsWith("http://") || path.startsWith("https://") || path.startsWith("/")) {
+            return path;
+        }
+        return MANUFACTURADO_UPLOADS_PREFIX + path;
     }
 }

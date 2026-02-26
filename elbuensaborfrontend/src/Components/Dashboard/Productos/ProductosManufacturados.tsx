@@ -7,6 +7,7 @@ import { useNavigate } from "react-router-dom";
 import { getRubrosManufacturados } from "../../../services/rubrosService";
 import type { Rubro } from "../../../models/Rubro";
 import ModalConfirmAction from "../../Common/ModalConfirmAction/ModalConfirmAction";
+import { getImageUrl } from '../../../utils/image';
 
 const ProductosManufacturados = () => {
     const { sucursales, sucursalId, setSucursalId, loading } = useSucursal();
@@ -106,6 +107,12 @@ const ProductosManufacturados = () => {
         setShowModal(false);
     };
 
+    const getManufacturadoImageUrl = (imagenes: Manufacturado["imagenes"]) => {
+        const primera = imagenes?.[0];
+        if (!primera) return "";
+        return getImageUrl(primera);
+    };
+
     return (
         <div>
             <div>
@@ -184,6 +191,7 @@ const ProductosManufacturados = () => {
                 <table className="table table-hover">
                     <thead>
                     <th>#</th>
+                    <th>Imagen</th>
                     <th>Denominación</th>
                     <th>Precio de costo</th>
                     <th>Precio de venta</th>
@@ -196,6 +204,22 @@ const ProductosManufacturados = () => {
                     {manufacturados?.map((m, index) => (
                         <tr key={index} className={m.activo ? "" : "deleted-row"}>
                             <td>{m.id}</td>
+                            <td>
+                                {getManufacturadoImageUrl(m.imagenes) ? (
+                                    <img
+                                        src={getManufacturadoImageUrl(m.imagenes)}
+                                        alt={m.denominacion}
+                                        style={{
+                                            width: "36px",
+                                            height: "36px",
+                                            objectFit: "cover",
+                                            borderRadius: "6px",
+                                        }}
+                                    />
+                                ) : (
+                                    <span className="text-muted small">Sin imagen</span>
+                                )}
+                            </td>
                             <td>{m.denominacion}</td>
                             <td>${m.precioCosto}</td>
                             <td>${m.precioVenta}</td>

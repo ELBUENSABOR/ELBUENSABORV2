@@ -8,6 +8,7 @@ import UnidadMedidaModal from './UnidadesMedidaModal/UnidadMedidaModal';
 import { getRubrosInsumos } from '../../../services/rubrosService';
 import type { Rubro } from '../../../models/Rubro';
 import ModalConfirmAction from '../../Common/ModalConfirmAction/ModalConfirmAction';
+import { getImageUrl } from '../../../utils/image';
 
 const ProductosInsumos = () => {
     const { sucursales, sucursalId, setSucursalId, loading } = useSucursal();
@@ -106,7 +107,8 @@ const ProductosInsumos = () => {
     const getImagenUrl = (imagenes: InsumoResponse["imagenes"]) => {
         const primera = imagenes?.[0];
         if (!primera) return "";
-        return typeof primera === "string" ? primera : primera.url;
+        const rawPath = typeof primera === "string" ? primera : primera.url;
+        return getImageUrl(rawPath);
     };
 
     return (

@@ -27,6 +27,7 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class ArticuloInsumoServiceImpl implements ArticuloInsumoService {
 
+    private static final String INSUMO_UPLOADS_PREFIX = "/uploads/insumos/";
     private final ArticuloInsumoRepository insumoRepo;
     private final CategoriaArticuloInsumoRepository categoriaRepo;
     private final UnidadMedidaRepository unidadMedidaRepo;
@@ -122,6 +123,8 @@ public class ArticuloInsumoServiceImpl implements ArticuloInsumoService {
         insumo.getImagenes().clear();
         if (request.imagenes() != null && !request.imagenes().isEmpty()) {
             List<ImagenInsumo> imagenes = request.imagenes().stream()
+                    .filter(this::isPersistableImagePath)
+                    .map(this::normalizeInsumoImagePath)
                     .map(url -> {
                         ImagenInsumo imagen = new ImagenInsumo();
                         imagen.setDenominacion(url);
@@ -158,7 +161,9 @@ public class ArticuloInsumoServiceImpl implements ArticuloInsumoService {
 
         List<String> imagenes = insumo.getImagenes()
                 .stream()
-                .map(img -> img.getDenominacion())
+                .map(ImagenInsumo::getDenominacion)
+                .filter(this::isPersistableImagePath)
+                .map(this::normalizeInsumoImagePath)
                 .toList();
 
         return new ArticuloInsumoResponse(
@@ -208,5 +213,21 @@ public class ArticuloInsumoServiceImpl implements ArticuloInsumoService {
         }
         return authentication.getAuthorities().stream()
                 .anyMatch(authority -> "ROLE_ADMIN".equals(authority.getAuthority()));
+    }
+
+    private boolean isPersistableImagePath(String value) {
+        if (value == null) {
+            return false;
+        }
+        String trimmed = value.trim();
+        return !trimmed.isBlank() && !trimmed.startsWith("data:image/");
+    }
+
+    private String normalizeInsumoImagePath(String rawPath) {
+        String path = rawPath.trim();
+        if (path.startsWith("http://") || path.startsWith("https://") || path.startsWith("/")) {
+            return path;
+        }
+        return INSUMO_UPLOADS_PREFIX + path;
     }
 }
