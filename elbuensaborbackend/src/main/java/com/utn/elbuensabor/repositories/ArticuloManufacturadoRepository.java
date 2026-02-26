@@ -15,4 +15,6 @@ public interface ArticuloManufacturadoRepository extends JpaRepository<ArticuloM
     List<ArticuloManufacturado> findByActivoTrue();
 
     List<ArticuloManufacturado> findByActivo(Boolean activo);
+
+    List<ArticuloManufacturado> findAllByCategoriaIdAndActivoTrue(Long categoriaId);
 }

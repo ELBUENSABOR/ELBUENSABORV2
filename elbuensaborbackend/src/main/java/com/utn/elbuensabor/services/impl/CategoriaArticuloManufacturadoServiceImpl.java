@@ -3,7 +3,7 @@ package com.utn.elbuensabor.services.impl;
 
 import java.util.List;
 
-import com.utn.elbuensabor.entities.CategoriaArticuloInsumo;
+import com.utn.elbuensabor.entities.ArticuloManufacturado;
 import com.utn.elbuensabor.services.CategoriaArticuloManufacturadoService;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -11,6 +11,7 @@ import org.springframework.transaction.annotation.Transactional;
 import com.utn.elbuensabor.dtos.CategoriaRequest;
 import com.utn.elbuensabor.dtos.CategoriaResponse;
 import com.utn.elbuensabor.entities.CategoriaArticuloManufacturado;
+import com.utn.elbuensabor.repositories.ArticuloManufacturadoRepository;
 import com.utn.elbuensabor.repositories.CategoriaArticuloManufacturadoRepository;
 
 import lombok.RequiredArgsConstructor;
@@ -20,6 +21,7 @@ import lombok.RequiredArgsConstructor;
 public class CategoriaArticuloManufacturadoServiceImpl implements CategoriaArticuloManufacturadoService {
 
     private final CategoriaArticuloManufacturadoRepository categoriaRepo;
+    private final ArticuloManufacturadoRepository manufacturadoRepo;
 
     public List<CategoriaResponse> getAll() {
         return categoriaRepo.findAll().stream()
@@ -49,15 +51,28 @@ public class CategoriaArticuloManufacturadoServiceImpl implements CategoriaArtic
                 .orElseThrow(() -> new RuntimeException("Rubro de producto no encontrado"));
         categoria.setDenominacion(request.denominacion());
         categoria.setActivo(request.activo());
+        boolean shouldCascadeDeactivate = Boolean.FALSE.equals(request.activo()) && categoria.isActivo();
         setParent(categoria, request.categoriaPadreId());
+        if (shouldCascadeDeactivate) {
+            desactivarManufacturadosActivosDeCategoria(categoria.getId());
+        }
         return toResponse(categoria);
     }
 
     public void delete(Long id) {
         CategoriaArticuloManufacturado categoria = categoriaRepo.findById(id)
-                .orElseThrow(() -> new RuntimeException("Rubro de insumo no encontrado"));
+                .orElseThrow(() -> new RuntimeException("Rubro de producto no encontrado"));
         categoria.setActivo(false);
         categoriaRepo.save(categoria);
+        desactivarManufacturadosActivosDeCategoria(categoria.getId());
+    }
+
+    private void desactivarManufacturadosActivosDeCategoria(Long categoriaId) {
+        List<ArticuloManufacturado> manufacturadosActivos = manufacturadoRepo.findAllByCategoriaIdAndActivoTrue(categoriaId);
+        for (ArticuloManufacturado manufacturado : manufacturadosActivos) {
+            manufacturado.setActivo(false);
+        }
+        manufacturadoRepo.saveAll(manufacturadosActivos);
     }
 
     public void setParent(CategoriaArticuloManufacturado categoria, Long parentId) {

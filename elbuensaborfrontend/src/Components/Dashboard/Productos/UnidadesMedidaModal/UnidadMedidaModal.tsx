@@ -2,6 +2,8 @@ import { Modal, ModalBody, ModalFooter, ModalHeader, ModalTitle } from "react-bo
 import { getAllUnidadesMedida, createUnidadMedida, editUnidadMedida, deleteUnidadMedida } from "../../../../services/insumosService";
 import { useEffect, useState } from "react";
 import type { UnidadMedida } from "../../../../models/UnidadMedida";
+import Alert from "../../../Alert/Alert";
+import "./UnidadMedidaModal.css";
 
 const UnidadMedidaModal = ({ showModal, setShowModal }: { showModal: boolean, setShowModal: (show: boolean) => void }) => {
     const [unidadesMedida, setUnidadesMedida] = useState<UnidadMedida[]>([]);
@@ -13,6 +15,9 @@ const UnidadMedidaModal = ({ showModal, setShowModal }: { showModal: boolean, se
     const [editUnidad, setEditUnidad] = useState(false);
     const [editUnidadId, setEditUnidadId] = useState<number | undefined>(undefined);
     const [refresh, setRefresh] = useState(false);
+    const [showAlert, setShowAlert] = useState(false);
+    const [alertMessage, setAlertMessage] = useState("");
+    const [alertStatus, setAlertStatus] = useState<"success" | "error">("success");
 
     useEffect(() => {
         const load = async () => {
@@ -56,14 +61,35 @@ const UnidadMedidaModal = ({ showModal, setShowModal }: { showModal: boolean, se
     };
 
     const handleDelete = async (id: number | undefined) => {
-        const unidad = await deleteUnidadMedida(id);
-        console.log(unidad);
-        setUnidadesMedida((prev) => prev.filter((u) => u.id !== id));
-        setRefresh(!refresh);
+        try {
+            const unidad = await deleteUnidadMedida(id);
+            console.log(unidad);
+            setUnidadesMedida((prev) => prev.filter((u) => u.id !== id));
+            setAlertMessage("Unidad de medida eliminada con éxito");
+            setAlertStatus("success");
+            setShowAlert(true);
+            setRefresh(!refresh);
+        } catch (error: any) {
+            const backendMessage = error?.response?.data?.error;
+            setAlertMessage(
+                backendMessage ||
+                "No se puede eliminar la unidad de medida porque está relacionada a insumos"
+            );
+            setAlertStatus("error");
+            setShowAlert(true);
+        }
     };
 
     return (
-        <Modal show={showModal} onHide={() => { setShowModal(false); setCreateNewUnidad(false); }} size="lg">
+        <Modal
+            show={showModal}
+            onHide={() => { setShowModal(false); setCreateNewUnidad(false); }}
+            size="lg"
+            centered
+            dialogClassName="unidad-medida-modal"
+            className="unidad-medida-modal-wrapper"
+            backdropClassName="unidad-medida-modal-backdrop"
+        >
             <ModalHeader closeButton>
                 <ModalTitle>Unidades de Medida</ModalTitle>
             </ModalHeader>
@@ -104,6 +130,13 @@ const UnidadMedidaModal = ({ showModal, setShowModal }: { showModal: boolean, se
             <ModalFooter>
                 <button className="btn btn-primary" onClick={() => { setCreateNewUnidad(true); setNewUnidad({ denominacion: "", activo: true }); }}>+ Nueva</button>
             </ModalFooter>
+            {showAlert && (
+                <Alert
+                    message={alertMessage}
+                    status={alertStatus}
+                    onClose={() => setShowAlert(false)}
+                />
+            )}
         </Modal>
     );
 };

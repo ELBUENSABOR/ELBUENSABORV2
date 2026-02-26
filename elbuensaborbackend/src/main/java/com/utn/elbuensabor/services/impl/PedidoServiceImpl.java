@@ -112,6 +112,12 @@ public class PedidoServiceImpl implements PedidoService {
                 ArticuloManufacturado manufacturado = manufacturadoRepository.findByIdAndActivoTrue(detalleDTO.manufacturadoId())
                         .orElseThrow(() -> new IllegalArgumentException("Artículo manufacturado no encontrado o inactivo: " + detalleDTO.manufacturadoId()));
 
+                boolean tieneInsumosInactivos = manufacturado.getArticuloManufacturadoDetalles().stream()
+                        .anyMatch(detalleReceta -> !Boolean.TRUE.equals(detalleReceta.getArticuloInsumo().getActivo()));
+                if (tieneInsumosInactivos) {
+                    throw new IllegalArgumentException("El artículo manufacturado contiene insumos inactivos: " + manufacturado.getDenominacion());
+                }
+
                 detalle.setManufacturado(manufacturado);
                 detalle.setPrecioUnit(manufacturado.getPrecioVenta());
                 detalle.setSubTotal(manufacturado.getPrecioVenta() * detalleDTO.cantidad());
@@ -285,6 +291,12 @@ public class PedidoServiceImpl implements PedidoService {
             if (detalleDTO.manufacturadoId() != null) {
                 ArticuloManufacturado manufacturado = manufacturadoRepository.findByIdAndActivoTrue(detalleDTO.manufacturadoId())
                         .orElseThrow(() -> new IllegalArgumentException("Artículo manufacturado no encontrado o inactivo"));
+
+                boolean tieneInsumosInactivos = manufacturado.getArticuloManufacturadoDetalles().stream()
+                        .anyMatch(detalleReceta -> !Boolean.TRUE.equals(detalleReceta.getArticuloInsumo().getActivo()));
+                if (tieneInsumosInactivos) {
+                    throw new IllegalArgumentException("El artículo manufacturado contiene insumos inactivos");
+                }
 
                 detalle.setManufacturado(manufacturado);
                 detalle.setPrecioUnit(manufacturado.getPrecioVenta());

@@ -1,0 +1,24 @@
+.unidad-medida-modal-wrapper {
+    z-index: 1705 !important;
+}
+
+.unidad-medida-modal-backdrop {
+    z-index: 1700 !important;
+}
+
+.unidad-medida-modal {
+    margin-top: -1vh;
+}
+
+@media (min-width: 1000px) {
+    .unidad-medida-modal {
+        transform: translateX(120px);
+    }
+}
+
+@media (max-width: 999.98px) {
+    .unidad-medida-modal {
+        margin-top: 2.5vh;
+        transform: none;
+    }
+}

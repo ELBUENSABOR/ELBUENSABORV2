@@ -166,7 +166,7 @@ const RubrosInsumos = () => {
             const res = await deleteRubroInsumoService(id);
             if (res) {
                 setRefresh(!refresh);
-                setAlertMessage("Rubro eliminado con éxito!");
+                setAlertMessage("Rubro inactivado con éxito. Los insumos de este rubro también fueron inactivados.");
                 setAlertStatus("success");
                 setShowAlert(true);
             }
@@ -234,8 +234,8 @@ const RubrosInsumos = () => {
                 <ModalConfirmAction
                     show={showModal}
                     setShowModal={setShowModal}
-                    headerText="¿Deseas eliminar este rubro?"
-                    bodyText="Esta acción no se puede deshacer"
+                    headerText="¿Confirmas inactivar este rubro de insumos?"
+                    bodyText="Se inactivará el rubro y también los insumos asociados a esta categoría."
                     onClick={() => deleteRubro(currentId)}
                 />
             )}

@@ -177,8 +177,10 @@ public class ArticuloManufacturadoServiceImpl implements ArticuloManufacturadoSe
                 })
                 .toList();
 
-        // ✅ DISPONIBILIDAD (CLARA Y SEGURA)
-        boolean disponible = ingredientes.stream()
+        boolean disponible = manufacturado.getActivo()
+                && manufacturado.getArticuloManufacturadoDetalles().stream()
+                .allMatch(det -> Boolean.TRUE.equals(det.getArticuloInsumo().getActivo()))
+                && ingredientes.stream()
                 .allMatch(i -> i.stockActual() >= i.cantidad());
 
         return new ArticuloManufacturadoResponse(
