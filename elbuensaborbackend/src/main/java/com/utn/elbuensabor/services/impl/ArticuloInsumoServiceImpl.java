@@ -68,6 +68,13 @@ public class ArticuloInsumoServiceImpl implements ArticuloInsumoService {
         insumoRepo.save(insumo);
     }
 
+    public void reactivate(Long id) {
+        ArticuloInsumo insumo = insumoRepo.findById(id)
+                .orElseThrow(() -> new RuntimeException("Insumo no encontrado"));
+        insumo.setActivo(true);
+        insumoRepo.save(insumo);
+    }
+
     public void fillFromRequest(ArticuloInsumo insumo, ArticuloInsumoRequest request) {
         CategoriaArticuloInsumo categoria = categoriaRepo.findById(request.categoriaId())
                 .orElseThrow(() -> new RuntimeException("Rubro de insumo no encontrado"));
@@ -198,7 +205,7 @@ public class ArticuloInsumoServiceImpl implements ArticuloInsumoService {
         }
         return categoriaDto;
     }
-    
+
     private Double resolveStockActual(Double existingStock, Double requestedStock) {
         if (isAdmin()) {
             return requestedStock != null ? requestedStock : 0.0;

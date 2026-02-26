@@ -19,6 +19,8 @@ public interface ArticuloManufacturadoService {
 
     void fillFromRequest(ArticuloManufacturado manufacturado, ArticuloManufacturadoRequest request);
 
+    void reactivate(Long id);
+
     ArticuloManufacturadoDetalle toDetalle(RecetaItemRequest item);
 
     List<ArticuloManufacturadoResponse> getAllBySucursal(Long sucursalId);

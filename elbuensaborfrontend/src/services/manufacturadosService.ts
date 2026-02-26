@@ -104,3 +104,18 @@ export const uploadImagenesManufacturado = async (id: string, imagenes: File[]) 
         throw error;
     }
 };
+
+export const reactivateManufacturado = async (id: number) => {
+    try {
+        const res = await axios.put(`${API_URL}/manufacturados/${id}/reactivar`, null, {
+            headers: {
+                Authorization: `Bearer ${sessionStorage.getItem("token")}`,
+            },
+            withCredentials: true,
+        });
+        return res.data;
+    } catch (error) {
+        console.error("Error al reactivar manufacturado", error);
+        throw error;
+    }
+};

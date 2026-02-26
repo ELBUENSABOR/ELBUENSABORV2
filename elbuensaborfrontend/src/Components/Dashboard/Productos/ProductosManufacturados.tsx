@@ -1,18 +1,18 @@
-import { useEffect, useState, type ChangeEvent } from "react";
-import { useSucursal } from "../../../contexts/SucursalContext";
-import { useUser } from "../../../contexts/UsuarioContext";
-import { getAll, deleteManufacturado } from "../../../services/manufacturadosService";
-import type { Manufacturado } from "../../../models/Manufacturado";
-import { useNavigate } from "react-router-dom";
-import { getRubrosManufacturados } from "../../../services/rubrosService";
-import type { Rubro } from "../../../models/Rubro";
+import {useEffect, useState, type ChangeEvent} from "react";
+import {useSucursal} from "../../../contexts/SucursalContext";
+import {useUser} from "../../../contexts/UsuarioContext";
+import {getAll, deleteManufacturado, reactivateManufacturado} from "../../../services/manufacturadosService";
+import type {Manufacturado} from "../../../models/Manufacturado";
+import {useNavigate} from "react-router-dom";
+import {getRubrosManufacturados} from "../../../services/rubrosService";
+import type {Rubro} from "../../../models/Rubro";
 import ModalConfirmAction from "../../Common/ModalConfirmAction/ModalConfirmAction";
-import { getImageUrl } from '../../../utils/image';
+import {getImageUrl} from '../../../utils/image';
 import Alert from "../../Alert/Alert";
 
 const ProductosManufacturados = () => {
-    const { sucursales, sucursalId, setSucursalId, loading } = useSucursal();
-    const { user } = useUser();
+    const {sucursales, sucursalId, setSucursalId, loading} = useSucursal();
+    const {user} = useUser();
     const [rubros, setRubros] = useState<Rubro[]>();
     const [manufacturados, setManufacturados] = useState<Manufacturado[]>();
     const [originalManufacturados, setOriginalManufacturados] =
@@ -31,6 +31,7 @@ const ProductosManufacturados = () => {
     const [showAlert, setShowAlert] = useState(false);
     const [alertMessage, setAlertMessage] = useState("");
     const [alertStatus, setAlertStatus] = useState<"success" | "error">("success");
+    const canManageProducts = user?.role === "ADMIN" || user?.subRole === "COCINERO";
 
     const handleSucursalChange = (event: ChangeEvent<HTMLSelectElement>) => {
         const value = event.target.value;
@@ -104,10 +105,10 @@ const ProductosManufacturados = () => {
         try {
             await deleteManufacturado(currentId);
             setManufacturados((prev) =>
-                prev?.map((m) => (m.id === currentId ? { ...m, activo: false } : m))
+                prev?.map((m) => (m.id === currentId ? {...m, activo: false} : m))
             );
             setOriginalManufacturados((prev) =>
-                prev?.map((m) => (m.id === currentId ? { ...m, activo: false } : m))
+                prev?.map((m) => (m.id === currentId ? {...m, activo: false} : m))
             );
             setShowModal(false);
             setAlertMessage("Manufacturado eliminado con éxito!");
@@ -117,6 +118,26 @@ const ProductosManufacturados = () => {
             console.error("Error al eliminar manufacturado", error);
             setShowModal(false);
             setAlertMessage("Error al eliminar el manufacturado");
+            setAlertStatus("error");
+            setShowAlert(true);
+        }
+    };
+
+    const reactivateManufacturadoConfirm = async (id: number) => {
+        try {
+            await reactivateManufacturado(id);
+            setManufacturados((prev) =>
+                prev?.map((m) => (m.id === id ? {...m, activo: true} : m))
+            );
+            setOriginalManufacturados((prev) =>
+                prev?.map((m) => (m.id === id ? {...m, activo: true} : m))
+            );
+            setAlertMessage("Manufacturado reactivado con éxito!");
+            setAlertStatus("success");
+            setShowAlert(true);
+        } catch (error) {
+            console.error("Error al reactivar manufacturado", error);
+            setAlertMessage("Error al reactivar el manufacturado");
             setAlertStatus("error");
             setShowAlert(true);
         }
@@ -246,14 +267,21 @@ const ProductosManufacturados = () => {
                                 </span>
                             </td>
                             <td>
-                                {
-                                    m.activo && (
+                                {canManageProducts && (
+                                    m.activo ? (
                                         <>
-                                            <button className="btn btn-primary" onClick={() => navigate(`/dashboard/manufacturados/edit/${m.id}`)}>Editar</button>
-                                            <button className="btn btn-danger" onClick={() => handleDeleteManufacturado(m.id)}>Eliminar</button>
+                                            <button className="btn btn-primary"
+                                                    onClick={() => navigate(`/dashboard/manufacturados/edit/${m.id}`)}>Editar
+                                            </button>
+                                            <button className="btn btn-danger"
+                                                    onClick={() => handleDeleteManufacturado(m.id)}>Eliminar
+                                            </button>
                                         </>
+                                    ) : (
+                                        <button className="btn btn-success"
+                                                onClick={() => reactivateManufacturadoConfirm(m.id)}>Reactivar</button>
                                     )
-                                }
+                                )}
                             </td>
                         </tr>
                     ))}

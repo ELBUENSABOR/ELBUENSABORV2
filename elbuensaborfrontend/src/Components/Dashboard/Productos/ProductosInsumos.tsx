@@ -1,19 +1,19 @@
-import { useEffect, useState, type ChangeEvent } from 'react'
-import { useUser } from '../../../contexts/UsuarioContext';
-import { useSucursal } from '../../../contexts/SucursalContext';
-import { useNavigate } from 'react-router-dom';
-import type { InsumoResponse } from '../../../models/Insumo';
-import { getAll, deleteInsumo } from '../../../services/insumosService';
+import {useEffect, useState, type ChangeEvent} from 'react'
+import {useUser} from '../../../contexts/UsuarioContext';
+import {useSucursal} from '../../../contexts/SucursalContext';
+import {useNavigate} from 'react-router-dom';
+import type {InsumoResponse} from '../../../models/Insumo';
+import {getAll, deleteInsumo, reactivateInsumo} from '../../../services/insumosService';
 import UnidadMedidaModal from './UnidadesMedidaModal/UnidadMedidaModal';
-import { getRubrosInsumos } from '../../../services/rubrosService';
-import type { Rubro } from '../../../models/Rubro';
+import {getRubrosInsumos} from '../../../services/rubrosService';
+import type {Rubro} from '../../../models/Rubro';
 import ModalConfirmAction from '../../Common/ModalConfirmAction/ModalConfirmAction';
-import { getImageUrl } from '../../../utils/image';
+import {getImageUrl} from '../../../utils/image';
 import Alert from '../../Alert/Alert';
 
 const ProductosInsumos = () => {
-    const { sucursales, sucursalId, setSucursalId, loading } = useSucursal();
-    const { user } = useUser();
+    const {sucursales, sucursalId, setSucursalId, loading} = useSucursal();
+    const {user} = useUser();
     const [insumos, setInsumos] = useState<InsumoResponse[]>();
     const [rubros, setRubros] = useState<Rubro[]>();
     const [originalInsumos, setOriginalInsumos] =
@@ -32,6 +32,7 @@ const ProductosInsumos = () => {
     const [alertMessage, setAlertMessage] = useState("");
     const [alertStatus, setAlertStatus] = useState<"success" | "error">("success");
 
+    const canManageProducts = user?.role === "ADMIN" || user?.subRole === "COCINERO";
     const navigate = useNavigate();
 
     const handleSucursalChange = (event: ChangeEvent<HTMLSelectElement>) => {
@@ -108,11 +109,28 @@ const ProductosInsumos = () => {
             setAlertMessage("Insumo eliminado con éxito!");
             setAlertStatus("success");
             setShowAlert(true);
-            setTimeout(() => window.location.reload(), 1200);
+            setInsumos((prev) => prev?.map((i) => (i.id === currentId ? {...i, activo: false} : i)));
+            setOriginalInsumos((prev) => prev?.map((i) => (i.id === currentId ? {...i, activo: false} : i)));
         } catch (error) {
             console.error("Error al eliminar insumo", error);
             setShowModal(false);
             setAlertMessage("Error al eliminar el insumo");
+            setAlertStatus("error");
+            setShowAlert(true);
+        }
+    };
+
+    const reactivateInsumoConfirm = async (id: number) => {
+        try {
+            await reactivateInsumo(id);
+            setInsumos((prev) => prev?.map((i) => (i.id === id ? {...i, activo: true} : i)));
+            setOriginalInsumos((prev) => prev?.map((i) => (i.id === id ? {...i, activo: true} : i)));
+            setAlertMessage("Insumo reactivado con éxito!");
+            setAlertStatus("success");
+            setShowAlert(true);
+        } catch (error) {
+            console.error("Error al reactivar insumo", error);
+            setAlertMessage("Error al reactivar el insumo");
             setAlertStatus("error");
             setShowAlert(true);
         }
@@ -210,68 +228,73 @@ const ProductosInsumos = () => {
                     <div className="table-responsive">
                         <table className="table table-hover dashboard-table">
                             <thead>
-                                <tr>
-                                    <th>#</th>
-                                    <th>Imagen</th>
-                                    <th>Denominación</th>
-                                    <th>Precio de costo</th>
-                                    <th>Precio de venta</th>
-                                    <th>Categoría</th>
-                                    <th>Stock actual</th>
-                                    <th>Acciones</th>
-                                </tr>
+                            <tr>
+                                <th>#</th>
+                                <th>Imagen</th>
+                                <th>Denominación</th>
+                                <th>Precio de costo</th>
+                                <th>Precio de venta</th>
+                                <th>Categoría</th>
+                                <th>Stock actual</th>
+                                <th>Acciones</th>
+                            </tr>
                             </thead>
                             <tbody className="table-group-divider">
-                                {insumos?.map((m, index) => (
-                                    <tr key={index} className={m.activo ? "" : "deleted-row"}>
-                                        <td>{m.id}</td>
-                                        <td>
-                                            {getImagenUrl(m.imagenes) ? (
-                                                <img
-                                                    src={getImagenUrl(m.imagenes)}
-                                                    alt={m.denominacion}
-                                                    style={{
-                                                        width: "36px",
-                                                        height: "36px",
-                                                        objectFit: "cover",
-                                                        borderRadius: "6px",
-                                                    }}
-                                                />
-                                            ) : (
-                                                <span className="text-muted small">Sin imagen</span>
-                                            )}
-                                        </td>
-                                        <td>{m.denominacion}</td>
-                                        <td>${m.precioCompra}</td>
-                                        <td>${m.precioVenta}</td>
-                                        <td>{m.categoria.denominacion}</td>
-                                        <td>
-                                            {m.stockSucursal.find((s) => s.sucursalId === sucursalId)
-                                                ?.stockActual ?? 0} {m.unidadMedida.denominacion}
-                                        </td>
-                                        <td>
-                                            {
-                                                m.activo && (
-                                                    <>
-                                                        <button className="btn btn-primary"
+                            {insumos?.map((m, index) => (
+                                <tr key={index} className={m.activo ? "" : "deleted-row"}>
+                                    <td>{m.id}</td>
+                                    <td>
+                                        {getImagenUrl(m.imagenes) ? (
+                                            <img
+                                                src={getImagenUrl(m.imagenes)}
+                                                alt={m.denominacion}
+                                                style={{
+                                                    width: "36px",
+                                                    height: "36px",
+                                                    objectFit: "cover",
+                                                    borderRadius: "6px",
+                                                }}
+                                            />
+                                        ) : (
+                                            <span className="text-muted small">Sin imagen</span>
+                                        )}
+                                    </td>
+                                    <td>{m.denominacion}</td>
+                                    <td>${m.precioCompra}</td>
+                                    <td>${m.precioVenta}</td>
+                                    <td>{m.categoria.denominacion}</td>
+                                    <td>
+                                        {m.stockSucursal.find((s) => s.sucursalId === sucursalId)
+                                            ?.stockActual ?? 0} {m.unidadMedida.denominacion}
+                                    </td>
+                                    <td>
+                                        {canManageProducts && (
+                                            m.activo ? (
+                                                <>
+                                                    <button className="btn btn-primary"
                                                             onClick={() => navigate(`/dashboard/insumos/edit/${m.id}`)}>Editar
-                                                        </button>
-                                                        <button className="btn btn-danger"
+                                                    </button>
+                                                    <button className="btn btn-danger"
                                                             onClick={() => handleDeleteInsumo(m.id ?? 0)}>Eliminar
-                                                        </button>
-                                                    </>
-                                                )
-                                            }
-                                        </td>
+                                                    </button>
+                                                </>
+                                            ) : (
+                                                <button className="btn btn-success"
+                                                        onClick={() => reactivateInsumoConfirm(m.id ?? 0)}>Reactivar
+                                                </button>
+                                            )
+                                        )}
+                                    </td>
 
-                                    </tr>
-                                ))}
+                                </tr>
+                            ))}
                             </tbody>
                         </table>
                     </div>
                 </div>
             </div>
-            <UnidadMedidaModal showModal={showModalUnidadMedida} setShowModal={setShowModalUnidadMedida} />
+            <UnidadMedidaModal showModal={showModalUnidadMedida}
+                               setShowModal={setShowModalUnidadMedida}/>
             {showModal && (
                 <ModalConfirmAction
                     show={showModal}

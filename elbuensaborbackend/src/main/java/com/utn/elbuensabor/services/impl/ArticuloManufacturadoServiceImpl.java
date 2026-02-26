@@ -60,6 +60,13 @@ public class ArticuloManufacturadoServiceImpl implements ArticuloManufacturadoSe
         manufacturadoRepo.save(manufacturado);
     }
 
+    public void reactivate(Long id) {
+        ArticuloManufacturado manufacturado = manufacturadoRepo.findById(id)
+                .orElseThrow(() -> new RuntimeException("Producto no encontrado"));
+        manufacturado.setActivo(true);
+        manufacturadoRepo.save(manufacturado);
+    }
+
     public void fillFromRequest(ArticuloManufacturado manufacturado, ArticuloManufacturadoRequest request) {
 
         CategoriaArticuloManufacturado categoria = categoriaRepo.findById(request.categoriaId())
@@ -73,11 +80,6 @@ public class ArticuloManufacturadoServiceImpl implements ArticuloManufacturadoSe
         manufacturado.setTiempoEstimado(request.tiempoEstimado());
         manufacturado.setCategoria(categoria);
         manufacturado.setActivo(request.activo() != null ? request.activo() : true);
-
-    /* ===============================
-       RECETA (INGREDIENTES)
-       =============================== */
-
         manufacturado.getArticuloManufacturadoDetalles().clear();
 
         for (RecetaItemRequest item : request.ingredientes()) {
@@ -85,10 +87,6 @@ public class ArticuloManufacturadoServiceImpl implements ArticuloManufacturadoSe
             detalle.setArticuloManufacturado(manufacturado);
             manufacturado.getArticuloManufacturadoDetalles().add(detalle);
         }
-
-    /* ===============================
-       IMÁGENES
-       =============================== */
 
         manufacturado.getImagenes().clear();
 

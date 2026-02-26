@@ -55,5 +55,11 @@ public class InsumoController {
         service.delete(id);
         return ResponseEntity.noContent().build();
     }
+
+    @PutMapping("/{id}/reactivar")
+    public ResponseEntity<Void> reactivate(@PathVariable Long id) {
+        service.reactivate(id);
+        return ResponseEntity.noContent().build();
+    }
 }
 
