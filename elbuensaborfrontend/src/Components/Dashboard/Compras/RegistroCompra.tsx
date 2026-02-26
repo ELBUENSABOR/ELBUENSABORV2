@@ -23,6 +23,7 @@ const RegistroCompra = () => {
     const navigate = useNavigate();
     const location = useLocation();
     const preselectedInsumoId = (location.state as { insumoId?: number } | null)?.insumoId;
+    const insumosActivos = insumos.filter((insumo) => insumo.activo);
 
     useEffect(() => {
         fetchInsumos();
@@ -30,12 +31,12 @@ const RegistroCompra = () => {
     }, [sucursalId]);
 
     useEffect(() => {
-        if (!preselectedInsumoId || insumos.length === 0) return;
-        const selected = insumos.find(i => i.id === preselectedInsumoId);
+        if (!preselectedInsumoId || insumosActivos.length === 0) return;
+        const selected = insumosActivos.find(i => i.id === preselectedInsumoId);
         if (!selected) return;
         setSelectedInsumoId(preselectedInsumoId);
         setPrecioCompra(selected.precioCompra || 0);
-    }, [preselectedInsumoId, insumos]);
+    }, [preselectedInsumoId, insumosActivos]);
 
     const fetchInsumos = async () => {
         setLoadingInsumos(true);
@@ -63,59 +64,57 @@ const RegistroCompra = () => {
     };
 
     const handleInsumoChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
-      const id = Number(e.target.value);
-      setSelectedInsumoId(id);
-
-      // Auto-fill price if available
-      const selected = insumos.find((i) => i.id === id);
-      if (selected) {
-        setPrecioCompra(selected.precioCompra || 0);
-      }
+        const id = Number(e.target.value);
+        setSelectedInsumoId(id);
+        const selected = insumosActivos.find((i) => i.id === id);
+        if (selected) {
+            setPrecioCompra(selected.precioCompra || 0);
+        }
     };
 
     const handleCantidadChange = (
-      e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>,
+        e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>,
     ) => {
-      const value = e.target.value;
-      setCantidad(Number(value));
-      setTotalCompra(Number(value) * Number(precioCompra));
+        const value = e.target.value;
+        setCantidad(Number(value));
+        setTotalCompra(Number(value) * Number(precioCompra));
     };
 
     const handlePrecioCompraChange = (
-      e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>,
+        e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>,
     ) => {
-      const value = e.target.value;
-      setPrecioCompra(Number(value));
-      setTotalCompra(Number(cantidad) * Number(value));
+        const value = e.target.value;
+        setPrecioCompra(Number(value));
+        setTotalCompra(Number(cantidad) * Number(value));
     };
 
     const handleSubmit = async (e: React.FormEvent) => {
-      e.preventDefault();
-      if (!sucursalId) {
-        setMessage({
-          type: "danger",
-          text: "Seleccione una sucursal primero.",
-        });
-        return;
-      }
-      if (!selectedInsumoId || !cantidad) {
-        setMessage({
-          type: "danger",
-          text: "Complete los campos obligatorios.",
-        });
-        return;
-      }
+        e.preventDefault();
+        if (!sucursalId) {
+            setMessage({
+                type: "danger",
+                text: "Seleccione una sucursal primero.",
+            });
+            return;
+        }
+        if (!selectedInsumoId || !cantidad) {
+            setMessage({
+                type: "danger",
+                text: "Complete los campos obligatorios.",
+            });
+            return;
+        }
 
-      setLoading(true);
-      setMessage(null);
+        setLoading(true);
+        setMessage(null);
 
-      const payload = {
-        insumoId: selectedInsumoId,
-        sucursalId,
-        cantidad: Number(cantidad),
-        precioCompra: precioCompra ? Number(precioCompra) : undefined,
-        totalCompra: Number(totalCompra),
-      };
+        const payload = {
+            insumoId: selectedInsumoId,
+            sucursalId,
+            cantidad: Number(cantidad),
+            precioCompra: precioCompra ? Number(precioCompra) : undefined,
+            totalCompra: Number(totalCompra),
+        };
 
         try {
             await registrarCompraInsumo(payload);
@@ -195,7 +194,7 @@ const RegistroCompra = () => {
                                         required
                                     >
                                         <option value="">Seleccione un insumo...</option>
-                                        {insumos.map((insumo) => (
+                                        {insumosActivos.map((insumo) => (
                                             <option key={insumo.id} value={insumo.id}>
                                                 {insumo.denominacion} ({insumo.unidadMedida.denominacion})
                                             </option>
