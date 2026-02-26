@@ -1,5 +1,5 @@
 import {useEffect, useMemo, useState, type ChangeEvent} from "react";
-import {getAllUsers, deleteUserService} from "../../../services/userService";
+import {getAllUsers, deleteUserService, reactivateUserService} from "../../../services/userService";
 import type {UsuarioDTO} from "../../../dtos/UsuarioDTO";
 import "./users.css";
 import {useNavigate} from "react-router-dom";
@@ -75,6 +75,24 @@ const Users = () => {
             console.error("Error", error);
             setAlertMessage("Error al eliminar el usuario");
             setAlertStatus("error");
+        }
+    };
+
+    const reactivateUser = async (id: number) => {
+        try {
+            const res = await reactivateUserService(id);
+            console.log("res", res);
+            if (res) {
+                setRefresh(!refresh);
+                setAlertMessage("Usuario reactivado con éxito!");
+                setAlertStatus("success");
+                setShowAlert(true);
+            }
+        } catch (error) {
+            console.error("Error", error);
+            setAlertMessage("Error al reactivar el usuario");
+            setAlertStatus("error");
+            setShowAlert(true);
         }
     };
 
@@ -206,22 +224,31 @@ const Users = () => {
                                     </td>
                                     <td>{formatRegistrationDate(u.fechaRegistro)}</td>
                                     <td>
-                                        {u.activo && (
-                                            <div className="users-actions">
+                                        <div className="users-actions">
+                                            {u.activo ? (
+                                                <>
+                                                    <button
+                                                        onClick={() => handleEditUser(u.id)}
+                                                        className="action-button edit"
+                                                    >
+                                                        Editar
+                                                    </button>
+                                                    <button
+                                                        onClick={() => handleDeleteUser(u.id)}
+                                                        className="action-button delete"
+                                                    >
+                                                        Eliminar
+                                                    </button>
+                                                </>
+                                            ) : (
                                                 <button
-                                                    onClick={() => handleEditUser(u.id)}
+                                                    onClick={() => reactivateUser(u.id)}
                                                     className="action-button edit"
                                                 >
-                                                    Editar
+                                                    Reactivar
                                                 </button>
-                                                <button
-                                                    onClick={() => handleDeleteUser(u.id)}
-                                                    className="action-button delete"
-                                                >
-                                                    Eliminar
-                                                </button>
-                                            </div>
-                                        )}
+                                            )}
+                                        </div>
                                     </td>
                                 </tr>
                             ))

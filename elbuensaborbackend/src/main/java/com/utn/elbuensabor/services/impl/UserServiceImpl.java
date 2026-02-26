@@ -231,7 +231,18 @@ public class UserServiceImpl implements UserService {
         return mapToUserDTO(usuario);
     }
 
+    public UserDTO reactivateUser(Long id) {
 
+        Usuario usuario = usuarioRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Usuario no encontrado"));
+
+        usuario.setActivo(true);
+
+        usuarioRepository.save(usuario);
+
+        return mapToUserDTO(usuario);
+    }
+    
     public UserDTO updateProfilePhoto(Long id, MultipartFile file) {
 
         if (file == null || file.isEmpty()) {

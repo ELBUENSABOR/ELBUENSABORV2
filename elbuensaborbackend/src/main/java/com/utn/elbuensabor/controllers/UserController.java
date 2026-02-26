@@ -55,6 +55,12 @@ public class UserController {
         return ResponseEntity.ok(dto);
     }
 
+    @PutMapping("/{id}/reactivar")
+    public ResponseEntity<UserDTO> reactivateUser(@PathVariable Long id){
+        UserDTO dto = userService.reactivateUser(id);
+        return ResponseEntity.ok(dto);
+    }
+
     @PostMapping("/{id}/foto-perfil")
     public ResponseEntity<UserDTO> uploadProfilePhoto(@PathVariable Long id,
                                                       @RequestParam("file") MultipartFile file) {
