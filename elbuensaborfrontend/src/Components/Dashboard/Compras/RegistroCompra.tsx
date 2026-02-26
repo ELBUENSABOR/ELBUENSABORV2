@@ -298,7 +298,6 @@ const RegistroCompra = () => {
                             <th>Ingrediente</th>
                             <th>Cantidad</th>
                             <th>Precio Total</th>
-                            <th>Proveedor</th>
                         </tr>
                         </thead>
                         <tbody>
@@ -318,7 +317,6 @@ const RegistroCompra = () => {
                                     {compra.cantidad} {compra.insumo.unidadMedida.denominacion}
                                 </td>
                                 <td>${compra.totalCompra.toFixed(2)}</td>
-                                <td>—</td>
                             </tr>
                         ))}
                         </tbody>
