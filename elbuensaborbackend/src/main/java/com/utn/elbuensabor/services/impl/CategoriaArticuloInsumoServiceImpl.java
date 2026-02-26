@@ -46,6 +46,7 @@ public class CategoriaArticuloInsumoServiceImpl implements CategoriaArticuloInsu
         CategoriaArticuloInsumo categoria = categoriaRepo.findById(id)
                 .orElseThrow(() -> new RuntimeException("Rubro de insumo no encontrado"));
         categoria.setDenominacion(request.denominacion());
+        categoria.setActivo(request.activo());
         setParent(categoria, request.categoriaPadreId());
         return toResponse(categoria);
     }

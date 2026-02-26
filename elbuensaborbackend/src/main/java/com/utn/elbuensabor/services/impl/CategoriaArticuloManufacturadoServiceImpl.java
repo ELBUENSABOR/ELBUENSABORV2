@@ -48,6 +48,7 @@ public class CategoriaArticuloManufacturadoServiceImpl implements CategoriaArtic
         CategoriaArticuloManufacturado categoria = categoriaRepo.findById(id)
                 .orElseThrow(() -> new RuntimeException("Rubro de producto no encontrado"));
         categoria.setDenominacion(request.denominacion());
+        categoria.setActivo(request.activo());
         setParent(categoria, request.categoriaPadreId());
         return toResponse(categoria);
     }
