@@ -98,7 +98,7 @@ public class UserServiceImpl implements UserService {
             clienteRepository.save(cliente);
         }
 
-        else if (dto.rolSistema() == RolSistema.EMPLEADO) {
+        else if (dto.rolSistema() == RolSistema.EMPLEADO || dto.rolSistema() == RolSistema.ADMIN) {
             Empleado empleado = new Empleado();
             empleado.setUsuario(usuario);
             empleado.setNombre(dto.nombre());
@@ -106,10 +106,14 @@ public class UserServiceImpl implements UserService {
             empleado.setEmail(dto.email());
             empleado.setTelefono(dto.telefono());
 
-            empleado.setPerfilEmpleado(
-                    dto.perfilEmpleado() != null
-                            ? dto.perfilEmpleado()
-                            : PerfilEmpleado.CAJERO);
+            if (dto.rolSistema() == RolSistema.ADMIN) {
+                empleado.setPerfilEmpleado(PerfilEmpleado.ADMINISTRADOR);
+            } else {
+                empleado.setPerfilEmpleado(
+                        dto.perfilEmpleado() != null
+                                ? dto.perfilEmpleado()
+                                : PerfilEmpleado.CAJERO);
+            }
 
             empleadoRepository.save(empleado);
         }
@@ -204,7 +208,9 @@ public class UserServiceImpl implements UserService {
             empleado.setApellido(userDTO.apellido());
             empleado.setTelefono(userDTO.telefono());
             empleado.setEmail(userDTO.email());
-            empleado.setPerfilEmpleado(userDTO.perfilEmpleado());
+            if (userDTO.perfilEmpleado() != null) {
+                empleado.setPerfilEmpleado(userDTO.perfilEmpleado());
+            }
         }
 
         if (userDTO.sucursalId() != null) {

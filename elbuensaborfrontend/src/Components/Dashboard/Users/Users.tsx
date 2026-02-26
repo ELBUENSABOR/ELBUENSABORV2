@@ -5,6 +5,7 @@ import "./users.css";
 import {useNavigate} from "react-router-dom";
 import ModalConfirmAction from "../../Common/ModalConfirmAction/ModalConfirmAction";
 import Alert from "../../Alert/Alert";
+import {ClipboardList} from "lucide-react";
 
 const formatRegistrationDate = (fechaRegistro?: string) => {
     if (!fechaRegistro) {
@@ -41,10 +42,7 @@ const Users = () => {
             try {
                 const res = await getAllUsers();
                 console.log("res", res);
-                const filtered = res.data.filter(
-                    (u: { rolSistema: string }) => u.rolSistema !== "ADMIN"
-                );
-                setOriginalUsers(filtered);
+                setOriginalUsers(res.data);
             } catch (error) {
                 console.error("Error al obtener los usuarios", error);
             }
@@ -105,16 +103,24 @@ const Users = () => {
     };
 
     const employeesCount =
-        originalUsers?.filter((u) => u.rolSistema === "EMPLEADO").length ?? 0;
+        originalUsers?.filter(
+            (u) => u.rolSistema === "EMPLEADO" || u.rolSistema === "ADMIN"
+        ).length ?? 0;
     const clientsCount =
         originalUsers?.filter((u) => u.rolSistema === "CLIENTE").length ?? 0;
 
     const filteredUsers = useMemo(() => {
         const list = originalUsers ?? [];
-        const role = activeTab === "empleados" ? "EMPLEADO" : "CLIENTE";
         const normalizedFilter = filterValue.trim().toLowerCase();
         return list.filter((u) => {
-            if (u.rolSistema !== role) {
+            const isEmployeeTabUser =
+                u.rolSistema === "EMPLEADO" || u.rolSistema === "ADMIN";
+
+            if (activeTab === "empleados" && !isEmployeeTabUser) {
+                return false;
+            }
+
+            if (activeTab === "clientes" && u.rolSistema !== "CLIENTE") {
                 return false;
             }
             if (statusFilter !== "todos") {
@@ -140,9 +146,6 @@ const Users = () => {
         <div className="users-container">
             <div className="users-controls">
                 <div className="users-search">
-          <span className="users-search-icon" aria-hidden="true">
-            🔍
-          </span>
                     <input
                         name="search"
                         type="text"
@@ -187,9 +190,9 @@ const Users = () => {
             </div>
             <div className="users-table-card">
                 <div className="users-table-header">
-          <span className="users-table-icon" aria-hidden="true">
-            📋
-          </span>
+              <span className="users-table-icon" aria-hidden="true">
+                <ClipboardList/>
+              </span>
                     <h6>
                         Lista de {activeTab === "empleados" ? "Empleados" : "Clientes"}
                     </h6>
