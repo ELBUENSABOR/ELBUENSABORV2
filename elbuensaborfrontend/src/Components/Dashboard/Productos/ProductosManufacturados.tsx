@@ -8,6 +8,7 @@ import { getRubrosManufacturados } from "../../../services/rubrosService";
 import type { Rubro } from "../../../models/Rubro";
 import ModalConfirmAction from "../../Common/ModalConfirmAction/ModalConfirmAction";
 import { getImageUrl } from '../../../utils/image';
+import Alert from "../../Alert/Alert";
 
 const ProductosManufacturados = () => {
     const { sucursales, sucursalId, setSucursalId, loading } = useSucursal();
@@ -27,6 +28,9 @@ const ProductosManufacturados = () => {
 
     const [currentId, setCurrentId] = useState(0);
 
+    const [showAlert, setShowAlert] = useState(false);
+    const [alertMessage, setAlertMessage] = useState("");
+    const [alertStatus, setAlertStatus] = useState<"success" | "error">("success");
 
     const handleSucursalChange = (event: ChangeEvent<HTMLSelectElement>) => {
         const value = event.target.value;
@@ -97,14 +101,25 @@ const ProductosManufacturados = () => {
     };
 
     const deleteManufacturadoConfirm = async () => {
-        await deleteManufacturado(currentId);
-        setManufacturados((prev) =>
-            prev?.map((m) => (m.id === currentId ? { ...m, activo: false } : m))
-        );
-        setOriginalManufacturados((prev) =>
-            prev?.map((m) => (m.id === currentId ? { ...m, activo: false } : m))
-        );
-        setShowModal(false);
+        try {
+            await deleteManufacturado(currentId);
+            setManufacturados((prev) =>
+                prev?.map((m) => (m.id === currentId ? { ...m, activo: false } : m))
+            );
+            setOriginalManufacturados((prev) =>
+                prev?.map((m) => (m.id === currentId ? { ...m, activo: false } : m))
+            );
+            setShowModal(false);
+            setAlertMessage("Manufacturado eliminado con éxito!");
+            setAlertStatus("success");
+            setShowAlert(true);
+        } catch (error) {
+            console.error("Error al eliminar manufacturado", error);
+            setShowModal(false);
+            setAlertMessage("Error al eliminar el manufacturado");
+            setAlertStatus("error");
+            setShowAlert(true);
+        }
     };
 
     const getManufacturadoImageUrl = (imagenes: Manufacturado["imagenes"]) => {
@@ -252,6 +267,13 @@ const ProductosManufacturados = () => {
                     headerText="¿Deseas eliminar el manufacturado?"
                     bodyText="Se dara de baja el manufacturado y sus datos"
                     onClick={() => deleteManufacturadoConfirm()}
+                />
+            )}
+            {showAlert && (
+                <Alert
+                    message={alertMessage}
+                    status={alertStatus}
+                    onClose={() => setShowAlert(false)}
                 />
             )}
         </div>

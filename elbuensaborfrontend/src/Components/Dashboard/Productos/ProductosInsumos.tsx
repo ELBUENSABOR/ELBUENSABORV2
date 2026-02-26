@@ -9,6 +9,7 @@ import { getRubrosInsumos } from '../../../services/rubrosService';
 import type { Rubro } from '../../../models/Rubro';
 import ModalConfirmAction from '../../Common/ModalConfirmAction/ModalConfirmAction';
 import { getImageUrl } from '../../../utils/image';
+import Alert from '../../Alert/Alert';
 
 const ProductosInsumos = () => {
     const { sucursales, sucursalId, setSucursalId, loading } = useSucursal();
@@ -26,8 +27,10 @@ const ProductosInsumos = () => {
     const [showModalUnidadMedida, setShowModalUnidadMedida] = useState(false);
 
     const [currentId, setCurrentId] = useState(0);
-    const [refreshData, setRefreshData] = useState(false);
 
+    const [showAlert, setShowAlert] = useState(false);
+    const [alertMessage, setAlertMessage] = useState("");
+    const [alertStatus, setAlertStatus] = useState<"success" | "error">("success");
 
     const navigate = useNavigate();
 
@@ -78,7 +81,7 @@ const ProductosInsumos = () => {
         }
 
         setInsumos(filtered);
-    }, [filterValue, filterRubroValue, filterStatusValue, originalInsumos, refreshData]);
+    }, [filterValue, filterRubroValue, filterStatusValue, originalInsumos]);
 
     const filterData = (e: ChangeEvent<HTMLInputElement>) => {
         setFilterValue(e.target.value);
@@ -99,9 +102,20 @@ const ProductosInsumos = () => {
     };
 
     const deleteInsumoConfirm = async () => {
-        await deleteInsumo(currentId);
-        setShowModal(false);
-        setRefreshData(!refreshData);
+        try {
+            await deleteInsumo(currentId);
+            setShowModal(false);
+            setAlertMessage("Insumo eliminado con éxito!");
+            setAlertStatus("success");
+            setShowAlert(true);
+            setTimeout(() => window.location.reload(), 1200);
+        } catch (error) {
+            console.error("Error al eliminar insumo", error);
+            setShowModal(false);
+            setAlertMessage("Error al eliminar el insumo");
+            setAlertStatus("error");
+            setShowAlert(true);
+        }
     };
 
     const getImagenUrl = (imagenes: InsumoResponse["imagenes"]) => {
@@ -265,6 +279,13 @@ const ProductosInsumos = () => {
                     headerText="¿Deseas eliminar el insumo?"
                     bodyText="Se dara de baja el insumo y sus datos"
                     onClick={() => deleteInsumoConfirm()}
+                />
+            )}
+            {showAlert && (
+                <Alert
+                    message={alertMessage}
+                    status={alertStatus}
+                    onClose={() => setShowAlert(false)}
                 />
             )}
         </div>
