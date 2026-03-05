@@ -10,6 +10,7 @@ import com.utn.elbuensabor.services.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
@@ -22,6 +23,9 @@ import java.util.UUID;
 @Service
 @RequiredArgsConstructor
 public class UserServiceImpl implements UserService {
+
+    @Value("${app.upload-dir:uploads}")
+    private String uploadRootDir;
 
     private final UsuarioRepository usuarioRepository;
     private final LocalidadRepository localidadRepository;
@@ -263,7 +267,7 @@ public class UserServiceImpl implements UserService {
                 ? "perfil.jpg"
                 : originalName.replaceAll("[^a-zA-Z0-9._-]", "_");
 
-        Path uploadDir = Path.of("uploads", "perfiles");
+        Path uploadDir = Path.of(uploadRootDir, "perfiles");
         String fileName = UUID.randomUUID() + "_" + safeName;
 
         try {
