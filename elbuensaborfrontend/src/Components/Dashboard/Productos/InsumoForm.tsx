@@ -17,6 +17,7 @@ import {useSucursal} from "../../../contexts/SucursalContext";
 import {useUser} from "../../../contexts/UsuarioContext";
 import {useParams} from "react-router-dom";
 import {useNavigate} from "react-router-dom";
+import {getImageUrl} from "../../../utils/image";
 
 const initialState: InsumoRequest = {
     id: 0,
@@ -32,7 +33,6 @@ const initialState: InsumoRequest = {
     imagenes: [],
 };
 
-const BACKEND_URL = "http://localhost:8080";
 
 const InsumoForm = () => {
     const {sucursalId, sucursales: sucursalesContext} = useSucursal();
@@ -388,7 +388,7 @@ const InsumoForm = () => {
                             {imagenesActuales.map((img, index) => (
                                 <div key={index} className="position-relative">
                                     <img
-                                        src={`${BACKEND_URL}${img}`}
+                                        src={getImageUrl(img)}
                                         alt="Imagen producto"
                                         style={{
                                             width: 150,

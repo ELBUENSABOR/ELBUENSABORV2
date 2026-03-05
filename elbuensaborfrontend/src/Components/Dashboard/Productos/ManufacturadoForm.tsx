@@ -12,6 +12,7 @@ import type { Sucursal } from "../../../models/Sucursal";
 import { useNavigate, useParams } from "react-router-dom";
 import { Alert } from "react-bootstrap";
 import type { Imagen } from "../../../models/Imagen";
+import {getImageUrl} from "../../../utils/image";
 
 const initialState: Manufacturado = {
     id: 0,
@@ -28,7 +29,6 @@ const initialState: Manufacturado = {
     imagenes: []
 }
 
-const BACKEND_URL = "http://localhost:8080";
 
 const ManufacturadoForm = () => {
     const [manufacturado, setManufacturado] = useState<Manufacturado>(initialState);
@@ -304,7 +304,7 @@ const ManufacturadoForm = () => {
                             {imagenesActuales.map((img, index) => (
                                 <div key={index} className="position-relative">
                                     <img
-                                        src={`${BACKEND_URL}${img.url}`}
+                                        src={getImageUrl(img.url)}
                                         alt="Imagen producto"
                                         style={{
                                             width: 150,

@@ -2,8 +2,7 @@ import { Modal } from "react-bootstrap";
 import type { Ingredientes } from "../../../../models/Insumo";
 import "./ingredientesModal.css";
 import { useEffect, useState } from "react";
-
-const BACKEND_URL = "http://localhost:8080";
+import {getImageUrl} from "../../../../utils/image";
 
 const IngredientesModal = ({
                                show,
@@ -85,7 +84,7 @@ const IngredientesModal = ({
                                     <div className="d-flex align-items-center gap-2">
                                         {ingrediente.denominacion}
                                         {ingrediente.imagenes.length > 0 && (
-                                            <img src={`${BACKEND_URL}${ingrediente.imagenes[0]}`} alt={ingrediente.denominacion} className="img-ingrediente" />
+                                            <img src={getImageUrl(ingrediente.imagenes[0])} alt={ingrediente.denominacion} className="img-ingrediente" />
                                         )}
                                     </div>
                                     {seleccionado ? (
