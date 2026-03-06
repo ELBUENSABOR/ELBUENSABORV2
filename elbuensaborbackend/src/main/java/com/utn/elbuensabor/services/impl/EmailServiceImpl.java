@@ -4,6 +4,7 @@ import org.springframework.mail.MailException;
 import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import com.utn.elbuensabor.entities.FacturaVenta;
@@ -23,6 +24,9 @@ import java.nio.file.Path;
 public class EmailServiceImpl implements EmailService {
 
     private final JavaMailSender mailSender;
+
+    @Value("${app.mail.from:}")
+    private String fromAddress;
 
     public void enviarFactura(FacturaVenta factura) {
         if (factura == null || factura.getPedido() == null || factura.getPedido().getCliente() == null) {
@@ -52,6 +56,9 @@ public class EmailServiceImpl implements EmailService {
                 var mimeMessage = mailSender.createMimeMessage();
                 var helper = new MimeMessageHelper(mimeMessage, true, "UTF-8");
                 helper.setTo(destinatario);
+                if (fromAddress != null && !fromAddress.isBlank()) {
+                    helper.setFrom(fromAddress);
+                }
                 helper.setSubject("Factura " + factura.getNumeroComprobante());
                 helper.setText(cuerpo);
                 helper.addAttachment(pdfPath.getFileName().toString(), pdfPath.toFile());
@@ -59,13 +66,16 @@ public class EmailServiceImpl implements EmailService {
             } else {
                 SimpleMailMessage message = new SimpleMailMessage();
                 message.setTo(destinatario);
+                if (fromAddress != null && !fromAddress.isBlank()) {
+                    message.setFrom(fromAddress);
+                }
                 message.setSubject("Factura " + factura.getNumeroComprobante());
                 message.setText(cuerpo);
                 mailSender.send(message);
             }
             log.info("Enviando mail a {} por factura {}", destinatario, factura.getNumeroComprobante());
         } catch (MailException | MessagingException ex) {
-            log.warn("No se pudo enviar la factura por email: {}", ex.getMessage());
+            log.error("No se pudo enviar la factura por email a {} (factura {}): {}", destinatario, factura.getNumeroComprobante(), ex.getMessage(), ex);
         }
     }
 
@@ -94,6 +104,9 @@ public class EmailServiceImpl implements EmailService {
                 var mimeMessage = mailSender.createMimeMessage();
                 var helper = new MimeMessageHelper(mimeMessage, true, "UTF-8");
                 helper.setTo(destinatario);
+                if (fromAddress != null && !fromAddress.isBlank()) {
+                    helper.setFrom(fromAddress);
+                }
                 helper.setSubject("Nota de crédito " + notaCredito.getNumeroComprobante());
                 helper.setText(cuerpo);
                 helper.addAttachment(pdfPath.getFileName().toString(), pdfPath.toFile());
@@ -101,13 +114,16 @@ public class EmailServiceImpl implements EmailService {
             } else {
                 SimpleMailMessage message = new SimpleMailMessage();
                 message.setTo(destinatario);
+                if (fromAddress != null && !fromAddress.isBlank()) {
+                    message.setFrom(fromAddress);
+                }
                 message.setSubject("Nota de crédito " + notaCredito.getNumeroComprobante());
                 message.setText(cuerpo);
                 mailSender.send(message);
             }
             log.info("Enviando mail a {} por nota de crédito {}", destinatario, notaCredito.getNumeroComprobante());
         } catch (MailException | MessagingException ex) {
-            log.warn("No se pudo enviar la nota de crédito por email: {}", ex.getMessage());
+            log.error("No se pudo enviar la nota de crédito por email a {} (nota {}): {}", destinatario, notaCredito.getNumeroComprobante(), ex.getMessage(), ex);
         }
     }
 
