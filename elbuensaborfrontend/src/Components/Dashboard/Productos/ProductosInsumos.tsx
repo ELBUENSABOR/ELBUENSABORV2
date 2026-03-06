@@ -1,7 +1,7 @@
 import {useEffect, useState, type ChangeEvent} from 'react'
 import {useUser} from '../../../contexts/UsuarioContext';
 import {useSucursal} from '../../../contexts/SucursalContext';
-import {useNavigate} from 'react-router-dom';
+import {useLocation, useNavigate} from 'react-router-dom';
 import type {InsumoResponse} from '../../../models/Insumo';
 import {getAll, deleteInsumo, reactivateInsumo} from '../../../services/insumosService';
 import UnidadMedidaModal from './UnidadesMedidaModal/UnidadMedidaModal';
@@ -34,6 +34,17 @@ const ProductosInsumos = () => {
 
     const canManageProducts = user?.role === "ADMIN" || user?.subRole === "COCINERO";
     const navigate = useNavigate();
+    const location = useLocation();
+    const fetchInsumos = async () => {
+        try {
+            const response = await getAll();
+            if (response) {
+                setOriginalInsumos(response);
+            }
+        } catch (error) {
+            console.error("Error al obtener insumos: ", error);
+        }
+    };
 
     const handleSucursalChange = (event: ChangeEvent<HTMLSelectElement>) => {
         const value = event.target.value;
@@ -41,22 +52,36 @@ const ProductosInsumos = () => {
     };
 
     useEffect(() => {
-        const getData = async () => {
-            try {
-                const response = await getAll();
-                const categorias = await getRubrosInsumos();
-                setRubros(categorias);
-                console.log(response);
-                if (response) {
-                    setOriginalInsumos(response);
-                }
-            } catch (error) {
-                console.error("Error al obtener insumos: ", error);
-            }
+        const loadInitialData = async () => {
+            const categorias = await getRubrosInsumos();
+            setRubros(categorias);
+            await fetchInsumos();
         };
 
-        getData();
+        loadInitialData();
     }, []);
+
+    useEffect(() => {
+        const state = location.state as {
+            refreshInsumos?: boolean;
+            alertMessage?: string;
+            alertStatus?: "success" | "error";
+        } | null;
+
+        if (!state) return;
+
+        if (state.alertMessage) {
+            setAlertMessage(state.alertMessage);
+            setAlertStatus(state.alertStatus ?? "success");
+            setShowAlert(true);
+        }
+
+        if (state.refreshInsumos) {
+            fetchInsumos();
+        }
+
+        navigate(location.pathname, {replace: true});
+    }, [location.state])
 
     useEffect(() => {
         if (!originalInsumos) return;

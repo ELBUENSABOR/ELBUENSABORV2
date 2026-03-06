@@ -137,15 +137,26 @@ const InsumoForm = () => {
                 if (imagenesNuevas.length > 0) {
                     await uploadImagenesInsumo(id ?? "", imagenesNuevas);
                 }
-                alert("Insumo actualizado con éxito");
+                navigate("/dashboard/productos-insumos", {
+                    state: {
+                        refreshInsumos: true,
+                        alertMessage: "Insumo actualizado con éxito",
+                        alertStatus: "success",
+                    },
+                });
             } else {
                 const created = await createInsumo(payload);
                 if (imagenesNuevas.length > 0) {
                     await uploadImagenesInsumo(created.id, imagenesNuevas);
                 }
-                alert("Insumo creado con éxito");
+                navigate("/dashboard/productos-insumos", {
+                    state: {
+                        refreshInsumos: true,
+                        alertMessage: "Insumo creado con éxito",
+                        alertStatus: "success",
+                    },
+                });
             }
-            navigate("/dashboard/productos-insumos");
         } catch (error) {
             console.error(error);
             alert(isEdit ? "Error al actualizar el insumo" : "Error al crear el insumo");
