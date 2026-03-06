@@ -46,6 +46,7 @@ const PedidosAdmin = () => {
     const [error, setError] = useState("");
     const [showConfirmNotaCredito, setShowConfirmNotaCredito] = useState(false);
     const [pedidoAAnular, setPedidoAAnular] = useState<PedidoResponse | null>(null);
+    const [actionLoadingId, setActionLoadingId] = useState<number | null>(null);
 
     const cargarPedidos = async (estadoFiltro?: string) => {
         setLoading(true);
@@ -137,15 +138,16 @@ const PedidosAdmin = () => {
         pedido.estado === "LISTO";
 
     const marcarPagado = async (pedido: PedidoResponse) => {
-        setLoading(true);
+        setActionLoadingId(pedido.id);
         setError("");
         try {
-            await marcarPedidoPagado(pedido.id);
-            await cargarPedidos(estado);
+            const actualizado = await marcarPedidoPagado(pedido.id);
+            setPedidos((prev) => prev.map((item) => (item.id === actualizado.id ? actualizado : item)));
+            setSelectedPedido((prev) => (prev?.id === actualizado.id ? actualizado : prev));
         } catch (err) {
             setError("No se pudo marcar el pedido como pagado.");
         } finally {
-            setLoading(false);
+            setActionLoadingId(null);
         }
     };
 
@@ -155,35 +157,37 @@ const PedidosAdmin = () => {
         pedido.estado !== "CANCELADO";
 
     const anularFactura = async (pedido: PedidoResponse) => {
-        setLoading(true);
+        setActionLoadingId(pedido.id);
         setError("");
         try {
-            await emitirNotaCredito(pedido.id);
-            await cargarPedidos(estado);
+            const actualizado = await emitirNotaCredito(pedido.id);
+            setPedidos((prev) => prev.map((item) => (item.id === actualizado.id ? actualizado : item)));
+            setSelectedPedido((prev) => (prev?.id === actualizado.id ? actualizado : prev));
         } catch (err) {
             setError("No se pudo emitir la nota de crédito.");
         } finally {
-            setLoading(false);
+            setActionLoadingId(null);
         }
     };
 
     const actualizarEstado = async (pedido: PedidoResponse) => {
         const nuevoEstado = estadoSeleccionado[pedido.id];
         if (!nuevoEstado) return;
-        setLoading(true);
+        setActionLoadingId(pedido.id);
         setError("");
         try {
-            await cambiarEstadoPedido(pedido.id, nuevoEstado);
+            const actualizado = await cambiarEstadoPedido(pedido.id, nuevoEstado);
+            setPedidos((prev) => prev.map((item) => (item.id === actualizado.id ? actualizado : item)));
+            setSelectedPedido((prev) => (prev?.id === actualizado.id ? actualizado : prev));
             setEstadoSeleccionado((prev) => {
                 const next = {...prev};
                 delete next[pedido.id];
                 return next;
             });
-            await cargarPedidos(estado);
         } catch (err) {
             setError("No se pudo actualizar el estado del pedido.");
         } finally {
-            setLoading(false);
+            setActionLoadingId(null);
         }
     };
 
@@ -289,6 +293,7 @@ const PedidosAdmin = () => {
                                                     <select
                                                         className="form-select form-select-sm"
                                                         style={{ width: "180px" }}
+                                                        disabled={actionLoadingId === pedido.id}
                                                         value={estadoSeleccionado[pedido.id] || ""}
                                                         onChange={(event) =>
                                                             setEstadoSeleccionado((prev) => ({
@@ -310,7 +315,7 @@ const PedidosAdmin = () => {
                                                     </select>
                                                     <button
                                                         className="btn btn-sm btn-outline-primary"
-                                                        disabled={!estadoSeleccionado[pedido.id]}
+                                                        disabled={!estadoSeleccionado[pedido.id] || actionLoadingId === pedido.id}
                                                         onClick={() => actualizarEstado(pedido)}
                                                     >
                                                         Actualizar
@@ -320,6 +325,7 @@ const PedidosAdmin = () => {
                                             {puedeMarcarPagado(pedido) && (
                                                 <button
                                                     className="btn btn-sm btn-outline-success"
+                                                    disabled={actionLoadingId === pedido.id}
                                                     onClick={() => marcarPagado(pedido)}
                                                 >
                                                     Marcar pagado
@@ -328,6 +334,7 @@ const PedidosAdmin = () => {
                                             {puedeEmitirNotaCredito(pedido) && (
                                                 <button
                                                     className="btn btn-sm btn-outline-danger"
+                                                    disabled={actionLoadingId === pedido.id}
                                                     onClick={() => {
                                                         setPedidoAAnular(pedido);
                                                         setShowConfirmNotaCredito(true);
