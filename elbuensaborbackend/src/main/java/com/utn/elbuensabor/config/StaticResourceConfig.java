@@ -19,6 +19,11 @@ public class StaticResourceConfig implements WebMvcConfigurer {
                 .normalize()
                 .toUri()
                 .toString();
+
+        if (!uploadLocation.endsWith("/")) {
+            uploadLocation = uploadLocation + "/";
+        }
+
         registry.addResourceHandler("/uploads/**", "/api/uploads/**")
                 .addResourceLocations(uploadLocation);
     }
