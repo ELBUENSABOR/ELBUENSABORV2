@@ -19,6 +19,9 @@ public class EmailServiceImpl implements EmailService {
     @Value("${app.mail.from:onboarding@resend.dev}")
     private String fromAddress;
 
+    @Value("${resend.test-recipient:}")
+    private String testRecipient;
+
     @Override
     public void enviarFactura(FacturaVenta factura) {
         if (!isConfigured()) {
@@ -73,15 +76,20 @@ public class EmailServiceImpl implements EmailService {
 
     private void enviar(String destinatario, String asunto, String cuerpo, String comprobante) {
         try {
+
+            String to = (testRecipient != null && !testRecipient.isBlank())
+                    ? testRecipient
+                    : destinatario;
+
             Resend resend = new Resend(resendApiKey);
             CreateEmailOptions params = CreateEmailOptions.builder()
                     .from(fromAddress)
-                    .to(destinatario)
+                    .to(to)
                     .subject(asunto)
-                    .text(cuerpo)
+                    .text(cuerpo + (to.equals(destinatario) ? "" : "\n\n[TEST - destinatario original: " + destinatario + "]"))
                     .build();
             resend.emails().send(params);
-            log.info("Email enviado a {} — {}", destinatario, comprobante);
+            log.info("Email enviado a {} — {}", to, comprobante);
         } catch (Exception ex) {
             log.error("No se pudo enviar email a {} ({}): {}", destinatario, comprobante, ex.getMessage(), ex);
         }
