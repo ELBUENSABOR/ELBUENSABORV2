@@ -28,7 +28,18 @@ public class EmailServiceImpl implements EmailService {
     @Value("${app.mail.from:}")
     private String fromAddress;
 
+    @Value("${spring.mail.username:}")
+    private String smtpUsername;
+
+    @Value("${spring.mail.password:}")
+    private String smtpPassword;
+
     public void enviarFactura(FacturaVenta factura) {
+        if (!isSmtpConfigured()) {
+            log.error("No se puede enviar factura por email porque faltan credenciales SMTP. Configurá SPRING_MAIL_USERNAME y SPRING_MAIL_PASSWORD en el entorno.");
+            return;
+        }
+
         if (factura == null || factura.getPedido() == null || factura.getPedido().getCliente() == null) {
             return;
         }
@@ -80,6 +91,11 @@ public class EmailServiceImpl implements EmailService {
     }
 
     public void enviarNotaCredito(NotaCreditoVenta notaCredito) {
+        if (!isSmtpConfigured()) {
+            log.error("No se puede enviar nota de crédito por email porque faltan credenciales SMTP. Configurá SPRING_MAIL_USERNAME y SPRING_MAIL_PASSWORD en el entorno.");
+            return;
+        }
+
         if (notaCredito == null || notaCredito.getPedido() == null || notaCredito.getPedido().getCliente() == null) {
             return;
         }
@@ -125,6 +141,11 @@ public class EmailServiceImpl implements EmailService {
         } catch (MailException | MessagingException ex) {
             log.error("No se pudo enviar la nota de crédito por email a {} (nota {}): {}", destinatario, notaCredito.getNumeroComprobante(), ex.getMessage(), ex);
         }
+    }
+
+    private boolean isSmtpConfigured() {
+        return smtpUsername != null && !smtpUsername.isBlank()
+                && smtpPassword != null && !smtpPassword.isBlank();
     }
 
     private Path resolvePdfPath(String pdfUrl) {
