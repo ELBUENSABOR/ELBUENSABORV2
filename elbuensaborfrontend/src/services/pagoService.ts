@@ -20,7 +20,7 @@ export const pagarConMercadoPago = async (pedidoId: number) => {
     throw new Error("No se recibió initPoint de Mercado Pago");
   }
 
-  window.location.href = initPoint; // 🔑 único redirect
+    return initPoint;
 };
 
 export const verificarPago = async (pedidoId: number, paymentId?: string | null) => {
