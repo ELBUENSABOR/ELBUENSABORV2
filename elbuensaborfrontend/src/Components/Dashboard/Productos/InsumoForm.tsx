@@ -2,7 +2,6 @@ import {useEffect, useState} from "react";
 import type {InsumoRequest} from "../../../models/Insumo";
 import type {Sucursal} from "../../../models/Sucursal";
 import type {Rubro} from "../../../models/Rubro";
-import type {Imagen} from "../../../models/Imagen";
 import type {UnidadMedida} from "../../../models/UnidadMedida";
 import {fetchSucursales} from "../../../services/dashboardService";
 import {getRubrosInsumos} from "../../../services/rubrosService";
@@ -10,8 +9,7 @@ import {
     createInsumo,
     getAllUnidadesMedida,
     getInsumoById,
-    updateInsumo,
-    uploadImagenesInsumo
+    updateInsumo
 } from "../../../services/insumosService";
 import {useSucursal} from "../../../contexts/SucursalContext";
 import {useUser} from "../../../contexts/UsuarioContext";
@@ -30,20 +28,19 @@ const initialState: InsumoRequest = {
     unidadMedidaId: 0,
     tiempoEstimado: 0,
     activo: true,
-    imagenes: [],
+    imagen: "",
 };
 
 
 const InsumoForm = () => {
-    const {sucursalId, sucursales: sucursalesContext} = useSucursal();
+    const {sucursalId} = useSucursal();
     const {user} = useUser();
     const [form, setForm] = useState<InsumoRequest>(initialState);
     const [sucursales, setSucursales] = useState<Sucursal[]>([]);
     const [categorias, setCategorias] = useState<Rubro[]>([]);
     const [unidadesMedida, setUnidadesMedida] = useState<UnidadMedida[]>([]);
-    const [imagenesActuales, setImagenesActuales] = useState<string[]>([]);
-    const [imagenesNuevas, setImagenesNuevas] = useState<File[]>([]);
-    const [sucursalSeleccionada, setSucursalSeleccionada] = useState<Sucursal>();
+    const [imagenActual, setImagenActual] = useState<string>("");
+    const [imagenNueva, setImagenNueva] = useState<File | null>(null);
     const {id} = useParams<{ id?: string }>();
     const navigate = useNavigate();
 
@@ -62,8 +59,6 @@ const InsumoForm = () => {
         const load = async () => {
             const s = await fetchSucursales();
             setSucursales(s);
-            const sucursalSeleccionada = s.find((sx) => sx.id === sucursalId);
-            setSucursalSeleccionada(sucursalSeleccionada);
 
             if (isEdit) {
                 const insumo = await getInsumoById(id ?? "");
@@ -77,7 +72,7 @@ const InsumoForm = () => {
                     unidadMedidaId: insumo.unidadMedida.id,
                 }));
 
-                setImagenesActuales(insumo.imagenes || []);
+                setImagenActual((insumo.imagen as string) || "");
             }
         };
 
@@ -115,10 +110,9 @@ const InsumoForm = () => {
                     stockMinimo: s.stockMinimo,
                     stockMaximo: s.stockMaximo,
                 }));
-            const nuevasImagenes = await Promise.all(
-                imagenesNuevas.map((file) => readFileAsDataUrl(file))
-            );
-            const imagenes = [...imagenesActuales, ...nuevasImagenes];
+            const imagen = imagenNueva
+                ? await readFileAsDataUrl(imagenNueva)
+                : imagenActual;
             const payload = {
                 denominacion: form.denominacion,
                 precioVenta: form.precioVenta,
@@ -128,15 +122,12 @@ const InsumoForm = () => {
                 esParaElaborar: form.esParaElaborar,
                 unidadMedidaId: form.unidadMedidaId,
                 stockSucursal,
-                imagenes,
+                imagen,
             };
 
             console.log("Enviando payload:", payload);
             if (isEdit) {
                 await updateInsumo(Number(id), payload);
-                if (imagenesNuevas.length > 0) {
-                    await uploadImagenesInsumo(id ?? "", imagenesNuevas);
-                }
                 navigate("/dashboard/productos-insumos", {
                     state: {
                         refreshInsumos: true,
@@ -145,10 +136,7 @@ const InsumoForm = () => {
                     },
                 });
             } else {
-                const created = await createInsumo(payload);
-                if (imagenesNuevas.length > 0) {
-                    await uploadImagenesInsumo(created.id, imagenesNuevas);
-                }
+                await createInsumo(payload);
                 navigate("/dashboard/productos-insumos", {
                     state: {
                         refreshInsumos: true,
@@ -379,38 +367,35 @@ const InsumoForm = () => {
                 <input
                     type="file"
                     className="form-control"
-                    multiple
+                    accept="image/*"
                     onChange={(e) => {
-                        const files = e.target.files ? Array.from(e.target.files) : [];
-                        setImagenesNuevas(files);
+                        const file = e.target.files?.[0] ?? null;
+                        setImagenNueva(file);
                     }}
                 />
-                {imagenesNuevas.map((file, i) => (
+                {imagenNueva && (
                     <img
-                        key={i}
-                        src={URL.createObjectURL(file)}
+                        src={URL.createObjectURL(imagenNueva)}
                         style={{width: 120, marginTop: 10}}
                     />
-                ))}
-                {imagenesActuales.length > 0 && (
+                )}
+                {imagenActual && (
                     <div className="mt-3">
-                        <p>Imágenes actuales:</p>
+                        <p>Imagen actual:</p>
                         <div className="d-flex gap-2 flex-wrap">
-                            {imagenesActuales.map((img, index) => (
-                                <div key={index} className="position-relative">
-                                    <img
-                                        src={getImageUrl(img)}
-                                        alt="Imagen producto"
-                                        style={{
-                                            width: 150,
-                                            height: 150,
-                                            objectFit: "cover",
-                                            borderRadius: 8,
-                                            border: "1px solid #ccc"
-                                        }}
-                                    />
-                                </div>
-                            ))}
+                            <div className="position-relative">
+                                <img
+                                    src={getImageUrl(imagenActual)}
+                                    alt="Imagen producto"
+                                    style={{
+                                        width: 150,
+                                        height: 150,
+                                        objectFit: "cover",
+                                        borderRadius: 8,
+                                        border: "1px solid #ccc"
+                                    }}
+                                />
+                            </div>
                         </div>
                     </div>
                 )}

@@ -90,16 +90,11 @@ public class ArticuloManufacturadoServiceImpl implements ArticuloManufacturadoSe
 
         manufacturado.getImagenes().clear();
 
-        if (request.imagenes() != null) {
-            for (String url : request.imagenes()) {
-                if (!isPersistableImagePath(url)) {
-                    continue;
-                }
-                ImagenArticuloManufacturado imagen = new ImagenArticuloManufacturado();
-                imagen.setDenominacion(normalizeManufacturadoImagePath(url));
-                imagen.setArticuloManufacturado(manufacturado);
-                manufacturado.getImagenes().add(imagen);
-            }
+        if (request.imagen() != null && !request.imagen().isBlank()) {
+            ImagenArticuloManufacturado imagen = new ImagenArticuloManufacturado();
+            imagen.setDenominacion(normalizeManufacturadoImagePath(request.imagen()));
+            imagen.setArticuloManufacturado(manufacturado);
+            manufacturado.getImagenes().add(imagen);
         }
 
     }
@@ -138,10 +133,10 @@ public class ArticuloManufacturadoServiceImpl implements ArticuloManufacturadoSe
                         .toList(),
                 manufacturado.getImagenes().stream()
                         .map(ImagenArticuloManufacturado::getDenominacion)
-                        .filter(this::isPersistableImagePath)
+                        .findFirst()
                         .map(this::normalizeManufacturadoImagePath)
-                        .toList(),
-                true // disponibilidad no se evalúa acá
+                        .orElse(null),
+                true
         );
     }
 
@@ -195,24 +190,22 @@ public class ArticuloManufacturadoServiceImpl implements ArticuloManufacturadoSe
                 ingredientes,
                 manufacturado.getImagenes().stream()
                         .map(ImagenArticuloManufacturado::getDenominacion)
-                        .filter(this::isPersistableImagePath)
+                        .findFirst()
                         .map(this::normalizeManufacturadoImagePath)
-                        .toList(),
+                        .orElse(null),
                 disponible
         );
     }
 
-    private boolean isPersistableImagePath(String value) {
-        if (value == null) {
-            return false;
-        }
-        String trimmed = value.trim();
-        return !trimmed.isBlank() && !trimmed.startsWith("data:image/");
-    }
-
     private String normalizeManufacturadoImagePath(String rawPath) {
+        if (rawPath == null) {
+            return null;
+        }
         String path = rawPath.trim();
-        if (path.startsWith("http://") || path.startsWith("https://") || path.startsWith("/")) {
+        if (path.isBlank()) {
+            return null;
+        }
+        if (path.startsWith("data:image/") || path.startsWith("http://") || path.startsWith("https://") || path.startsWith("/")) {
             return path;
         }
         return MANUFACTURADO_UPLOADS_PREFIX + path;

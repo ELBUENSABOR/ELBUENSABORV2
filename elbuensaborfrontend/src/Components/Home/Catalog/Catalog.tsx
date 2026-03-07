@@ -133,9 +133,9 @@ const Catalog = () => {
                                                 }`}
                                         >
                                             <div className="product-card__image">
-                                                {product.imagenes?.[0] ? (
+                                                {product.imagen ? (
                                                     <img
-                                                        src={getImageUrl(product.imagenes[0])}
+                                                        src={getImageUrl(product.imagen)}
                                                         alt={product.denominacion}
                                                     />
                                                 ) : (
@@ -179,7 +179,7 @@ const Catalog = () => {
                                                             denominacion: product.denominacion,
                                                             precio: product.precioVenta,
                                                             cantidad: 1,
-                                                            imagen: product.imagenes?.[0],
+                                                            imagen: product.imagen,
                                                         })
                                                     }
                                                 >

@@ -161,10 +161,9 @@ const ProductosInsumos = () => {
         }
     };
 
-    const getImagenUrl = (imagenes: InsumoResponse["imagenes"]) => {
-        const primera = imagenes?.[0];
-        if (!primera) return "";
-        const rawPath = typeof primera === "string" ? primera : primera.url;
+    const getImagenUrl = (imagen: InsumoResponse["imagen"]) => {
+        if (!imagen) return "";
+        const rawPath = typeof imagen === "string" ? imagen : imagen.url;
         return getImageUrl(rawPath);
     };
 
@@ -269,9 +268,9 @@ const ProductosInsumos = () => {
                                 <tr key={index} className={m.activo ? "" : "deleted-row"}>
                                     <td>{m.id}</td>
                                     <td>
-                                        {getImagenUrl(m.imagenes) ? (
+                                        {getImagenUrl(m.imagen) ? (
                                             <img
-                                                src={getImagenUrl(m.imagenes)}
+                                                src={getImagenUrl(m.imagen)}
                                                 alt={m.denominacion}
                                                 style={{
                                                     width: "36px",

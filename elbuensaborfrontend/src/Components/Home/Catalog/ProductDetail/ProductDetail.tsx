@@ -53,8 +53,8 @@ const ProductDetail = () => {
             </Link>
             <div className="product-detail__content">
                 <div className="product-detail__image">
-                    {product.imagenes?.[0] ? (
-                        <img src={getImageUrl(product.imagenes[0])} alt={product.denominacion}/>
+                    {product.imagen ? (
+                        <img src={getImageUrl(product.imagen)} alt={product.denominacion}/>
                     ) : (
                         <div className="product-detail__placeholder">Sin imagen</div>
                     )}
@@ -88,7 +88,7 @@ const ProductDetail = () => {
                                     denominacion: product.denominacion,
                                     precio: product.precioVenta,
                                     cantidad: 1,
-                                    imagen: product.imagenes?.[0],
+                                    imagen: product.imagen,
                                 })
                             }
                         >

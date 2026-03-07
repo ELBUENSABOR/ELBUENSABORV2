@@ -143,10 +143,9 @@ const ProductosManufacturados = () => {
         }
     };
 
-    const getManufacturadoImageUrl = (imagenes: Manufacturado["imagenes"]) => {
-        const primera = imagenes?.[0];
-        if (!primera) return "";
-        return getImageUrl(primera);
+    const getManufacturadoImageUrl = (imagen: Manufacturado["imagen"]) => {
+        if (!imagen) return "";
+        return getImageUrl(imagen);
     };
 
     return (
@@ -241,9 +240,9 @@ const ProductosManufacturados = () => {
                         <tr key={index} className={m.activo ? "" : "deleted-row"}>
                             <td>{m.id}</td>
                             <td>
-                                {getManufacturadoImageUrl(m.imagenes) ? (
+                                {getManufacturadoImageUrl(m.imagen) ? (
                                     <img
-                                        src={getManufacturadoImageUrl(m.imagenes)}
+                                        src={getManufacturadoImageUrl(m.imagen)}
                                         alt={m.denominacion}
                                         style={{
                                             width: "36px",

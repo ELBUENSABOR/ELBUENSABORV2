@@ -10,22 +10,14 @@ import com.utn.elbuensabor.services.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.StandardCopyOption;
 import java.util.List;
-import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
 public class UserServiceImpl implements UserService {
-
-    @Value("${app.upload-dir:uploads}")
-    private String uploadRootDir;
 
     private final UsuarioRepository usuarioRepository;
     private final LocalidadRepository localidadRepository;
@@ -252,7 +244,7 @@ public class UserServiceImpl implements UserService {
 
         return mapToUserDTO(usuario);
     }
-    
+
     public UserDTO updateProfilePhoto(Long id, MultipartFile file) {
 
         if (file == null || file.isEmpty()) {
@@ -262,23 +254,18 @@ public class UserServiceImpl implements UserService {
         Usuario usuario = usuarioRepository.findByIdWithClienteEmpleadoAndDomicilio(id)
                 .orElseThrow(() -> new RuntimeException("Usuario no encontrado"));
 
-        String originalName = file.getOriginalFilename();
-        String safeName = (originalName == null || originalName.isBlank())
-                ? "perfil.jpg"
-                : originalName.replaceAll("[^a-zA-Z0-9._-]", "_");
-
-        Path uploadDir = Path.of(uploadRootDir, "perfiles");
-        String fileName = UUID.randomUUID() + "_" + safeName;
-
-        try {
-            Files.createDirectories(uploadDir);
-            Path destination = uploadDir.resolve(fileName);
-            Files.copy(file.getInputStream(), destination, StandardCopyOption.REPLACE_EXISTING);
-        } catch (IOException e) {
-            throw new RuntimeException("No se pudo guardar la imagen de perfil", e);
+        String contentType = file.getContentType();
+        if (contentType == null || !contentType.startsWith("image/")) {
+            throw new IllegalArgumentException("El archivo debe ser una imagen");
         }
 
-        usuario.setFotoPerfil("/uploads/perfiles/" + fileName);
+        try {
+            byte[] bytes = file.getBytes();
+            String base64 = java.util.Base64.getEncoder().encodeToString(bytes);
+            usuario.setFotoPerfil("data:" + contentType + ";base64," + base64);
+        } catch (IOException e) {
+            throw new RuntimeException("No se pudo procesar la imagen de perfil", e);
+        }
         usuarioRepository.save(usuario);
 
         return mapToUserDTO(usuario);

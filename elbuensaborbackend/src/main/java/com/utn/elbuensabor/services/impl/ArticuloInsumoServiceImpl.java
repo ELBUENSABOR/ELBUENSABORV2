@@ -128,18 +128,11 @@ public class ArticuloInsumoServiceImpl implements ArticuloInsumoService {
         }
 
         insumo.getImagenes().clear();
-        if (request.imagenes() != null && !request.imagenes().isEmpty()) {
-            List<ImagenInsumo> imagenes = request.imagenes().stream()
-                    .filter(this::isPersistableImagePath)
-                    .map(this::normalizeInsumoImagePath)
-                    .map(url -> {
-                        ImagenInsumo imagen = new ImagenInsumo();
-                        imagen.setDenominacion(url);
-                        imagen.setArticuloInsumo(insumo);
-                        return imagen;
-                    })
-                    .toList();
-            insumo.getImagenes().addAll(imagenes);
+        if (request.imagen() != null && !request.imagen().isBlank()) {
+            ImagenInsumo imagen = new ImagenInsumo();
+            imagen.setDenominacion(normalizeInsumoImagePath(request.imagen()));
+            imagen.setArticuloInsumo(insumo);
+            insumo.getImagenes().add(imagen);
         }
     }
 
@@ -166,12 +159,12 @@ public class ArticuloInsumoServiceImpl implements ArticuloInsumoService {
                         s.getStockMaximo()))
                 .toList();
 
-        List<String> imagenes = insumo.getImagenes()
+        String imagen = insumo.getImagenes()
                 .stream()
                 .map(ImagenInsumo::getDenominacion)
-                .filter(this::isPersistableImagePath)
+                .findFirst()
                 .map(this::normalizeInsumoImagePath)
-                .toList();
+                .orElse(null);
 
         return new ArticuloInsumoResponse(
                 insumo.getId(),
@@ -185,7 +178,7 @@ public class ArticuloInsumoServiceImpl implements ArticuloInsumoService {
                 insumo.getActivo(),
                 unidadMedidaDTO,
                 stocks,
-                imagenes
+                imagen
         );
     }
 
@@ -222,17 +215,15 @@ public class ArticuloInsumoServiceImpl implements ArticuloInsumoService {
                 .anyMatch(authority -> "ROLE_ADMIN".equals(authority.getAuthority()));
     }
 
-    private boolean isPersistableImagePath(String value) {
-        if (value == null) {
-            return false;
-        }
-        String trimmed = value.trim();
-        return !trimmed.isBlank() && !trimmed.startsWith("data:image/");
-    }
-
     private String normalizeInsumoImagePath(String rawPath) {
+        if (rawPath == null) {
+            return null;
+        }
         String path = rawPath.trim();
-        if (path.startsWith("http://") || path.startsWith("https://") || path.startsWith("/")) {
+        if (path.isBlank()) {
+            return null;
+        }
+        if (path.startsWith("data:image/") || path.startsWith("http://") || path.startsWith("https://") || path.startsWith("/")) {
             return path;
         }
         return INSUMO_UPLOADS_PREFIX + path;

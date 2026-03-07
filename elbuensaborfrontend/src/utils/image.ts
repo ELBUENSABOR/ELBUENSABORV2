@@ -23,6 +23,10 @@ export const getImageUrl = (path?: string) => {
         return "";
     }
 
+    if (/^data:image\//i.test(path)) {
+        return path;
+    }
+
     if (/^https?:\/\//i.test(path)) {
         if (backendBase && isLocalHost(path) && !isLocalHost(backendBase)) {
             try {
