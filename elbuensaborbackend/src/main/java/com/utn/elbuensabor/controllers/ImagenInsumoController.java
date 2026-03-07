@@ -47,6 +47,8 @@ public class ImagenInsumoController {
             String filename = UUID.randomUUID() + "_" + file.getOriginalFilename();
             Path path = uploadDir.resolve(filename);
 
+            Files.copy(file.getInputStream(), path, StandardCopyOption.REPLACE_EXISTING);
+
             ImagenInsumo imagen = new ImagenInsumo();
             imagen.setDenominacion("/uploads/" + UPLOAD_SUBDIR + "/" + filename);
             imagen.setArticuloInsumo(insumo);
