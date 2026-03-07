@@ -11,7 +11,6 @@ import com.utn.elbuensabor.repositories.ArticuloInsumoRepository;
 import com.utn.elbuensabor.repositories.SucursalInsumoRepository;
 import java.time.LocalDateTime;
 import java.util.List;
-import java.util.ArrayList;
 
 import lombok.RequiredArgsConstructor;
 
@@ -86,9 +85,9 @@ public class CompraInsumoServiceImpl implements CompraInsumoService {
                 mapToCategoriaResponse(i.getCategoriaArticuloInsumo()),
                 i.getEsParaElaborar(),
                 i.getActivo(),
-                new UnidadMedidaDTO(i.getUnidadMedida().getId(), i.getUnidadMedida().getDenominacion(), i.getUnidadMedida().isActivo()),
-                new ArrayList<>(),
-                new ArrayList<>()
+                unidadMedidaDTO,
+                java.util.List.of(),
+                null
         );
     }
 
