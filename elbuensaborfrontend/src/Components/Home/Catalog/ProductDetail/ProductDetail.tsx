@@ -98,7 +98,6 @@ const ProductDetail = () => {
                     <div className="product-detail__extra">
                         <p>
                             Tiempo estimado: {product.tiempoEstimado} min
-                            {formatCurrency(product.precioCosto)}
                         </p>
                     </div>
                 </div>
