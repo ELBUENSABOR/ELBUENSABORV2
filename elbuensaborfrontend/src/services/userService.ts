@@ -102,7 +102,6 @@ export const uploadProfilePhoto = async (userId: number, file: File) => {
     const res = await axios.post(`${API_URL}/user/${userId}/foto-perfil`, formData, {
         headers: {
             Authorization: `Bearer ${sessionStorage.getItem("token")}`,
-            "Content-Type": "multipart/form-data",
         },
         withCredentials: true,
     });
