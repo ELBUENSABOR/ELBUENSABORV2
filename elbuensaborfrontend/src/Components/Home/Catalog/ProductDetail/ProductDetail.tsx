@@ -97,7 +97,7 @@ const ProductDetail = () => {
                     </div>
                     <div className="product-detail__extra">
                         <p>
-                            Tiempo estimado: {product.tiempoEstimado} min · Precio costo: {" "}
+                            Tiempo estimado: {product.tiempoEstimado} min
                             {formatCurrency(product.precioCosto)}
                         </p>
                     </div>
