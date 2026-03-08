@@ -7,6 +7,8 @@ import ModalConfirmAction from "../../Common/ModalConfirmAction/ModalConfirmActi
 import Alert from "../../Alert/Alert";
 import {ClipboardList} from "lucide-react";
 import LoadingState from "../../Common/LoadingState";
+import {fetchSucursales} from "../../../services/dashboardService";
+import type {Sucursal} from "../../../models/Sucursal";
 
 const formatRegistrationDate = (fechaRegistro?: string) => {
     if (!fechaRegistro) {
@@ -35,6 +37,8 @@ const Users = () => {
     const [alertStatus, setAlertStatus] = useState("");
     const [filterValue, setFilterValue] = useState("");
     const [statusFilter, setStatusFilter] = useState("activos");
+    const [sucursalFilter, setSucursalFilter] = useState("todas");
+    const [sucursales, setSucursales] = useState<Sucursal[]>([]);
     const [activeTab, setActiveTab] = useState<"empleados" | "clientes">(
         "empleados"
     );
@@ -43,9 +47,13 @@ const Users = () => {
         const getData = async () => {
             setIsLoading(true);
             try {
-                const res = await getAllUsers();
-                console.log("res", res);
-                setOriginalUsers(res.data);
+                const [usersRes, sucursalesRes] = await Promise.all([
+                    getAllUsers(),
+                    fetchSucursales(),
+                ]);
+                console.log("res", usersRes);
+                setOriginalUsers(usersRes.data);
+                setSucursales(sucursalesRes);
             } catch (error) {
                 console.error("Error al obtener los usuarios", error);
             } finally {
@@ -107,12 +115,27 @@ const Users = () => {
         setStatusFilter(e.target.value);
     };
 
+    const handleSucursalFilter = (e: ChangeEvent<HTMLSelectElement>) => {
+        setSucursalFilter(e.target.value);
+    };
+
     const employeesCount =
         originalUsers?.filter(
             (u) => u.rolSistema === "EMPLEADO" || u.rolSistema === "ADMIN"
         ).length ?? 0;
     const clientsCount =
         originalUsers?.filter((u) => u.rolSistema === "CLIENTE").length ?? 0;
+
+    const sucursalMap = useMemo(() => {
+        return new Map(sucursales.map((sucursal) => [String(sucursal.id), sucursal.nombre]));
+    }, [sucursales]);
+
+
+    useEffect(() => {
+        if (activeTab === "clientes") {
+            setSucursalFilter("todas");
+        }
+    }, [activeTab]);
 
     const filteredUsers = useMemo(() => {
         const list = originalUsers ?? [];
@@ -137,6 +160,12 @@ const Users = () => {
                     return false;
                 }
             }
+            if (activeTab === "empleados" && sucursalFilter !== "todas") {
+                if ((u.rolSistema === "ADMIN" && sucursalFilter !== "sin_sucursal") ||
+                    (u.rolSistema !== "ADMIN" && String(u.sucursalId) !== sucursalFilter)) {
+                    return false;
+                }
+            }
             if (!normalizedFilter) {
                 return true;
             }
@@ -145,7 +174,7 @@ const Users = () => {
                 u.email.toLowerCase().includes(normalizedFilter)
             );
         });
-    }, [activeTab, filterValue, originalUsers, statusFilter]);
+    }, [activeTab, filterValue, originalUsers, statusFilter, sucursalFilter]);
 
     return (
         <div className="users-container">
@@ -170,6 +199,22 @@ const Users = () => {
                     <option value="activos">Activos</option>
                     <option value="inactivos">Inactivos</option>
                 </select>
+                {activeTab === "empleados" && (
+                    <select
+                        name="sucursal"
+                        className="form-select users-status"
+                        value={sucursalFilter}
+                        onChange={handleSucursalFilter}
+                    >
+                        <option value="todas">Sucursal: Todas</option>
+                        <option value="sin_sucursal">Sucursal: Sin sucursal (Admins)</option>
+                        {sucursales.map((sucursal) => (
+                            <option key={sucursal.id} value={String(sucursal.id)}>
+                                Sucursal: {sucursal.nombre}
+                            </option>
+                        ))}
+                    </select>
+                )}
                 <button
                     className="btn users-add-button"
                     onClick={() => navigate("/dashboard/usuarios/add")}
@@ -211,6 +256,7 @@ const Users = () => {
                             <th>Email</th>
                             <th>Teléfono</th>
                             <th>Estado</th>
+                            {activeTab === "empleados" && <th>Sucursal</th>}
                             <th>Fecha Registro</th>
                             <th>Acciones</th>
                         </tr>
@@ -231,6 +277,13 @@ const Users = () => {
                         {u.activo ? "Activo" : "Inactivo"}
                       </span>
                                     </td>
+                                    {activeTab === "empleados" && (
+                                        <td>
+                                            {u.rolSistema === "ADMIN"
+                                                ? ""
+                                                : sucursalMap.get(String(u.sucursalId)) ?? "-"}
+                                        </td>
+                                    )}
                                     <td>{formatRegistrationDate(u.fechaRegistro)}</td>
                                     <td>
                                         <div className="users-actions">
@@ -263,7 +316,7 @@ const Users = () => {
                             ))
                         ) : (
                             <tr>
-                                <td colSpan={6} className="users-empty">
+                                <td colSpan={activeTab === "empleados" ? 7 : 6} className="users-empty">
                                     No hay {activeTab === "empleados" ? "empleados" : "clientes"}{" "}
                                     registrados
                                 </td>
