@@ -8,6 +8,7 @@ import { useSucursal } from "../../contexts/SucursalContext";
 import { LogIn, UserPlus, Search, ShoppingCart, Menu, X } from "lucide-react";
 import { HiOutlineUserCircle } from "react-icons/hi";
 import { getImageUrl } from "../../utils/image";
+import {getEmployeeDashboardRoute, getEmployeePanelLabel} from "../../utils/employeePanel";
 
 interface MyNavbarProps {
     onCartOpen: () => void;
@@ -28,6 +29,8 @@ export default function MyNavbar({ onCartOpen, isCartOpen }: MyNavbarProps) {
     const profilePhotoUrl = user?.fotoPerfil ? getImageUrl(user.fotoPerfil) : "";
     const showSucursalSelector = user?.role !== "EMPLEADO";
     const hidePublicNavForEmployeeAccount = user?.role === "EMPLEADO" && location.pathname.startsWith("/account");
+    const employeeDashboardRoute = getEmployeeDashboardRoute(user?.role, user?.subRole);
+    const employeePanelLabel = getEmployeePanelLabel(user?.subRole);
 
     const closeMobileMenu = () => setExpanded(false);
 
@@ -39,7 +42,7 @@ export default function MyNavbar({ onCartOpen, isCartOpen }: MyNavbarProps) {
             expanded={expanded}
             onToggle={(next) => setExpanded(!!next)}
         >
-            <Container className="navbar-main">
+            <Container className={`navbar-main${hidePublicNavForEmployeeAccount ? " navbar-main--employee-account" : ""}`}>
                 <Navbar.Brand as={Link} to="/" className="navbar-brand-group" aria-label="Ir al inicio"
                     onClick={closeMobileMenu}>
                     <span className="navbar-brand-logo-mark" aria-hidden="true">
@@ -138,6 +141,17 @@ export default function MyNavbar({ onCartOpen, isCartOpen }: MyNavbarProps) {
                             </Nav.Link>
                         )}
 
+                        {hidePublicNavForEmployeeAccount && (
+                            <Nav.Link
+                                as={Link}
+                                to={employeeDashboardRoute}
+                                className="navbar-admin-link"
+                                onClick={closeMobileMenu}
+                            >
+                                Volver a {employeePanelLabel}
+                            </Nav.Link>
+                        )}
+
                         {user && (
                             <>
                                 <Nav.Link as={Link} to="/account" className="navbar-link" onClick={closeMobileMenu}>
@@ -203,6 +217,14 @@ export default function MyNavbar({ onCartOpen, isCartOpen }: MyNavbarProps) {
                                     />
                                 </Form>
                             </>
+                        )}
+
+                        {hidePublicNavForEmployeeAccount && (
+                            <Nav className="navbar-desktop-links">
+                                <Nav.Link as={Link} to={employeeDashboardRoute} className="navbar-admin-link">
+                                    Volver a {employeePanelLabel}
+                                </Nav.Link>
+                            </Nav>
                         )}
 
                         {showSucursalSelector && (
