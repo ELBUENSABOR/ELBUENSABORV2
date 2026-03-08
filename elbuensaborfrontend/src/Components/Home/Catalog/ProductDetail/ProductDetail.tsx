@@ -39,7 +39,7 @@ const ProductDetail = () => {
         return (
             <div className="product-detail">
                 <p>Producto no encontrado.</p>
-                <Link to="/">Volver al catálogo</Link>
+                <Link to="/catalog">Volver al catálogo</Link>
             </div>
         );
     }
@@ -48,7 +48,7 @@ const ProductDetail = () => {
 
     return (
         <div className="product-detail">
-            <Link to="/" className="product-detail__back">
+            <Link to="/catalog" className="product-detail__back">
                 ← Volver al catálogo
             </Link>
             <div className="product-detail__content">
