@@ -61,6 +61,14 @@ const IngredientesModal = ({
         }));
     };
 
+    const handleQuitarIngrediente = (insumoId: number) => {
+        setIngredientesSelected(prev => prev.filter((i) => i.insumoId !== insumoId));
+        setCantidades(prev => {
+            const next = { ...prev };
+            delete next[insumoId];
+            return next;
+        });
+    };
 
     return (
         <Modal show={show} onHide={onClose}>
@@ -112,12 +120,24 @@ const IngredientesModal = ({
                                                 )
                                             }
                                         />
-                                        <button
-                                            className="btn btn-primary mt-2"
-                                            onClick={() => handleAgregarIngrediente(ingrediente)}
-                                        >
-                                            Agregar
-                                        </button>
+                                        <div className="d-flex gap-2 mt-2">
+                                            <button
+                                                type="button"
+                                                className="btn btn-primary"
+                                                onClick={() => handleAgregarIngrediente(ingrediente)}
+                                            >
+                                                {seleccionado ? "Actualizar" : "Agregar"}
+                                            </button>
+                                            {seleccionado && (
+                                                <button
+                                                    type="button"
+                                                    className="btn btn-outline-danger"
+                                                    onClick={() => handleQuitarIngrediente(ingrediente.insumoId)}
+                                                >
+                                                    Quitar
+                                                </button>
+                                            )}
+                                        </div>
                                     </div>
                                 )}
                             </div>
@@ -126,8 +146,9 @@ const IngredientesModal = ({
                 </div>
             </Modal.Body>
             <Modal.Footer>
-                <button className="btn btn-secondary" onClick={onClose}>Cancelar</button>
+                <button type="button" className="btn btn-secondary" onClick={onClose}>Cancelar</button>
                 <button
+                    type="button"
                     className="btn btn-primary"
                     onClick={() => {
                         onSave(ingredientesSelected);
