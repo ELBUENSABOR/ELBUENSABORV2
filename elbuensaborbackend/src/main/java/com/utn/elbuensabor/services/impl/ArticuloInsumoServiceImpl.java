@@ -1,5 +1,7 @@
 package com.utn.elbuensabor.services.impl;
 
+import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -201,9 +203,18 @@ public class ArticuloInsumoServiceImpl implements ArticuloInsumoService {
 
     private Double resolveStockActual(Double existingStock, Double requestedStock) {
         if (isAdmin()) {
-            return requestedStock != null ? requestedStock : 0.0;
+            return roundStock(requestedStock != null ? requestedStock : 0.0);
         }
-        return existingStock != null ? existingStock : 0.0;
+        return roundStock(existingStock != null ? existingStock : 0.0);
+    }
+
+    private Double roundStock(Double value) {
+        if (value == null) {
+            return 0.0;
+        }
+        return BigDecimal.valueOf(value)
+                .setScale(2, RoundingMode.HALF_UP)
+                .doubleValue();
     }
 
     private boolean isAdmin() {

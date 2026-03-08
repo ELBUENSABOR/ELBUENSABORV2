@@ -9,6 +9,8 @@ import com.utn.elbuensabor.entities.*;
 import com.utn.elbuensabor.repositories.CompraInsumoRepository;
 import com.utn.elbuensabor.repositories.ArticuloInsumoRepository;
 import com.utn.elbuensabor.repositories.SucursalInsumoRepository;
+import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -40,7 +42,7 @@ public class CompraInsumoServiceImpl implements CompraInsumoService {
                 .findBySucursalIdAndInsumoId(request.sucursalId(), request.insumoId())
                 .orElseThrow(() -> new RuntimeException("Stock del insumo no registrado en la sucursal"));
 
-        stock.setStockActual(stock.getStockActual() + request.cantidad());
+        stock.setStockActual(roundStock(stock.getStockActual() + request.cantidad()));
 
         if (request.precioCompra() != null) {
             ArticuloInsumo insumo = stock.getInsumo();
@@ -60,6 +62,15 @@ public class CompraInsumoServiceImpl implements CompraInsumoService {
         compra.setTotalCompra(compra.getPrecioCompra() * request.cantidad());
 
         compraInsumoRepository.save(compra);
+    }
+
+    private Double roundStock(Double value) {
+        if (value == null) {
+            return 0.0;
+        }
+        return BigDecimal.valueOf(value)
+                .setScale(2, RoundingMode.HALF_UP)
+                .doubleValue();
     }
 
     private SucursalDTO mapToSucursalDTO(SucursalEmpresa s) {
