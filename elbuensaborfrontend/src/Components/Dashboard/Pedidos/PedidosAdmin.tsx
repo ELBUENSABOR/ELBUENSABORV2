@@ -11,6 +11,7 @@ import OrderDetailModal from "../../Common/OrderDetailModal/OrderDetailModal.tsx
 import ModalConfirmAction from "../../Common/ModalConfirmAction/ModalConfirmAction";
 import {useSucursal} from "../../../contexts/SucursalContext";
 import {useUser} from "../../../contexts/UsuarioContext";
+import "./pedidosAdmin.css";
 
 const ESTADOS = [
     {label: "A confirmar", value: "A_CONFIRMAR"},
@@ -281,18 +282,20 @@ const PedidosAdmin = () => {
                                     <td>${pedido.total}</td>
                                     <td>{pedido.estado}</td>
                                     <td className="text-end">
-                                        <div className="d-flex justify-content-end gap-2 flex-wrap">
-                                            <button
-                                                className="btn btn-sm btn-outline-secondary"
-                                                onClick={() => setSelectedPedido(pedido)}
-                                            >
-                                                Ver detalle
-                                            </button>
-                                            {pedido.estado !== "CANCELADO" && (
-                                                <>
+                                        <div className="pedidos-admin-actions">
+                                            <div className="pedidos-admin-action-slot">
+                                                <button
+                                                    className="btn btn-sm btn-outline-secondary w-100"
+                                                    onClick={() => setSelectedPedido(pedido)}
+                                                >
+                                                    Ver detalle
+                                                </button>
+                                            </div>
+
+                                            <div className="pedidos-admin-action-slot pedidos-admin-select-slot">
+                                                {pedido.estado !== "CANCELADO" ? (
                                                     <select
                                                         className="form-select form-select-sm"
-                                                        style={{ width: "180px" }}
                                                         disabled={actionLoadingId === pedido.id}
                                                         value={estadoSeleccionado[pedido.id] || ""}
                                                         onChange={(event) =>
@@ -313,36 +316,55 @@ const PedidosAdmin = () => {
                                                             );
                                                         })}
                                                     </select>
+                                                ) : (
+                                                    <span className="pedidos-admin-action-placeholder" aria-hidden="true" />
+                                                )}
+                                            </div>
+
+                                            <div className="pedidos-admin-action-slot">
+                                                {pedido.estado !== "CANCELADO" ? (
                                                     <button
-                                                        className="btn btn-sm btn-outline-primary"
+                                                        className="btn btn-sm btn-outline-primary w-100"
                                                         disabled={!estadoSeleccionado[pedido.id] || actionLoadingId === pedido.id}
                                                         onClick={() => actualizarEstado(pedido)}
                                                     >
                                                         Actualizar
                                                     </button>
-                                                </>
-                                            )}
-                                            {puedeMarcarPagado(pedido) && (
-                                                <button
-                                                    className="btn btn-sm btn-outline-success"
-                                                    disabled={actionLoadingId === pedido.id}
-                                                    onClick={() => marcarPagado(pedido)}
-                                                >
-                                                    Marcar pagado
-                                                </button>
-                                            )}
-                                            {puedeEmitirNotaCredito(pedido) && (
-                                                <button
-                                                    className="btn btn-sm btn-outline-danger"
-                                                    disabled={actionLoadingId === pedido.id}
-                                                    onClick={() => {
-                                                        setPedidoAAnular(pedido);
-                                                        setShowConfirmNotaCredito(true);
-                                                    }}
-                                                >
-                                                    Emitir nota de crédito
-                                                </button>
-                                            )}
+                                                ) : (
+                                                    <span className="pedidos-admin-action-placeholder" aria-hidden="true" />
+                                                )}
+                                            </div>
+
+                                            <div className="pedidos-admin-action-slot">
+                                                {puedeMarcarPagado(pedido) ? (
+                                                    <button
+                                                        className="btn btn-sm btn-outline-success w-100"
+                                                        disabled={actionLoadingId === pedido.id}
+                                                        onClick={() => marcarPagado(pedido)}
+                                                    >
+                                                        Marcar pagado
+                                                    </button>
+                                                ) : (
+                                                    <span className="pedidos-admin-action-placeholder" aria-hidden="true" />
+                                                )}
+                                            </div>
+
+                                            <div className="pedidos-admin-action-slot">
+                                                {puedeEmitirNotaCredito(pedido) ? (
+                                                    <button
+                                                        className="btn btn-sm btn-outline-danger w-100"
+                                                        disabled={actionLoadingId === pedido.id}
+                                                        onClick={() => {
+                                                            setPedidoAAnular(pedido);
+                                                            setShowConfirmNotaCredito(true);
+                                                        }}
+                                                    >
+                                                        Emitir nota de crédito
+                                                    </button>
+                                                ) : (
+                                                    <span className="pedidos-admin-action-placeholder" aria-hidden="true" />
+                                                )}
+                                            </div>
                                         </div>
                                     </td>
                                 </tr>
