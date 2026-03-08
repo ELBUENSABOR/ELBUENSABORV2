@@ -3,6 +3,7 @@ import {
     fetchBalanceFinanciero,
 } from "../../../services/reportesService";
 import type {ReporteBalanceFinancieroDTO} from "../../../services/reportesService";
+import LoadingState from "../../Common/LoadingState";
 
 const formatDateInput = (date: Date) => {
     const year = date.getFullYear();
@@ -121,6 +122,8 @@ const BalanceFinanciero = () => {
             </div>
 
             {error && <div className="alert alert-danger">{error}</div>}
+
+            {isLoading && <LoadingState />}
 
             <div className="row g-3">
                 <div className="col-12 col-md-4">

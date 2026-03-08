@@ -9,6 +9,7 @@ import type {Rubro} from "../../../models/Rubro";
 import ModalConfirmAction from "../../Common/ModalConfirmAction/ModalConfirmAction";
 import {getImageUrl} from '../../../utils/image';
 import Alert from "../../Alert/Alert";
+import LoadingState from "../../Common/LoadingState";
 
 const ProductosManufacturados = () => {
     const {sucursales, sucursalId, setSucursalId, loading} = useSucursal();
@@ -31,6 +32,7 @@ const ProductosManufacturados = () => {
     const [showAlert, setShowAlert] = useState(false);
     const [alertMessage, setAlertMessage] = useState("");
     const [alertStatus, setAlertStatus] = useState<"success" | "error">("success");
+    const [isLoading, setIsLoading] = useState(true);
     const canManageProducts = user?.role === "ADMIN" || user?.subRole === "COCINERO";
 
     const handleSucursalChange = (event: ChangeEvent<HTMLSelectElement>) => {
@@ -40,6 +42,7 @@ const ProductosManufacturados = () => {
 
     useEffect(() => {
         const getData = async () => {
+            setIsLoading(true);
             try {
                 const response = await getAll(sucursalId ?? 0);
                 const rubros = await getRubrosManufacturados();
@@ -51,6 +54,8 @@ const ProductosManufacturados = () => {
                 }
             } catch (error) {
                 console.error("Error al obtener manufacturados: ", error);
+            } finally {
+                setIsLoading(false);
             }
         };
 
@@ -286,6 +291,7 @@ const ProductosManufacturados = () => {
                     ))}
                     </tbody>
                 </table>
+                {isLoading && <LoadingState />}
             </div>
             {showModal && (
                 <ModalConfirmAction

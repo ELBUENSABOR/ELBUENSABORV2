@@ -10,6 +10,7 @@ import type {Rubro} from '../../../models/Rubro';
 import ModalConfirmAction from '../../Common/ModalConfirmAction/ModalConfirmAction';
 import {getImageUrl} from '../../../utils/image';
 import Alert from '../../Alert/Alert';
+import LoadingState from '../../Common/LoadingState';
 
 const formatStockValue = (value?: number | null) => {
     const numericValue = Number(value ?? 0);
@@ -37,11 +38,13 @@ const ProductosInsumos = () => {
     const [showAlert, setShowAlert] = useState(false);
     const [alertMessage, setAlertMessage] = useState("");
     const [alertStatus, setAlertStatus] = useState<"success" | "error">("success");
+    const [isLoading, setIsLoading] = useState(true);
 
     const canManageProducts = user?.role === "ADMIN" || user?.subRole === "COCINERO";
     const navigate = useNavigate();
     const location = useLocation();
     const fetchInsumos = async () => {
+        setIsLoading(true);
         try {
             const response = await getAll();
             if (response) {
@@ -49,6 +52,8 @@ const ProductosInsumos = () => {
             }
         } catch (error) {
             console.error("Error al obtener insumos: ", error);
+        } finally {
+            setIsLoading(false);
         }
     };
 
@@ -255,6 +260,7 @@ const ProductosInsumos = () => {
                 </div>
                 <div className="dashboard-table-card">
                     <div className="dashboard-table-header">Lista de Insumos</div>
+                    {isLoading && <LoadingState />}
                     <div className="table-responsive">
                         <table className="table table-hover dashboard-table">
                             <thead>

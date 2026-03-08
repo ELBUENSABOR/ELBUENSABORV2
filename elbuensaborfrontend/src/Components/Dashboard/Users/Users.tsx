@@ -6,6 +6,7 @@ import {useNavigate} from "react-router-dom";
 import ModalConfirmAction from "../../Common/ModalConfirmAction/ModalConfirmAction";
 import Alert from "../../Alert/Alert";
 import {ClipboardList} from "lucide-react";
+import LoadingState from "../../Common/LoadingState";
 
 const formatRegistrationDate = (fechaRegistro?: string) => {
     if (!fechaRegistro) {
@@ -28,6 +29,7 @@ const Users = () => {
     const [currentId, setCurrentId] = useState(0);
     const [showModal, setShowModal] = useState(false);
     const [refresh, setRefresh] = useState(false);
+    const [isLoading, setIsLoading] = useState(true);
     const [showAlert, setShowAlert] = useState(false);
     const [alertMessage, setAlertMessage] = useState("");
     const [alertStatus, setAlertStatus] = useState("");
@@ -39,12 +41,15 @@ const Users = () => {
 
     useEffect(() => {
         const getData = async () => {
+            setIsLoading(true);
             try {
                 const res = await getAllUsers();
                 console.log("res", res);
                 setOriginalUsers(res.data);
             } catch (error) {
                 console.error("Error al obtener los usuarios", error);
+            } finally {
+                setIsLoading(false);
             }
         };
         getData();
@@ -189,6 +194,7 @@ const Users = () => {
                 </button>
             </div>
             <div className="users-table-card">
+                {isLoading && <LoadingState />}
                 <div className="users-table-header">
               <span className="users-table-icon" aria-hidden="true">
                 <ClipboardList/>

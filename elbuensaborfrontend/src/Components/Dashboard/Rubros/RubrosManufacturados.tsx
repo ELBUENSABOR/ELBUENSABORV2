@@ -2,6 +2,7 @@ import {useEffect, useState, type ChangeEvent, type JSX} from "react";
 import "./rubros.css";
 import {useNavigate} from "react-router-dom";
 import ModalConfirmAction from "../../Common/ModalConfirmAction/ModalConfirmAction";
+import LoadingState from "../../Common/LoadingState";
 import Alert from "../../Alert/Alert";
 import type {Rubro} from "../../../models/Rubro";
 import {
@@ -17,6 +18,7 @@ const RubrosManufacturados = () => {
     const [currentId, setCurrentId] = useState(0);
     const [showModal, setShowModal] = useState(false);
     const [refresh, setRefresh] = useState(false);
+    const [isLoading, setIsLoading] = useState(true);
 
     const [showAlert, setShowAlert] = useState(false);
     const [alertMessage, setAlertMessage] = useState("");
@@ -50,6 +52,7 @@ const RubrosManufacturados = () => {
 
     useEffect(() => {
         const getData = async () => {
+            setIsLoading(true);
             try {
                 const res = await getRubrosManufacturados();
                 setOriginalRubros(res.data);
@@ -59,6 +62,8 @@ const RubrosManufacturados = () => {
                 console.log("tree", tree);
             } catch (error) {
                 console.error("Error al obtener rubros", error);
+            } finally {
+                setIsLoading(false);
             }
         };
 
@@ -218,6 +223,7 @@ const RubrosManufacturados = () => {
 
             <div className="dashboard-table-card">
                 <div className="dashboard-table-header">Lista de Rubros</div>
+                {isLoading && <LoadingState />}
                 <div className="table-responsive">
                     <table className="table table-hover dashboard-table">
                         <thead>

@@ -4,16 +4,19 @@ import {deleteSucursal, fetchSucursales} from "../../../services/dashboardServic
 import {useNavigate} from "react-router-dom";
 import type {Sucursal} from "../../../models/Sucursal";
 import "./sucursales.css";
+import LoadingState from "../../Common/LoadingState";
 
 const Sucursales = () => {
     const [sucursales, setSucursales] = useState<Sucursal[]>();
     const [originalSucursales, setOriginalSucursales] = useState<Sucursal[]>();
     const [filterValue, setFilterValue] = useState("");
     const [filterStatus, setFilterStatus] = useState("activo");
+    const [isLoading, setIsLoading] = useState(true);
     const navigate = useNavigate();
 
     useEffect(() => {
         const getData = async () => {
+            setIsLoading(true);
             try {
                 const res = await fetchSucursales();
                 console.log("res", res);
@@ -21,6 +24,8 @@ const Sucursales = () => {
                 setOriginalSucursales(res);
             } catch (error) {
                 console.error("Error al obtener sucursales", error);
+            } finally {
+                setIsLoading(false);
             }
         };
 
@@ -101,6 +106,7 @@ const Sucursales = () => {
             </div>
             <div className="dashboard-table-card">
                 <div className="dashboard-table-header">Lista de Sucursales</div>
+                {isLoading && <LoadingState />}
                 <div className="table-responsive">
                     <table className="table table-hover dashboard-table">
                         <thead>
