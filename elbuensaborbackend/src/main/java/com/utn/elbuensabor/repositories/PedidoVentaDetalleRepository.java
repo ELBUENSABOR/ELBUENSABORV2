@@ -26,7 +26,7 @@ public interface PedidoVentaDetalleRepository extends JpaRepository<PedidoVentaD
             where d.manufacturado is not null
               and not (
                 lower(c.denominacion) in ('bebidas', 'bebida')
-                or lower(cp.denominacion) in ('bebidas', 'bebida')
+                or coalesce(lower(cp.denominacion), '') in ('bebidas', 'bebida')
               )
               and p.fechaPedido between :desde and :hasta
             group by d.manufacturado.denominacion
@@ -48,7 +48,7 @@ public interface PedidoVentaDetalleRepository extends JpaRepository<PedidoVentaD
             where d.manufacturado is not null
               and (
                 lower(c.denominacion) in ('bebidas', 'bebida')
-                or lower(cp.denominacion) in ('bebidas', 'bebida')
+                or coalesce(lower(cp.denominacion), '') in ('bebidas', 'bebida')
               )
               and p.fechaPedido between :desde and :hasta
             group by d.manufacturado.denominacion
