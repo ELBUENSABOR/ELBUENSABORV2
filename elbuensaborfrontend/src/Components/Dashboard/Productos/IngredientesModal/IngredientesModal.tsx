@@ -1,9 +1,15 @@
-import { Modal } from "react-bootstrap";
-import type { Ingredientes } from "../../../../models/Insumo";
+import {Modal} from "react-bootstrap";
+import type {Ingredientes} from "../../../../models/Insumo";
 import "./ingredientesModal.css";
-import { useEffect, useState } from "react";
-import type { Dispatch, SetStateAction } from "react";
+import {useEffect, useState} from "react";
+import type {Dispatch, SetStateAction} from "react";
 import {getImageUrl} from "../../../../utils/image";
+
+const formatStockValue = (value?: number | null) => {
+    const numericValue = Number(value ?? 0);
+    if (!Number.isFinite(numericValue)) return "0.00";
+    return numericValue.toFixed(2);
+};
 
 const IngredientesModal = ({
                                show,
@@ -40,12 +46,12 @@ const IngredientesModal = ({
             if (existe) {
                 return prev.map(i =>
                     i.insumoId === ingrediente.insumoId
-                        ? { ...i, cantidad }
+                        ? {...i, cantidad}
                         : i
                 );
             }
 
-            return [...prev, { ...ingrediente, cantidad }];
+            return [...prev, {...ingrediente, cantidad}];
         });
 
         setSelected(null);
@@ -64,7 +70,7 @@ const IngredientesModal = ({
     const handleQuitarIngrediente = (insumoId: number) => {
         setIngredientesSelected(prev => prev.filter((i) => i.insumoId !== insumoId));
         setCantidades(prev => {
-            const next = { ...prev };
+            const next = {...prev};
             delete next[insumoId];
             return next;
         });
@@ -80,82 +86,85 @@ const IngredientesModal = ({
                     {ingredientes
                         .filter((ingrediente) => ingrediente.activo)
                         .map((ingrediente, index) => {
-                        const seleccionado = ingredientesSelected.find(
-                            i => i.insumoId === ingrediente.insumoId
-                        );
+                            const seleccionado = ingredientesSelected.find(
+                                i => i.insumoId === ingrediente.insumoId
+                            );
 
-                        return (
-                            <div key={ingrediente.insumoId} className={ingrediente.activo && seleccionado ? "ingrediente-card selected" : ingrediente.activo && !seleccionado ? "ingrediente-card" : "ingrediente-card disabled"}>
-                                <div
-                                    className="ingrediente-card-header"
-                                    onClick={() => setSelected(selected === index ? null : index)}
-                                >
-                                    <div className="d-flex align-items-center gap-2">
-                                        {ingrediente.denominacion}
-                                        {Boolean(ingrediente.imagen) && (
-                                            <img src={getImageUrl(ingrediente.imagen)} alt={ingrediente.denominacion} className="img-ingrediente" />
-                                        )}
-                                    </div>
-                                    {seleccionado ? (
-                                        <div className="ingrediente-card-actions">
-                                            <i className="bi bi-check"> ✓</i>
-                                            <button
-                                                type="button"
-                                                className="ingrediente-deselect-btn"
-                                                title="Deseleccionar ingrediente"
-                                                onClick={(e) => {
-                                                    e.stopPropagation();
-                                                    handleQuitarIngrediente(ingrediente.insumoId);
-                                                }}
-                                            >
-                                                ×
-                                            </button>
-                                        </div>
-                                    ) : (
-                                        <i className="bi bi-plus"> +</i>
-                                    )}
-                                </div>
-
-                                {selected === index && (
-                                    <div className="ingrediente-info">
-                                        <hr />
-                                        <p>- Stock actual: {ingrediente.stockActual || 0} {ingrediente.unidadMedida}</p>
-                                        <p>Cantidad ({ingrediente.unidadMedida})</p>
-                                        <input
-                                            type="number"
-                                            className="form-control"
-                                            placeholder="Ingrese la cantidad"
-                                            value={cantidades[ingrediente.insumoId] ?? seleccionado?.cantidad ?? ingrediente.cantidad ?? ""}
-                                            onChange={(e) =>
-                                                handleCantidadChange(
-                                                    ingrediente.insumoId,
-                                                    Number(e.target.value)
-                                                )
-                                            }
-                                        />
-                                        <div className="d-flex gap-2 mt-2">
-                                            <button
-                                                type="button"
-                                                className="btn btn-primary"
-                                                onClick={() => handleAgregarIngrediente(ingrediente)}
-                                            >
-                                                {seleccionado ? "Actualizar" : "Agregar"}
-                                            </button>
-                                            {seleccionado && (
-                                                <button
-                                                    type="button"
-                                                    className="btn btn-outline-danger"
-                                                    onClick={() => handleQuitarIngrediente(ingrediente.insumoId)}
-                                                >
-                                                    Quitar
-                                                </button>
+                            return (
+                                <div key={ingrediente.insumoId}
+                                     className={ingrediente.activo && seleccionado ? "ingrediente-card selected" : ingrediente.activo && !seleccionado ? "ingrediente-card" : "ingrediente-card disabled"}>
+                                    <div
+                                        className="ingrediente-card-header"
+                                        onClick={() => setSelected(selected === index ? null : index)}
+                                    >
+                                        <div className="d-flex align-items-center gap-2">
+                                            {ingrediente.denominacion}
+                                            {Boolean(ingrediente.imagen) && (
+                                                <img src={getImageUrl(ingrediente.imagen)}
+                                                     alt={ingrediente.denominacion} className="img-ingrediente"/>
                                             )}
                                         </div>
+                                        {seleccionado ? (
+                                            <div className="ingrediente-card-actions">
+                                                <i className="bi bi-check"> ✓</i>
+                                                <button
+                                                    type="button"
+                                                    className="ingrediente-deselect-btn"
+                                                    title="Deseleccionar ingrediente"
+                                                    onClick={(e) => {
+                                                        e.stopPropagation();
+                                                        handleQuitarIngrediente(ingrediente.insumoId);
+                                                    }}
+                                                >
+                                                    ×
+                                                </button>
+                                            </div>
+                                        ) : (
+                                            <i className="bi bi-plus"> +</i>
+                                        )}
                                     </div>
-                                )}
-                            </div>
-                        );
-                    })}
+
+                                    {selected === index && (
+                                        <div className="ingrediente-info">
+                                            <hr/>
+                                            <p>- Stock
+                                                actual: {formatStockValue(ingrediente.stockActual)} {ingrediente.unidadMedida}</p>
+                                            <p>Cantidad ({ingrediente.unidadMedida})</p>
+                                            <input
+                                                type="number"
+                                                className="form-control"
+                                                placeholder="Ingrese la cantidad"
+                                                value={cantidades[ingrediente.insumoId] ?? seleccionado?.cantidad ?? ingrediente.cantidad ?? ""}
+                                                onChange={(e) =>
+                                                    handleCantidadChange(
+                                                        ingrediente.insumoId,
+                                                        Number(e.target.value)
+                                                    )
+                                                }
+                                            />
+                                            <div className="d-flex gap-2 mt-2">
+                                                <button
+                                                    type="button"
+                                                    className="btn btn-primary"
+                                                    onClick={() => handleAgregarIngrediente(ingrediente)}
+                                                >
+                                                    {seleccionado ? "Actualizar" : "Agregar"}
+                                                </button>
+                                                {seleccionado && (
+                                                    <button
+                                                        type="button"
+                                                        className="btn btn-outline-danger"
+                                                        onClick={() => handleQuitarIngrediente(ingrediente.insumoId)}
+                                                    >
+                                                        Quitar
+                                                    </button>
+                                                )}
+                                            </div>
+                                        </div>
+                                    )}
+                                </div>
+                            );
+                        })}
                 </div>
             </Modal.Body>
             <Modal.Footer>

@@ -11,6 +11,12 @@ import ModalConfirmAction from '../../Common/ModalConfirmAction/ModalConfirmActi
 import {getImageUrl} from '../../../utils/image';
 import Alert from '../../Alert/Alert';
 
+const formatStockValue = (value?: number | null) => {
+    const numericValue = Number(value ?? 0);
+    if (!Number.isFinite(numericValue)) return "0.00";
+    return numericValue.toFixed(2);
+};
+
 const ProductosInsumos = () => {
     const {sucursales, sucursalId, setSucursalId, loading} = useSucursal();
     const {user} = useUser();
@@ -288,8 +294,8 @@ const ProductosInsumos = () => {
                                     <td>${m.precioVenta}</td>
                                     <td>{m.categoria.denominacion}</td>
                                     <td>
-                                        {m.stockSucursal.find((s) => s.sucursalId === sucursalId)
-                                            ?.stockActual ?? 0} {m.unidadMedida.denominacion}
+                                        {formatStockValue(m.stockSucursal.find((s) => s.sucursalId === sucursalId)
+                                            ?.stockActual)} {m.unidadMedida.denominacion}
                                     </td>
                                     <td>
                                         {canManageProducts && (
