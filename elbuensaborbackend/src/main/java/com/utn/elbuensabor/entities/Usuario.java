@@ -17,7 +17,8 @@ public class Usuario extends BaseEntity {
     private String username;
     private String password;
     private Boolean activo;
-    @Column(length = 500)
+    @Lob
+    @Column(name = "foto_perfil", columnDefinition = "LONGTEXT")
     private String fotoPerfil;
 
     @Column(name = "must_change_password")
