@@ -97,7 +97,20 @@ const IngredientesModal = ({
                                         )}
                                     </div>
                                     {seleccionado ? (
-                                        <i className="bi bi-check"> ✓</i>
+                                        <div className="ingrediente-card-actions">
+                                            <i className="bi bi-check"> ✓</i>
+                                            <button
+                                                type="button"
+                                                className="ingrediente-deselect-btn"
+                                                title="Deseleccionar ingrediente"
+                                                onClick={(e) => {
+                                                    e.stopPropagation();
+                                                    handleQuitarIngrediente(ingrediente.insumoId);
+                                                }}
+                                            >
+                                                ×
+                                            </button>
+                                        </div>
                                     ) : (
                                         <i className="bi bi-plus"> +</i>
                                     )}
