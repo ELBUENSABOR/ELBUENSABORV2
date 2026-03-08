@@ -258,7 +258,7 @@ const PedidosAdmin = () => {
                             <th>Pago</th>
                             <th>Total</th>
                             <th>Estado</th>
-                            <th className="text-end">Acción</th>
+                            <th className="text-center">Acción</th>
                         </tr>
                         </thead>
                         <tbody>
