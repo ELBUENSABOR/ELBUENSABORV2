@@ -131,6 +131,7 @@ export const UserProvider = ({children}: { children: ReactNode }) => {
     const logout = () => {
         clearUserStorage();
         setUserState(null);
+        window.location.assign("/");
     };
 
     useEffect(() => {
