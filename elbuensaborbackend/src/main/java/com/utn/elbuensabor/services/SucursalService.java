@@ -16,5 +16,7 @@ public interface SucursalService {
     SucursalDTO updateSucursal(Long id, SucursalDTO sucursal);
 
     SucursalDTO toDTO(SucursalEmpresa sucursal);
+
+    void deleteSucursal(Long id);
 }
 

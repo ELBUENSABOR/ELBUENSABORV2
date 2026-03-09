@@ -65,8 +65,12 @@ const DashboardRoutes = () => (
                     path="manufacturados/rubros/edit/:id"
                     element={<AddRubroManufacturado/>}
                 />
+            </Route>
+            <Route element={<PrivateRoute roles={["ADMIN", "COCINERO"]}/>}>
                 <Route path={DASHBOARD_PATHS.rubrosInsumos} element={<RubrosInsumos/>}/>
+                <Route path="rubros-insumos" element={<RubrosInsumos/>}/>
                 <Route path={DASHBOARD_PATHS.rubrosProductos} element={<RubrosManufacturados/>}/>
+                <Route path="rubros-productos" element={<RubrosManufacturados/>}/>
             </Route>
             <Route element={<PrivateRoute roles={["ADMIN", "EMPLEADO"]}/>}>
                 <Route

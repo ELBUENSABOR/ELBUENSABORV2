@@ -15,7 +15,7 @@ public record ArticuloManufacturadoRequest(
         @NotNull Integer tiempoEstimado,
         @NotNull Long categoriaId,
         @NotNull List<RecetaItemRequest> ingredientes,
-        List<String> imagenes,
+        String imagen,
         Boolean activo
 ) {
 }

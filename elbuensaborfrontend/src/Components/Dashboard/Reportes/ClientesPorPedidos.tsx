@@ -6,6 +6,7 @@ import type {ReporteClientesPedidosDTO} from "../../../services/reportesService"
 import { getPedidosByCliente } from "../../../services/pedidoService";
 import type { PedidoResponse } from "../../../services/pedidoService";
 import OrderDetailModal from "../../Common/OrderDetailModal/OrderDetailModal";
+import LoadingState from "../../Common/LoadingState";
 
 const formatDateInput = (date: Date) => {
     const year = date.getFullYear();
@@ -174,6 +175,8 @@ const ClientesPorPedidos = () => {
             </div>
 
             {error && <div className="alert alert-danger">{error}</div>}
+
+            {isLoading && <LoadingState />}
 
             <div className="table-responsive">
                 <table className="table table-hover dashboard-table">

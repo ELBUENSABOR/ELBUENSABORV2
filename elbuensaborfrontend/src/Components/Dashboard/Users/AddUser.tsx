@@ -100,8 +100,6 @@ export const AddUser: React.FC = () => {
         e.preventDefault();
         setErrorMsg("");
 
-        // 💡 Validaciones de la HU
-
         // 1) Email con formato correcto
         if (!validateEmail(form.email)) {
             setErrorMsg("El email no tiene un formato válido.");
@@ -148,12 +146,9 @@ export const AddUser: React.FC = () => {
             if (axios.isAxiosError(err) && err.response) {
                 const data = err.response.data;
 
-                // Si el back devuelve un mapa de errores (Bean Validation)
                 if (data && typeof data === "object" && !Array.isArray(data)) {
                     msg = Object.values(data as Record<string, string>).join("\n");
                 }
-
-                // Si el back devuelve { error: "mensaje" } o { message: "mensaje" }
                 if ((data as any).error) {
                     msg = (data as any).error as string;
                 } else if ((data as any).message) {
@@ -169,7 +164,6 @@ export const AddUser: React.FC = () => {
         <form onSubmit={handleSubmit} className="p-4 border rounded">
             <h2 className="mb-4">Crear Usuario</h2>
 
-            {/* ROL DEL SISTEMA */}
             <div className="mb-3">
                 <label>Rol del Sistema</label>
                 <select
@@ -180,11 +174,10 @@ export const AddUser: React.FC = () => {
                 >
                     <option value="CLIENTE">Cliente</option>
                     <option value="EMPLEADO">Empleado</option>
-                    <option value="ADMIN">Admin</option>
+                    <option value="ADMIN">Administrador</option>
                 </select>
             </div>
 
-            {/* PERFIL EMPLEADO - SOLO SI ES EMPLEADO */}
             {form.rolSistema === "EMPLEADO" && (
                 <div className="mb-3">
                     <label>Rol del empleado</label>
@@ -199,12 +192,10 @@ export const AddUser: React.FC = () => {
                         <option value="CAJERO">Cajero</option>
                         <option value="COCINERO">Cocinero</option>
                         <option value="DELIVERY">Delivery</option>
-                        <option value="ADMINISTRADOR">Administrador</option>
                     </select>
                 </div>
             )}
 
-            {/* USERNAME */}
             <div className="mb-3">
                 <label>Usuario</label>
                 <input
@@ -216,7 +207,6 @@ export const AddUser: React.FC = () => {
                 />
             </div>
 
-            {/* PASSWORD */}
             <div className="mb-3">
                 <label>Contraseña provisoria</label>
                 <input
@@ -229,7 +219,6 @@ export const AddUser: React.FC = () => {
                 />
             </div>
 
-            {/* CONFIRM PASSWORD */}
             <div className="mb-3">
                 <label>Confirmar contraseña</label>
                 <input
@@ -242,7 +231,6 @@ export const AddUser: React.FC = () => {
                 />
             </div>
 
-            {/* NOMBRE */}
             <div className="mb-3">
                 <label>Nombre</label>
                 <input
@@ -254,7 +242,6 @@ export const AddUser: React.FC = () => {
                 />
             </div>
 
-            {/* APELLIDO */}
             <div className="mb-3">
                 <label>Apellido</label>
                 <input
@@ -266,7 +253,6 @@ export const AddUser: React.FC = () => {
                 />
             </div>
 
-            {/* EMAIL */}
             <div className="mb-3">
                 <label>Email</label>
                 <input
@@ -279,7 +265,6 @@ export const AddUser: React.FC = () => {
                 />
             </div>
 
-            {/* TELEFONO */}
             <div className="mb-3">
                 <label>Teléfono</label>
                 <input
@@ -291,8 +276,6 @@ export const AddUser: React.FC = () => {
                 />
             </div>
 
-
-            {/* SUCURSAL - SOLO PARA EMPLEADOS */}
             {isEmpleado && (
                 <div className="mb-3">
                     <label>Sucursal</label>
@@ -313,7 +296,6 @@ export const AddUser: React.FC = () => {
                 </div>
             )}
 
-            {/* CAMPOS SOLO PARA CLIENTE */}
             {isCliente && (
                 <>
                     <h4 className="mt-4">Domicilio</h4>
@@ -373,7 +355,6 @@ export const AddUser: React.FC = () => {
                 </>
             )}
 
-            {/* Mensajes de error */}
             {
                 errorMsg && (
                     <p className="text-danger mt-2" style={{ whiteSpace: "pre-line" }}>

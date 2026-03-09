@@ -47,6 +47,19 @@ export const deleteInsumo = async (id: number) => {
     }
 }
 
+export const reactivateInsumo = async (id: number) => {
+    try {
+        const res = await axios.put(`${API_URL}/insumos/${id}/reactivar`, null, {
+            headers: buildAuthHeaders(),
+            withCredentials: true,
+        });
+        return res.data;
+    } catch (error) {
+        console.error("Error al reactivar insumo", error);
+        throw error;
+    }
+}
+
 export const getAllUnidadesMedida = async () => {
     try {
         const res = await axios.get(`${API_URL}/unidades-medida`, {

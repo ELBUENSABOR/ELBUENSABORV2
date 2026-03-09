@@ -249,16 +249,31 @@ export const emitirNotaCredito = async (pedidoId: number): Promise<PedidoRespons
     try {
         const token = sessionStorage.getItem("token");
 
-        const res = await axios.put(
-            `${API_URL}/pedidos/${pedidoId}/nota-credito`,
-            {},
-            {
-                headers: {
-                    Authorization: `Bearer ${token}`,
-                },
-                withCredentials: true,
+        const requestConfig = {
+            headers: {
+                Authorization: `Bearer ${token}`,
+            },
+            withCredentials: true,
+        };
+
+        let res;
+        try {
+            res = await axios.put(
+                `${API_URL}/pedidos/${pedidoId}/nota-credito`,
+                {},
+                requestConfig
+            );
+        } catch (error: any) {
+            if (error?.response?.status !== 404) {
+                throw error;
             }
-        );
+
+            res = await axios.put(
+                `${API_URL}/pedidos/${pedidoId}/estado`,
+                { estado: "CANCELADO" },
+                requestConfig
+            );
+        }
 
         return res.data;
     } catch (error: any) {

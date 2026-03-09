@@ -12,7 +12,7 @@ const Alert = ({ message, status, onClose }: AlertProps) => {
   useEffect(() => {
     const timer = setTimeout(() => {
       onClose();
-    }, 2000);
+    }, 5000);
 
     return () => clearTimeout(timer); // limpia si se desmonta
   }, []);

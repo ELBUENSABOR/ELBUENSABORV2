@@ -19,5 +19,7 @@ public interface UserService {
 
     UserDTO deleteUser(Long id);
 
+    UserDTO reactivateUser(Long id);
+
     UserDTO updateProfilePhoto(Long id, MultipartFile file);
 }

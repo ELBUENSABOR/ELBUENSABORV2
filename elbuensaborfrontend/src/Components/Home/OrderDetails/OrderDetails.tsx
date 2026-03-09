@@ -48,7 +48,8 @@ const OrderDetails = () => {
 
   const handlePagar = async () => {
     try {
-      await pagarConMercadoPago(pedido.id);
+        const initPoint = await pagarConMercadoPago(pedido.id);
+        window.location.href = initPoint;
     } catch (e) {
       console.error(e);
       alert("No se pudo iniciar el pago con Mercado Pago");

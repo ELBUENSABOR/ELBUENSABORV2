@@ -127,15 +127,9 @@ const ConfirmOrder = () => {
             setIsSubmitting(true);
             const pedidoCreado = await createPedido(payload);
             if (formaPago === "MP") {
-                const response = await pagarConMercadoPago(pedidoCreado.id);
-                const initPoint = response?.data?.initPoint;
+                const initPoint = await pagarConMercadoPago(pedidoCreado.id);
                 clearCart();
-                if (initPoint) {
-                    window.location.href = initPoint;
-                    return;
-                }
-                alert("No se pudo iniciar el pago en Mercado Pago");
-                navigate(`/pedido/${pedidoCreado.id}`);
+                window.location.href = initPoint;
                 return;
             }
             clearCart();

@@ -13,11 +13,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.StandardCopyOption;
 import java.util.List;
-import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
@@ -98,7 +94,7 @@ public class UserServiceImpl implements UserService {
             clienteRepository.save(cliente);
         }
 
-        else if (dto.rolSistema() == RolSistema.EMPLEADO) {
+        else if (dto.rolSistema() == RolSistema.EMPLEADO || dto.rolSistema() == RolSistema.ADMIN) {
             Empleado empleado = new Empleado();
             empleado.setUsuario(usuario);
             empleado.setNombre(dto.nombre());
@@ -106,10 +102,14 @@ public class UserServiceImpl implements UserService {
             empleado.setEmail(dto.email());
             empleado.setTelefono(dto.telefono());
 
-            empleado.setPerfilEmpleado(
-                    dto.perfilEmpleado() != null
-                            ? dto.perfilEmpleado()
-                            : PerfilEmpleado.CAJERO);
+            if (dto.rolSistema() == RolSistema.ADMIN) {
+                empleado.setPerfilEmpleado(PerfilEmpleado.ADMINISTRADOR);
+            } else {
+                empleado.setPerfilEmpleado(
+                        dto.perfilEmpleado() != null
+                                ? dto.perfilEmpleado()
+                                : PerfilEmpleado.CAJERO);
+            }
 
             empleadoRepository.save(empleado);
         }
@@ -204,7 +204,9 @@ public class UserServiceImpl implements UserService {
             empleado.setApellido(userDTO.apellido());
             empleado.setTelefono(userDTO.telefono());
             empleado.setEmail(userDTO.email());
-            empleado.setPerfilEmpleado(userDTO.perfilEmpleado());
+            if (userDTO.perfilEmpleado() != null) {
+                empleado.setPerfilEmpleado(userDTO.perfilEmpleado());
+            }
         }
 
         if (userDTO.sucursalId() != null) {
@@ -231,6 +233,17 @@ public class UserServiceImpl implements UserService {
         return mapToUserDTO(usuario);
     }
 
+    public UserDTO reactivateUser(Long id) {
+
+        Usuario usuario = usuarioRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Usuario no encontrado"));
+
+        usuario.setActivo(true);
+
+        usuarioRepository.save(usuario);
+
+        return mapToUserDTO(usuario);
+    }
 
     public UserDTO updateProfilePhoto(Long id, MultipartFile file) {
 
@@ -241,23 +254,18 @@ public class UserServiceImpl implements UserService {
         Usuario usuario = usuarioRepository.findByIdWithClienteEmpleadoAndDomicilio(id)
                 .orElseThrow(() -> new RuntimeException("Usuario no encontrado"));
 
-        String originalName = file.getOriginalFilename();
-        String safeName = (originalName == null || originalName.isBlank())
-                ? "perfil.jpg"
-                : originalName.replaceAll("[^a-zA-Z0-9._-]", "_");
-
-        Path uploadDir = Path.of("uploads", "perfiles");
-        String fileName = UUID.randomUUID() + "_" + safeName;
-
-        try {
-            Files.createDirectories(uploadDir);
-            Path destination = uploadDir.resolve(fileName);
-            Files.copy(file.getInputStream(), destination, StandardCopyOption.REPLACE_EXISTING);
-        } catch (IOException e) {
-            throw new RuntimeException("No se pudo guardar la imagen de perfil", e);
+        String contentType = file.getContentType();
+        if (contentType == null || !contentType.startsWith("image/")) {
+            throw new IllegalArgumentException("El archivo debe ser una imagen");
         }
 
-        usuario.setFotoPerfil("/uploads/perfiles/" + fileName);
+        try {
+            byte[] bytes = file.getBytes();
+            String base64 = java.util.Base64.getEncoder().encodeToString(bytes);
+            usuario.setFotoPerfil("data:" + contentType + ";base64," + base64);
+        } catch (IOException e) {
+            throw new RuntimeException("No se pudo procesar la imagen de perfil", e);
+        }
         usuarioRepository.save(usuario);
 
         return mapToUserDTO(usuario);

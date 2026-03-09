@@ -3,6 +3,7 @@ import {
     fetchProductosMasVendidos
 } from "../../../services/reportesService";
 import type {ReporteProductosVendidosDTO} from "../../../services/reportesService";
+import LoadingState from "../../Common/LoadingState";
 
 const formatDateInput = (date: Date) => {
     const year = date.getFullYear();
@@ -115,6 +116,8 @@ const ProductosMasVendidos = () => {
             </div>
 
             {error && <div className="alert alert-danger">{error}</div>}
+
+            {isLoading && <LoadingState />}
 
             <div className="row g-4">
                 <div className="col-12 col-lg-6">

@@ -4,9 +4,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import com.utn.elbuensabor.dtos.UserDTO;
 import jakarta.validation.Valid;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -42,6 +40,14 @@ public class SucursalController {
     public ResponseEntity<?> update(@PathVariable Long id , @RequestBody @Valid SucursalDTO sucursal) {
         SucursalDTO result = sucursalService.updateSucursal(id, sucursal);
         return ResponseEntity.ok(result);
+    }
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<?> delete(@PathVariable Long id) {
+        sucursalService.deleteSucursal(id);
+        Map<String, String> response = new HashMap<>();
+        response.put("mensaje", "Sucursal eliminada correctamente");
+        return ResponseEntity.ok(response);
     }
 }
 

@@ -3,8 +3,8 @@ package com.utn.elbuensabor.controllers;
 import com.utn.elbuensabor.dtos.UserEditRequestDTO;
 import com.utn.elbuensabor.dtos.UserRequestDTO;
 import jakarta.validation.Valid;
-import org.apache.catalina.User;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
@@ -55,7 +55,13 @@ public class UserController {
         return ResponseEntity.ok(dto);
     }
 
-    @PostMapping("/{id}/foto-perfil")
+    @PutMapping("/{id}/reactivar")
+    public ResponseEntity<UserDTO> reactivateUser(@PathVariable Long id){
+        UserDTO dto = userService.reactivateUser(id);
+        return ResponseEntity.ok(dto);
+    }
+
+    @PostMapping(value = "/{id}/foto-perfil", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<UserDTO> uploadProfilePhoto(@PathVariable Long id,
                                                       @RequestParam("file") MultipartFile file) {
         return ResponseEntity.ok(userService.updateProfilePhoto(id, file));

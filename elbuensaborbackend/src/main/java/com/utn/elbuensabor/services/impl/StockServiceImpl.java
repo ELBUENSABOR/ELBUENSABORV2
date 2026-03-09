@@ -1,5 +1,7 @@
 package com.utn.elbuensabor.services.impl;
 
+import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -103,7 +105,7 @@ public class StockServiceImpl implements StockService {
                         "Error crítico: El stock no puede ser negativo. Esto indica un problema en el sistema.");
             }
 
-            stock.setStockActual(nuevoStock);
+            stock.setStockActual(roundStock(nuevoStock));
             sucursalInsumoRepository.save(stock);
         }
     }
@@ -122,7 +124,7 @@ public class StockServiceImpl implements StockService {
                     .orElseThrow(() -> new IllegalStateException(
                             "No existe registro de stock para el insumo ID: " + insumoId));
 
-            stock.setStockActual(stock.getStockActual() + cantidadAReponer);
+            stock.setStockActual(roundStock(stock.getStockActual() + cantidadAReponer));
             sucursalInsumoRepository.save(stock);
         }
     }
@@ -204,6 +206,15 @@ public class StockServiceImpl implements StockService {
                 .findBySucursalIdAndInsumoId(sucursalId, insumoId)
                 .map(SucursalInsumo::getStockActual)
                 .orElse(0.0);
+    }
+
+    private Double roundStock(Double value) {
+        if (value == null) {
+            return 0.0;
+        }
+        return BigDecimal.valueOf(value)
+                .setScale(2, RoundingMode.HALF_UP)
+                .doubleValue();
     }
 
     public List<StockAlertaDTO> obtenerAlertas(Long sucursalId) {

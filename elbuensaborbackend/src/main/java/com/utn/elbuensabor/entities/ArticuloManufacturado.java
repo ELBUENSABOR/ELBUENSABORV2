@@ -15,6 +15,8 @@ public class ArticuloManufacturado extends BaseEntity {
 
     private String denominacion;
     private String descripcion;
+    @Lob
+    @Column(name = "receta", columnDefinition = "LONGTEXT")
     private String receta;
     private Double precioVenta;
     private Double precioCosto;

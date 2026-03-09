@@ -5,13 +5,13 @@ import { getAll } from "../../../services/insumosService";
 import { getRubrosManufacturados } from "../../../services/rubrosService";
 import type { Rubro } from "../../../models/Rubro";
 import IngredientesModal from "./IngredientesModal/IngredientesModal";
-import { createManufacturado, getManufacturadoById, updateManufacturado, uploadImagenesManufacturado } from "../../../services/manufacturadosService";
+import { createManufacturado, getManufacturadoById, updateManufacturado } from "../../../services/manufacturadosService";
 import { useSucursal } from "../../../contexts/SucursalContext";
 import { fetchSucursales } from "../../../services/dashboardService";
 import type { Sucursal } from "../../../models/Sucursal";
 import { useNavigate, useParams } from "react-router-dom";
 import { Alert } from "react-bootstrap";
-import type { Imagen } from "../../../models/Imagen";
+import {getImageUrl} from "../../../utils/image";
 
 const initialState: Manufacturado = {
     id: 0,
@@ -25,25 +25,31 @@ const initialState: Manufacturado = {
     tiempoEstimado: 0,
     activo: false,
     ingredientes: [],
-    imagenes: []
+    imagen: ""
 }
 
-const BACKEND_URL = "http://localhost:8080";
 
 const ManufacturadoForm = () => {
     const [manufacturado, setManufacturado] = useState<Manufacturado>(initialState);
     const [ingredientes, setIngredientes] = useState<Ingredientes[]>([]);
     const [rubrosManufacturados, setRubrosManufacturados] = useState<Rubro[]>([]);
     const [ingredientesSelected, setIngredientesSelected] = useState<Ingredientes[]>([]);
-    const { sucursalId, sucursales: sucursalesContext } = useSucursal();
-    const [imagenesActuales, setImagenesActuales] = useState<Imagen[]>([]);
-    const [imagenesNuevas, setImagenesNuevas] = useState<File[]>([]);
+    const { sucursalId } = useSucursal();
+    const [imagenActual, setImagenActual] = useState<string>("");
+    const [imagenNueva, setImagenNueva] = useState<File | null>(null);
     const [sucursalSeleccionada, setSucursalSeleccionada] = useState<Sucursal | null>(null);
     const [message, setMessage] = useState<{ type: 'success' | 'danger', text: string } | null>(null);
     const navigate = useNavigate();
     const { id } = useParams<{ id?: string }>();
 
     const isEdit = Boolean(id);
+    const readFileAsDataUrl = (file: File) =>
+        new Promise<string>((resolve, reject) => {
+            const reader = new FileReader();
+            reader.onload = () => resolve(reader.result as string);
+            reader.onerror = () => reject(new Error("No se pudo leer la imagen"));
+            reader.readAsDataURL(file);
+        });
 
     const [showModal, setShowModal] = useState(false);
 
@@ -62,7 +68,7 @@ const ManufacturadoForm = () => {
                 if (response) {
                     const paraElaborar = response.filter((ingrediente: { esParaElaborar: any; }) => ingrediente.esParaElaborar);
                     const ingredientesValue = paraElaborar.map((ingrediente: {
-                        imagenes: any;
+                        imagen: any;
                         stockSucursal: any;
                         activo: any;
                         precioCompra: any;
@@ -76,7 +82,7 @@ const ManufacturadoForm = () => {
                             precioCompra: ingrediente.precioCompra,
                             stockActual: ingrediente.stockSucursal.filter((sx: { sucursalId: number | null; }) => sx.sucursalId === sucursalId)[0]?.stockActual,
                             activo: ingrediente.activo,
-                            imagenes: ingrediente.imagenes
+                            imagen: ingrediente.imagen
                         }
                     });
                     setIngredientes(ingredientesValue);
@@ -113,11 +119,7 @@ const ManufacturadoForm = () => {
                             precioCompra: i.precioCompra
                         }))
                     );
-                    setImagenesActuales(
-                        responseEdit.imagenes.map((url: string) => ({
-                            url
-                        }))
-                    );
+                    setImagenActual(responseEdit.imagen || "");
                 }
             } catch (error) {
                 console.error("Error al obtener ingredientes");
@@ -156,6 +158,7 @@ const ManufacturadoForm = () => {
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
         try {
+            const imagen = imagenNueva ? await readFileAsDataUrl(imagenNueva) : imagenActual;
             const payload = {
                 sucursalId: sucursalId,
                 denominacion: manufacturado.denominacion,
@@ -169,25 +172,19 @@ const ManufacturadoForm = () => {
                     insumoId: i.insumoId,
                     cantidad: i.cantidad
                 })),
-                imagenes: manufacturado.imagenes,
+                imagen,
                 activo: manufacturado.activo
             }
             console.log(payload);
             if (isEdit) {
                 await updateManufacturado(id ?? "", payload, sucursalId ?? 0);
-                if (imagenesNuevas.length > 0) {
-                    await uploadImagenesManufacturado(id ?? "", imagenesNuevas);
-                }
                 setMessage({ type: 'success', text: 'Manufacturado actualizado con éxito.' });
                 setTimeout(() => {
                     navigate('/dashboard/productos-manufacturados');
                 }, 2000);
             } else {
                 console.log(payload);
-                const created = await createManufacturado(payload, sucursalId ?? 0);
-                if (imagenesNuevas.length > 0) {
-                    await uploadImagenesManufacturado(created.id ?? "", imagenesNuevas);
-                }
+                await createManufacturado(payload, sucursalId ?? 0);
                 setMessage({ type: 'success', text: 'Manufacturado registrado con éxito.' });
                 setTimeout(() => {
                     navigate('/dashboard/productos-manufacturados');
@@ -238,7 +235,7 @@ const ManufacturadoForm = () => {
                                     ing.insumoId !== 0 && (
                                         <div key={ing.insumoId} className="mt-2 rounded border p-2 d-flex justify-content-between align-items-center">
                                             <div>{ing.denominacion} – {ing.cantidad} {ing.unidadMedida}</div>
-                                            <button className="btn btn-danger" onClick={() => handleDeleteIngredient(ing.insumoId)}>Eliminar</button>
+                                            <button type="button" className="btn btn-danger" onClick={() => handleDeleteIngredient(ing.insumoId)}>Eliminar</button>
                                         </div>
                                     )
                                 ))}
@@ -284,38 +281,35 @@ const ManufacturadoForm = () => {
                 <input
                     type="file"
                     className="form-control"
-                    multiple
+                    accept="image/*"
                     onChange={(e) => {
-                        const files = e.target.files ? Array.from(e.target.files) : [];
-                        setImagenesNuevas(files);
+                        const file = e.target.files?.[0] ?? null;
+                        setImagenNueva(file);
                     }}
                 />
-                {imagenesNuevas.map((file, i) => (
+                {imagenNueva && (
                     <img
-                        key={i}
-                        src={URL.createObjectURL(file)}
+                        src={URL.createObjectURL(imagenNueva)}
                         style={{ width: 120, marginTop: 10 }}
                     />
-                ))}
-                {imagenesActuales.length > 0 && (
+                )}
+                {imagenActual && (
                     <div className="mt-3">
-                        <p>Imágenes actuales:</p>
+                        <p>Imagen actual:</p>
                         <div className="d-flex gap-2 flex-wrap">
-                            {imagenesActuales.map((img, index) => (
-                                <div key={index} className="position-relative">
-                                    <img
-                                        src={`${BACKEND_URL}${img.url}`}
-                                        alt="Imagen producto"
-                                        style={{
-                                            width: 150,
-                                            height: 150,
-                                            objectFit: "cover",
-                                            borderRadius: 8,
-                                            border: "1px solid #ccc"
-                                        }}
-                                    />
-                                </div>
-                            ))}
+                            <div className="position-relative">
+                                <img
+                                    src={getImageUrl(imagenActual)}
+                                    alt="Imagen producto"
+                                    style={{
+                                        width: 150,
+                                        height: 150,
+                                        objectFit: "cover",
+                                        borderRadius: 8,
+                                        border: "1px solid #ccc"
+                                    }}
+                                />
+                            </div>
                         </div>
                     </div>
                 )}

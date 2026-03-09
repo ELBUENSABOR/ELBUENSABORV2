@@ -10,11 +10,13 @@ import org.apache.pdfbox.pdmodel.font.PDType1Font;
 import org.apache.pdfbox.pdmodel.graphics.image.LosslessFactory;
 import org.apache.pdfbox.pdmodel.graphics.image.PDImageXObject;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.core.io.ClassPathResource;
 import org.springframework.stereotype.Component;
 
 import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
+import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.time.format.DateTimeFormatter;
@@ -25,8 +27,11 @@ import static java.awt.Color.*;
 @Component
 public class FacturaPdfTemplateRenderer {
 
-    @Value("${app.factura.logo-path:../uploads/el buen sabor/logo.png}")
+    @Value("${app.factura.logo-path:}")
     private String facturaLogoPath;
+
+    @Value("${app.upload-dir:uploads}")
+    private String uploadRootDir;
 
     public void render(Path filePath, FacturaVenta factura) throws IOException {
         render(filePath, factura, "FACTURA");
@@ -82,12 +87,7 @@ public class FacturaPdfTemplateRenderer {
                            PDDocument document,
                            float left,
                            float topY) throws IOException {
-        Path logoPath = resolveLogoPath();
-        if (!Files.exists(logoPath)) {
-            return 96f;
-        }
-
-        BufferedImage rawLogo = ImageIO.read(logoPath.toFile());
+        BufferedImage rawLogo = loadLogoImage();
         if (rawLogo == null) {
             return 96f;
         }
@@ -350,9 +350,34 @@ public class FacturaPdfTemplateRenderer {
     }
 
 
+    private BufferedImage loadLogoImage() throws IOException {
+        Path logoPath = resolveLogoPath();
+
+        if (logoPath != null && Files.exists(logoPath)) {
+            BufferedImage fromFile = ImageIO.read(logoPath.toFile());
+            if (fromFile != null) {
+                return fromFile;
+            }
+        }
+
+        ClassPathResource classPathResource = new ClassPathResource("static/logo-el-buen-sabor.png");
+        if (!classPathResource.exists()) {
+            return null;
+        }
+
+        try (InputStream inputStream = classPathResource.getInputStream()) {
+            return ImageIO.read(inputStream);
+        }
+    }
+
     private Path resolveLogoPath() {
-        Path configured = Path.of(facturaLogoPath);
-        if (Files.exists(configured)) return configured;
+        if (facturaLogoPath != null && !facturaLogoPath.isBlank()) {
+            Path configured = Path.of(facturaLogoPath);
+            if (Files.exists(configured)) return configured;
+        }
+
+        Path uploadRelative = Path.of(uploadRootDir, "el buen sabor", "logo.png");
+        if (Files.exists(uploadRelative)) return uploadRelative;
 
         Path rootRelative = Path.of("uploads", "el buen sabor", "logo.png");
         if (Files.exists(rootRelative)) return rootRelative;
@@ -360,7 +385,7 @@ public class FacturaPdfTemplateRenderer {
         Path parentRelative = Path.of("..", "uploads", "el buen sabor", "logo.png");
         if (Files.exists(parentRelative)) return parentRelative;
 
-        return configured;
+        return null;
     }
 
     private void writeCenteredText(PDPageContentStream content,

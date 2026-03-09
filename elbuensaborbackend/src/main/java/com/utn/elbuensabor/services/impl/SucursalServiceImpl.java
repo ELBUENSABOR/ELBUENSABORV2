@@ -5,6 +5,7 @@ import java.util.List;
 import com.utn.elbuensabor.entities.Empresa;
 import com.utn.elbuensabor.repositories.EmpresaRepository;
 import com.utn.elbuensabor.services.SucursalService;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
 
 import com.utn.elbuensabor.dtos.SucursalDTO;
@@ -60,6 +61,18 @@ public class SucursalServiceImpl implements SucursalService {
         sucursalRepository.save(sucursalUpdate);
 
         return toDTO(sucursalUpdate);
+    }
+
+    @Override
+    public void deleteSucursal(Long id) {
+        SucursalEmpresa sucursal = sucursalRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Sucursal no encontrada"));
+        try {
+            sucursalRepository.delete(sucursal);
+            sucursalRepository.flush();
+        } catch (DataIntegrityViolationException ex) {
+            throw new RuntimeException("No se puede eliminar la sucursal porque tiene datos asociados (usuarios, pedidos, compras o stock).", ex);
+        }
     }
 
     public SucursalDTO toDTO(SucursalEmpresa sucursal) {

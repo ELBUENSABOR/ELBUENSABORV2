@@ -1,5 +1,7 @@
 package com.utn.elbuensabor.services.impl;
 
+import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -27,6 +29,7 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class ArticuloInsumoServiceImpl implements ArticuloInsumoService {
 
+    private static final String INSUMO_UPLOADS_PREFIX = "/uploads/insumos/";
     private final ArticuloInsumoRepository insumoRepo;
     private final CategoriaArticuloInsumoRepository categoriaRepo;
     private final UnidadMedidaRepository unidadMedidaRepo;
@@ -64,6 +67,13 @@ public class ArticuloInsumoServiceImpl implements ArticuloInsumoService {
         ArticuloInsumo insumo = insumoRepo.findById(id)
                 .orElseThrow(() -> new RuntimeException("Insumo no encontrado"));
         insumo.setActivo(false);
+        insumoRepo.save(insumo);
+    }
+
+    public void reactivate(Long id) {
+        ArticuloInsumo insumo = insumoRepo.findById(id)
+                .orElseThrow(() -> new RuntimeException("Insumo no encontrado"));
+        insumo.setActivo(true);
         insumoRepo.save(insumo);
     }
 
@@ -120,16 +130,11 @@ public class ArticuloInsumoServiceImpl implements ArticuloInsumoService {
         }
 
         insumo.getImagenes().clear();
-        if (request.imagenes() != null && !request.imagenes().isEmpty()) {
-            List<ImagenInsumo> imagenes = request.imagenes().stream()
-                    .map(url -> {
-                        ImagenInsumo imagen = new ImagenInsumo();
-                        imagen.setDenominacion(url);
-                        imagen.setArticuloInsumo(insumo);
-                        return imagen;
-                    })
-                    .toList();
-            insumo.getImagenes().addAll(imagenes);
+        if (request.imagen() != null && !request.imagen().isBlank()) {
+            ImagenInsumo imagen = new ImagenInsumo();
+            imagen.setDenominacion(normalizeInsumoImagePath(request.imagen()));
+            imagen.setArticuloInsumo(insumo);
+            insumo.getImagenes().add(imagen);
         }
     }
 
@@ -156,10 +161,12 @@ public class ArticuloInsumoServiceImpl implements ArticuloInsumoService {
                         s.getStockMaximo()))
                 .toList();
 
-        List<String> imagenes = insumo.getImagenes()
+        String imagen = insumo.getImagenes()
                 .stream()
-                .map(img -> img.getDenominacion())
-                .toList();
+                .map(ImagenInsumo::getDenominacion)
+                .findFirst()
+                .map(this::normalizeInsumoImagePath)
+                .orElse(null);
 
         return new ArticuloInsumoResponse(
                 insumo.getId(),
@@ -173,7 +180,7 @@ public class ArticuloInsumoServiceImpl implements ArticuloInsumoService {
                 insumo.getActivo(),
                 unidadMedidaDTO,
                 stocks,
-                imagenes
+                imagen
         );
     }
 
@@ -193,12 +200,21 @@ public class ArticuloInsumoServiceImpl implements ArticuloInsumoService {
         }
         return categoriaDto;
     }
-    
+
     private Double resolveStockActual(Double existingStock, Double requestedStock) {
         if (isAdmin()) {
-            return requestedStock != null ? requestedStock : 0.0;
+            return roundStock(requestedStock != null ? requestedStock : 0.0);
         }
-        return existingStock != null ? existingStock : 0.0;
+        return roundStock(existingStock != null ? existingStock : 0.0);
+    }
+
+    private Double roundStock(Double value) {
+        if (value == null) {
+            return 0.0;
+        }
+        return BigDecimal.valueOf(value)
+                .setScale(2, RoundingMode.HALF_UP)
+                .doubleValue();
     }
 
     private boolean isAdmin() {
@@ -208,5 +224,19 @@ public class ArticuloInsumoServiceImpl implements ArticuloInsumoService {
         }
         return authentication.getAuthorities().stream()
                 .anyMatch(authority -> "ROLE_ADMIN".equals(authority.getAuthority()));
+    }
+
+    private String normalizeInsumoImagePath(String rawPath) {
+        if (rawPath == null) {
+            return null;
+        }
+        String path = rawPath.trim();
+        if (path.isBlank()) {
+            return null;
+        }
+        if (path.startsWith("data:image/") || path.startsWith("http://") || path.startsWith("https://") || path.startsWith("/")) {
+            return path;
+        }
+        return INSUMO_UPLOADS_PREFIX + path;
     }
 }
