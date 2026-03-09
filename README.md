@@ -48,7 +48,7 @@ El sistema está dividido en dos aplicaciones desacopladas:
 4. **Servicios externos**
    - **Mercado Pago** para cobros y webhooks de pago.
    - **Google OAuth** para autenticación social.
-   - **SMTP Gmail** para notificaciones por correo.
+   - **SMTP Gmail(Localhost)/Resend(Deploy)** para notificaciones por correo.
 
 ### Flujo de capas (backend)
 
