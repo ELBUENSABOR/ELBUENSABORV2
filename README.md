@@ -1,206 +1,178 @@
-# El Buen Sabor V2
+# El Buen Sabor 🍔
 
-Aplicación web full stack para la gestión integral de un local gastronómico. El sistema combina una **API REST en Spring Boot** y una **interfaz web en React + Vite** para cubrir operaciones de venta, catálogo, stock, usuarios, reportes y pagos.
+Plataforma full stack para gestión y venta online de una cadena gastronómica, con catálogo de productos, carrito, checkout con Mercado Pago, generación de comprobantes PDF y paneles operativos por rol (admin, cocina, caja, delivery).
 
-## 🚀 Tecnologías principales
+## Tabla de contenidos
+- [1. Arquitectura general](#1-arquitectura-general)
+- [2. Stack tecnológico](#2-stack-tecnológico)
+- [3. Funcionalidades principales](#3-funcionalidades-principales)
+- [4. Flujo funcional del sistema](#4-flujo-funcional-del-sistema)
+- [5. Estructura del repositorio](#5-estructura-del-repositorio)
+- [6. Requisitos previos](#6-requisitos-previos)
+- [7. Configuración de entorno](#7-configuración-de-entorno)
+- [8. Ejecución local](#8-ejecución-local)
+- [9. Integraciones externas](#9-integraciones-externas)
+- [10. Deploy en Railway](#10-deploy-en-railway)
+- [11. Seguridad](#11-seguridad)
+- [12. Endpoints base del backend](#12-endpoints-base-del-backend)
 
-### Backend (`elbuensaborbackend`)
-- Java 21
-- Spring Boot 3
-- Spring Security + JWT
-- Spring Data JPA
-- MySQL
-- Integración con Mercado Pago
-- Generación de PDF (facturas / notas de crédito)
+---
 
-### Frontend (`elbuensaborfrontend`)
+## 1. Arquitectura general
+
+El proyecto está dividido en dos aplicaciones:
+
+- **Frontend SPA** en React + Vite + TypeScript.
+- **Backend API REST** en Spring Boot (Java 17), con persistencia en MySQL.
+
+Comunicación:
+1. El frontend consume la API vía `VITE_API_URL`.
+2. El backend valida autenticación JWT para endpoints protegidos.
+3. Los pagos online se inician contra Mercado Pago y se sincronizan por webhook/verificación.
+4. Al aprobarse un pago, se genera factura PDF y se envía por email.
+
+---
+
+## 2. Stack tecnológico
+
+### Frontend
 - React 19
 - TypeScript
-- Vite
-- React Router
+- Vite 7
+- React Router DOM
 - Axios
-- Bootstrap / React-Bootstrap
+- Bootstrap + React Bootstrap
+- Lucide React / React Icons
 
-## 🧩 Módulos funcionales
+### Backend
+- Java 17
+- Spring Boot 3.5
+- Spring Web, Validation, Security, Data JPA
+- OAuth2 Resource Server / OAuth2 Client
+- MySQL + Hibernate
+- JWT (`jjwt`)
+- Mercado Pago SDK (Java)
+- PDFBox (comprobantes PDF)
+- Resend (envío de emails transaccionales)
 
-- **Autenticación y usuarios**: login, registro y gestión de perfiles/roles.
-- **Catálogo de productos**: gestión de insumos y productos manufacturados con imágenes.
-- **Pedidos y ventas**: flujo de compra, detalle de pedidos e historial.
-- **Stock y compras**: control de inventario, alertas y registro de compras de insumos.
-- **Sucursal y configuración**: gestión de sucursales, rubros y unidades de medida.
-- **Reportes**: métricas de clientes, productos más vendidos y balance financiero.
-- **Pagos online**: integración de checkout/webhooks con Mercado Pago.
+### Infra / Deploy
+- **Railway** para despliegue (frontend y backend)
+- CORS preparado para dominios `*.up.railway.app`
 
-## 🏗️ Arquitectura técnica
+---
 
-### Vista general
+## 3. Funcionalidades principales
 
-El sistema está dividido en dos aplicaciones desacopladas:
+### Cliente
+- Registro/Login tradicional.
+- Login con Google.
+- Catálogo de productos e insumos.
+- Carrito y confirmación de pedido.
+- Pago de pedido con Mercado Pago.
+- Historial y detalle de pedidos.
 
-1. **SPA Frontend (React + Vite)**
-   - Consume la API vía `VITE_API_URL`.
-   - Maneja navegación, estado de sesión y pantallas de cliente/admin/empleado.
-2. **API Backend (Spring Boot)**
-   - Expone endpoints REST bajo `/api/**`.
-   - Implementa reglas de negocio, seguridad, persistencia y archivos.
-3. **Base de datos MySQL**
-   - Persistencia de usuarios, productos, pedidos, stock, facturación, etc.
-4. **Servicios externos**
-   - **Mercado Pago** para cobros y webhooks de pago.
-   - **Google OAuth** para autenticación social.
-   - **SMTP Gmail(Localhost)/Resend(Deploy)** para notificaciones por correo.
+### Operación interna
+- Panel de empleados por rol.
+- Gestión de productos manufacturados, insumos, rubros y unidades de medida.
+- Gestión de stock y alertas de stock bajo.
+- Gestión de sucursales y compras de insumos.
+- Reportes operativos.
 
-### Flujo de capas (backend)
+### Facturación y post-pago
+- Sincronización de estado de pago desde Mercado Pago.
+- Generación de factura PDF.
+- Generación de nota de crédito.
+- Envío de comprobantes por email.
 
-```text
-Controller -> Service -> Repository (Spring Data JPA) -> MySQL
-                |
-                +-> Integraciones (Mercado Pago, Mail, PDF, almacenamiento en uploads/)
-```
+---
 
-### Componentes clave
+## 4. Flujo funcional del sistema
 
-- **Seguridad**:
-  - JWT para autenticación de requests.
-  - Control de acceso por roles (admin, empleado, cliente).
-- **Gestión de archivos**:
-  - Imágenes de perfil/productos y comprobantes en `uploads/`.
-- **Módulo de pedidos**:
-  - Alta/seguimiento de pedidos, actualización de estados, marcado de pago.
-- **Módulo financiero**:
-  - Facturas, notas de crédito y reportes agregados.
+1. El usuario navega el catálogo y arma el carrito.
+2. Confirma el pedido desde frontend.
+3. Se crea preferencia de pago en backend (`/api/pagos/mercadopago/{pedidoId}`).
+4. El usuario paga en Mercado Pago.
+5. Mercado Pago notifica al webhook (`/api/pagos/mercadopago/webhook`).
+6. El backend valida/consulta el pago, actualiza estado y marca pedido como pagado.
+7. Se genera factura automáticamente y se envía por email.
 
-## 🗺️ Mapa de endpoints (backend)
+---
 
-> Base URL local: `http://localhost:8080`
+## 5. Estructura del repositorio
 
-### Salud de servicio
-- `GET /`
-- `GET /health`
-
-### Autenticación (`/api/auth`)
-- `POST /register`
-- `POST /login`
-- `POST /google`
-- `POST /change-password`
-
-### Usuarios (`/api/user`)
-- `POST /`
-- `GET /`
-- `GET /{id}`
-- `PUT /{id}`
-- `DELETE /{id}`
-- `POST /{id}/foto-perfil`
-
-### Sucursales (`/api/sucursales`)
-- `GET /`
-- `GET /{id}`
-- `POST /`
-- `PUT /{id}`
-
-### Insumos (`/api/insumos`)
-- `GET /`
-- `GET /{id}`
-- `POST /`
-- `PUT /{id}`
-- `DELETE /{id}`
-- `POST /{id}/imagenes` (carga de imágenes)
-
-### Compras de insumos (`/api/insumos/compras`)
-- `GET /`
-- `POST /`
-
-### Rubros de insumos (`/api/insumos/rubros`)
-- `GET /`
-- `GET /{id}`
-- `POST /`
-- `PUT /{id}`
-- `DELETE /{id}`
-
-### Manufacturados (`/api/manufacturados`)
-- `GET /`
-- `GET /{id}`
-- `POST /`
-- `PUT /{id}`
-- `DELETE /{id}`
-- `POST /{id}/imagenes` (carga de imágenes)
-
-### Rubros de manufacturados (`/api/manufacturados/rubros`)
-- `GET /`
-- `GET /{id}`
-- `POST /`
-- `PUT /{id}`
-- `DELETE /{id}`
-
-### Pedidos (`/api/pedidos`)
-- `POST /`
-- `GET /`
-- `GET /{id}`
-- `PUT /{id}`
-- `DELETE /{id}`
-- `PUT /{id}/estado`
-- `PUT /{id}/nota-credito`
-- `PUT /{id}/pagado`
-
-### Pagos (`/api/pagos`)
-- `POST /mercadopago/{pedidoId}`
-- `POST /mercadopago/webhook`
-- `GET /mercadopago/verificar/{pedidoId}`
-
-### Stock (`/api/stock`)
-- `GET /verificar-manufacturado`
-- `GET /verificar-insumo`
-- `GET /alertas`
-
-### Reportes (`/api/reportes`)
-- `GET /productos-mas-vendidos`
-- `GET /clientes-por-pedidos`
-- `GET /balance-financiero`
-
-### Soporte administrativo
-- **Localidades** (`/api/localidad`): `GET /`
-- **Unidades de medida** (`/api/unidades-medida`): `GET /`, `GET /{id}`, `POST /`, `PUT /{id}`, `DELETE /{id}`
-- **Notas de crédito** (`/api/notas-credito`): `POST /factura/{facturaId}`
-
-## 📁 Estructura del repositorio
-
-```text
+```bash
 .
-├── elbuensaborbackend/   # API REST y lógica de negocio
-├── elbuensaborfrontend/  # SPA React
-├── uploads/              # Archivos subidos (imágenes, facturas, etc.)
-└── README.md
+├── elbuensaborfrontend/   # SPA React + Vite
+├── elbuensaborbackend/    # API Spring Boot
+└── uploads/               # Archivos generados (imagenes, facturas, notas de crédito)
 ```
 
-## ⚙️ Requisitos
+---
 
-- Java 21
-- Node.js 20+ (recomendado)
-- npm
+## 6. Requisitos previos
+
+- Node.js 20+
+- npm 10+
+- Java 17
 - MySQL 8+
+- (Opcional en local) ngrok para webhook de Mercado Pago
 
-## 🛠️ Configuración rápida (desarrollo)
+---
 
-### 1) Backend
+## 7. Configuración de entorno
+
+> Recomendación: crear archivos `.env` en frontend y configurar variables en Railway para producción.
+
+### 7.1 Frontend (`elbuensaborfrontend/.env`)
+
+```env
+VITE_API_URL=http://localhost:8080/api
+VITE_GOOGLE_CLIENT_ID=tu_google_client_id
+```
+
+### 7.2 Backend (variables de entorno)
+
+```env
+# Server
+PORT=8080
+
+# Base de datos
+SPRING_DATASOURCE_URL=jdbc:mysql://localhost:3306/elbuensabor
+SPRING_DATASOURCE_USERNAME=root
+SPRING_DATASOURCE_PASSWORD=admin
+
+# Mercado Pago
+MERCADOPAGO_ACCESS_TOKEN=TEST-...
+MERCADOPAGO_FRONTEND_BASE_URL=http://localhost:5173
+MERCADOPAGO_WEBHOOK_URL=https://tu-url-publica/api/pagos/mercadopago/webhook
+
+# Google OAuth
+GOOGLE_CLIENT_ID=tu_google_client_id
+GOOGLE_ISSUER=https://accounts.google.com
+
+# Email (deploy)
+RESEND_API_KEY=re_...
+APP_MAIL_FROM=onboarding@resend.dev
+
+# CORS
+APP_CORS_ALLOWED_ORIGIN_PATTERNS=http://localhost:5173,https://*.up.railway.app
+
+# Uploads
+APP_UPLOAD_DIR=uploads
+```
+
+---
+
+## 8. Ejecución local
+
+### 8.1 Backend
 
 ```bash
 cd elbuensaborbackend
 ./gradlew bootRun
 ```
 
-La API queda disponible por defecto en `http://localhost:8080`.
-
-Variables recomendadas (ejemplo):
-
-- `SPRING_DATASOURCE_URL=jdbc:mysql://localhost:3306/elbuensabor`
-- `SPRING_DATASOURCE_USERNAME=tu_usuario`
-- `SPRING_DATASOURCE_PASSWORD=tu_password`
-- `MERCADOPAGO_ACCESS_TOKEN=tu_token`
-- `GOOGLE_CLIENT_ID=tu_client_id`
-
-> Nota: para entornos productivos, usar secretos/variables de entorno y no credenciales embebidas en archivos versionados.
-
-### 2) Frontend
+### 8.2 Frontend
 
 ```bash
 cd elbuensaborfrontend
@@ -208,29 +180,83 @@ npm install
 npm run dev
 ```
 
-La app web corre por defecto en `http://localhost:5173`.
+La app web quedará disponible por defecto en `http://localhost:5173`.
 
-Configurar `.env` del frontend (ejemplo):
+---
 
-```env
-VITE_API_URL=http://localhost:8080/api
-VITE_GOOGLE_CLIENT_ID=tu_client_id_google
-```
+## 9. Integraciones externas
 
-## 🧪 Scripts útiles
+### 9.1 Mercado Pago API
 
-### Frontend
+- Se usa para crear preferencias de pago y validar estado de transacciones.
+- Endpoints clave:
+  - `POST /api/pagos/mercadopago/{pedidoId}`
+  - `POST /api/pagos/mercadopago/webhook`
+  - `GET /api/pagos/mercadopago/verificar/{pedidoId}`
+- Requiere `MERCADOPAGO_ACCESS_TOKEN` y URL pública de webhook en entornos no locales.
 
-```bash
-npm run dev      # desarrollo
-npm run build    # build de producción
-npm run lint     # análisis estático
-npm run preview  # previsualizar build
-```
+### 9.2 Email en deploy: Resend
+
+- El backend utiliza Resend para enviar facturas y notas de crédito.
+- Variables mínimas: `RESEND_API_KEY` y `APP_MAIL_FROM`.
+- Si no hay API key, el envío se omite y se registra en logs.
+
+### 9.3 Email en localhost: SMTP (alternativa recomendada)
+
+Actualmente el flujo productivo implementado es Resend. Para desarrollo local, se recomienda contar con un SMTP de pruebas (MailHog/Mailpit/Gmail sandbox) si querés simular inbox local sin depender de un proveedor externo.
+
+> Nota: el proyecto ya incluye `spring-boot-starter-mail`, por lo que puede extenderse fácilmente con un `EmailService` SMTP para ambientes locales.
+
+---
+
+## 10. Deploy en Railway
+
+Estrategia sugerida:
 
 ### Backend
+1. Crear servicio Railway apuntando a `elbuensaborbackend`.
+2. Build: `./gradlew build`.
+3. Start: `java -jar build/libs/*.jar`.
+4. Configurar variables de entorno (DB, Mercado Pago, Resend, CORS).
 
-```bash
-./gradlew bootRun
-./gradlew test
-```
+### Frontend
+1. Crear servicio Railway apuntando a `elbuensaborfrontend`.
+2. Build command: `npm ci && npm run build:railway`.
+3. Publicar carpeta `dist`.
+4. Configurar `VITE_API_URL` apuntando al backend deployado.
+
+### Consideraciones
+- Agregar dominio frontend en `APP_CORS_ALLOWED_ORIGIN_PATTERNS`.
+- Configurar `MERCADOPAGO_FRONTEND_BASE_URL` con URL pública del frontend.
+- Configurar `MERCADOPAGO_WEBHOOK_URL` con URL pública del backend.
+
+---
+
+## 11. Seguridad
+
+- Autenticación JWT stateless.
+- Filtro JWT para rutas protegidas.
+- BCrypt para hash de contraseñas.
+- CORS configurable por variable de entorno.
+- Rutas públicas específicas (auth, health, webhook, catálogo), resto autenticadas.
+
+---
+
+## 12. Endpoints base del backend
+
+Prefijo principal: `/api`
+
+- `POST /api/auth/register`
+- `POST /api/auth/login`
+- `POST /api/auth/google`
+- `POST /api/auth/change-password`
+- `POST /api/pagos/mercadopago/{pedidoId}`
+- `POST /api/pagos/mercadopago/webhook`
+- `GET /api/pagos/mercadopago/verificar/{pedidoId}`
+- `GET /health`
+- `GET /actuator/health`
+
+Además existen controladores para pedidos, insumos, manufacturados, stock, rubros, reportes, sucursales, usuarios, imágenes y unidades de medida.
+ 
+
+
