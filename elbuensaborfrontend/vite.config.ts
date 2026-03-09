@@ -11,10 +11,9 @@ export default defineConfig({
   plugins: [react()],
   server: {
     host: true,
-    allowedHosts,
-  },
-  preview: {
-    host: true,
-    allowedHosts,
+    allowedHosts: [
+      "6342-2803-9800-9843-7bb4-c89e-1fd1-6fc2-1fd7.ngrok-free.app",
+      "frontend-sandbox-dc89.up.railway.app",
+    ],
   },
 });

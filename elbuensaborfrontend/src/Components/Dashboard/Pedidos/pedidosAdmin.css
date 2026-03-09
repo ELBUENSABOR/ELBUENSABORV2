@@ -1,0 +1,24 @@
+.pedidos-admin-actions {
+    display: grid;
+    grid-template-columns: 120px 180px 110px 140px 180px;
+    justify-content: end;
+    gap: 0.5rem;
+    align-items: center;
+    min-width: 770px;
+}
+
+.pedidos-admin-action-slot {
+    min-height: 32px;
+    display: flex;
+    align-items: center;
+}
+
+.pedidos-admin-select-slot .form-select {
+    width: 100%;
+}
+
+.pedidos-admin-action-placeholder {
+    display: block;
+    width: 100%;
+    height: 32px;
+}

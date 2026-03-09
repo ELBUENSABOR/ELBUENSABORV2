@@ -53,3 +53,12 @@ export const updateSucursal = async (id: number, data: Sucursal) => {
         withCredentials: true,
     });
 };
+
+export const deleteSucursal = async (id: number) => {
+    return axios.delete(`${API_BASE}/sucursales/${id}`, {
+        headers: {
+            Authorization: `Bearer ${sessionStorage.getItem("token")}`,
+        },
+        withCredentials: true,
+    });
+};

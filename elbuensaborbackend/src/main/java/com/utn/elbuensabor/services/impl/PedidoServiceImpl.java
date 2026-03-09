@@ -112,6 +112,12 @@ public class PedidoServiceImpl implements PedidoService {
                 ArticuloManufacturado manufacturado = manufacturadoRepository.findByIdAndActivoTrue(detalleDTO.manufacturadoId())
                         .orElseThrow(() -> new IllegalArgumentException("Artículo manufacturado no encontrado o inactivo: " + detalleDTO.manufacturadoId()));
 
+                boolean tieneInsumosInactivos = manufacturado.getArticuloManufacturadoDetalles().stream()
+                        .anyMatch(detalleReceta -> !Boolean.TRUE.equals(detalleReceta.getArticuloInsumo().getActivo()));
+                if (tieneInsumosInactivos) {
+                    throw new IllegalArgumentException("El artículo manufacturado contiene insumos inactivos: " + manufacturado.getDenominacion());
+                }
+
                 detalle.setManufacturado(manufacturado);
                 detalle.setPrecioUnit(manufacturado.getPrecioVenta());
                 detalle.setSubTotal(manufacturado.getPrecioVenta() * detalleDTO.cantidad());
@@ -286,6 +292,12 @@ public class PedidoServiceImpl implements PedidoService {
                 ArticuloManufacturado manufacturado = manufacturadoRepository.findByIdAndActivoTrue(detalleDTO.manufacturadoId())
                         .orElseThrow(() -> new IllegalArgumentException("Artículo manufacturado no encontrado o inactivo"));
 
+                boolean tieneInsumosInactivos = manufacturado.getArticuloManufacturadoDetalles().stream()
+                        .anyMatch(detalleReceta -> !Boolean.TRUE.equals(detalleReceta.getArticuloInsumo().getActivo()));
+                if (tieneInsumosInactivos) {
+                    throw new IllegalArgumentException("El artículo manufacturado contiene insumos inactivos");
+                }
+
                 detalle.setManufacturado(manufacturado);
                 detalle.setPrecioUnit(manufacturado.getPrecioVenta());
                 detalle.setSubTotal(manufacturado.getPrecioVenta() * detalleDTO.cantidad());
@@ -452,13 +464,15 @@ public class PedidoServiceImpl implements PedidoService {
                 .orElseThrow(() -> new RuntimeException("Pedido no encontrado"));
         validarAccesoSucursal(pedido.getSucursal());
 
-        if (Boolean.TRUE.equals(pedido.getPagado()) && pedido.getFormaPago() == FormaPago.MP) {
-            var factura = facturaService.generarFactura(pedido);
-            pedido.setFacturaVenta(factura);
-            pedido = pedidoRepository.save(pedido);
-            emailService.enviarFactura(factura);
-        } else {
-            throw new IllegalArgumentException("El pedido no tiene factura para anular");
+        if (pedido.getFacturaVenta() == null) {
+            if (Boolean.TRUE.equals(pedido.getPagado()) && pedido.getFormaPago() == FormaPago.MP) {
+                var factura = facturaService.generarFactura(pedido);
+                pedido.setFacturaVenta(factura);
+                pedido = pedidoRepository.save(pedido);
+                emailService.enviarFactura(factura);
+            } else {
+                throw new IllegalArgumentException("El pedido no tiene factura para anular");
+            }
         }
         
         if (notaCreditoVentaRepository.findByPedidoId(id).isPresent()) {

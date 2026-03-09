@@ -1,10 +1,14 @@
 import {useEffect, useMemo, useState, type ChangeEvent} from "react";
-import {getAllUsers, deleteUserService} from "../../../services/userService";
+import {getAllUsers, deleteUserService, reactivateUserService} from "../../../services/userService";
 import type {UsuarioDTO} from "../../../dtos/UsuarioDTO";
 import "./users.css";
 import {useNavigate} from "react-router-dom";
 import ModalConfirmAction from "../../Common/ModalConfirmAction/ModalConfirmAction";
 import Alert from "../../Alert/Alert";
+import {ClipboardList} from "lucide-react";
+import LoadingState from "../../Common/LoadingState";
+import {fetchSucursales} from "../../../services/dashboardService";
+import type {Sucursal} from "../../../models/Sucursal";
 
 const formatRegistrationDate = (fechaRegistro?: string) => {
     if (!fechaRegistro) {
@@ -27,26 +31,33 @@ const Users = () => {
     const [currentId, setCurrentId] = useState(0);
     const [showModal, setShowModal] = useState(false);
     const [refresh, setRefresh] = useState(false);
+    const [isLoading, setIsLoading] = useState(true);
     const [showAlert, setShowAlert] = useState(false);
     const [alertMessage, setAlertMessage] = useState("");
     const [alertStatus, setAlertStatus] = useState("");
     const [filterValue, setFilterValue] = useState("");
     const [statusFilter, setStatusFilter] = useState("activos");
+    const [sucursalFilter, setSucursalFilter] = useState("todas");
+    const [sucursales, setSucursales] = useState<Sucursal[]>([]);
     const [activeTab, setActiveTab] = useState<"empleados" | "clientes">(
         "empleados"
     );
 
     useEffect(() => {
         const getData = async () => {
+            setIsLoading(true);
             try {
-                const res = await getAllUsers();
-                console.log("res", res);
-                const filtered = res.data.filter(
-                    (u: { rolSistema: string }) => u.rolSistema !== "ADMIN"
-                );
-                setOriginalUsers(filtered);
+                const [usersRes, sucursalesRes] = await Promise.all([
+                    getAllUsers(),
+                    fetchSucursales(),
+                ]);
+                console.log("res", usersRes);
+                setOriginalUsers(usersRes.data);
+                setSucursales(sucursalesRes);
             } catch (error) {
                 console.error("Error al obtener los usuarios", error);
+            } finally {
+                setIsLoading(false);
             }
         };
         getData();
@@ -78,6 +89,24 @@ const Users = () => {
         }
     };
 
+    const reactivateUser = async (id: number) => {
+        try {
+            const res = await reactivateUserService(id);
+            console.log("res", res);
+            if (res) {
+                setRefresh(!refresh);
+                setAlertMessage("Usuario reactivado con éxito!");
+                setAlertStatus("success");
+                setShowAlert(true);
+            }
+        } catch (error) {
+            console.error("Error", error);
+            setAlertMessage("Error al reactivar el usuario");
+            setAlertStatus("error");
+            setShowAlert(true);
+        }
+    };
+
     const filterData = (e: ChangeEvent<HTMLInputElement>) => {
         setFilterValue(e.target.value);
     };
@@ -86,17 +115,40 @@ const Users = () => {
         setStatusFilter(e.target.value);
     };
 
+    const handleSucursalFilter = (e: ChangeEvent<HTMLSelectElement>) => {
+        setSucursalFilter(e.target.value);
+    };
+
     const employeesCount =
-        originalUsers?.filter((u) => u.rolSistema === "EMPLEADO").length ?? 0;
+        originalUsers?.filter(
+            (u) => u.rolSistema === "EMPLEADO" || u.rolSistema === "ADMIN"
+        ).length ?? 0;
     const clientsCount =
         originalUsers?.filter((u) => u.rolSistema === "CLIENTE").length ?? 0;
 
+    const sucursalMap = useMemo(() => {
+        return new Map(sucursales.map((sucursal) => [String(sucursal.id), sucursal.nombre]));
+    }, [sucursales]);
+
+
+    useEffect(() => {
+        if (activeTab === "clientes") {
+            setSucursalFilter("todas");
+        }
+    }, [activeTab]);
+
     const filteredUsers = useMemo(() => {
         const list = originalUsers ?? [];
-        const role = activeTab === "empleados" ? "EMPLEADO" : "CLIENTE";
         const normalizedFilter = filterValue.trim().toLowerCase();
         return list.filter((u) => {
-            if (u.rolSistema !== role) {
+            const isEmployeeTabUser =
+                u.rolSistema === "EMPLEADO" || u.rolSistema === "ADMIN";
+
+            if (activeTab === "empleados" && !isEmployeeTabUser) {
+                return false;
+            }
+
+            if (activeTab === "clientes" && u.rolSistema !== "CLIENTE") {
                 return false;
             }
             if (statusFilter !== "todos") {
@@ -108,6 +160,12 @@ const Users = () => {
                     return false;
                 }
             }
+            if (activeTab === "empleados" && sucursalFilter !== "todas") {
+                if ((u.rolSistema === "ADMIN" && sucursalFilter !== "sin_sucursal") ||
+                    (u.rolSistema !== "ADMIN" && String(u.sucursalId) !== sucursalFilter)) {
+                    return false;
+                }
+            }
             if (!normalizedFilter) {
                 return true;
             }
@@ -116,15 +174,12 @@ const Users = () => {
                 u.email.toLowerCase().includes(normalizedFilter)
             );
         });
-    }, [activeTab, filterValue, originalUsers, statusFilter]);
+    }, [activeTab, filterValue, originalUsers, statusFilter, sucursalFilter]);
 
     return (
         <div className="users-container">
             <div className="users-controls">
                 <div className="users-search">
-          <span className="users-search-icon" aria-hidden="true">
-            🔍
-          </span>
                     <input
                         name="search"
                         type="text"
@@ -144,6 +199,22 @@ const Users = () => {
                     <option value="activos">Activos</option>
                     <option value="inactivos">Inactivos</option>
                 </select>
+                {activeTab === "empleados" && (
+                    <select
+                        name="sucursal"
+                        className="form-select users-status"
+                        value={sucursalFilter}
+                        onChange={handleSucursalFilter}
+                    >
+                        <option value="todas">Sucursal: Todas</option>
+                        <option value="sin_sucursal">Sucursal: Sin sucursal (Admins)</option>
+                        {sucursales.map((sucursal) => (
+                            <option key={sucursal.id} value={String(sucursal.id)}>
+                                Sucursal: {sucursal.nombre}
+                            </option>
+                        ))}
+                    </select>
+                )}
                 <button
                     className="btn users-add-button"
                     onClick={() => navigate("/dashboard/usuarios/add")}
@@ -168,10 +239,11 @@ const Users = () => {
                 </button>
             </div>
             <div className="users-table-card">
+                {isLoading && <LoadingState />}
                 <div className="users-table-header">
-          <span className="users-table-icon" aria-hidden="true">
-            📋
-          </span>
+              <span className="users-table-icon" aria-hidden="true">
+                <ClipboardList/>
+              </span>
                     <h6>
                         Lista de {activeTab === "empleados" ? "Empleados" : "Clientes"}
                     </h6>
@@ -184,6 +256,7 @@ const Users = () => {
                             <th>Email</th>
                             <th>Teléfono</th>
                             <th>Estado</th>
+                            {activeTab === "empleados" && <th>Sucursal</th>}
                             <th>Fecha Registro</th>
                             <th>Acciones</th>
                         </tr>
@@ -204,30 +277,46 @@ const Users = () => {
                         {u.activo ? "Activo" : "Inactivo"}
                       </span>
                                     </td>
+                                    {activeTab === "empleados" && (
+                                        <td>
+                                            {u.rolSistema === "ADMIN"
+                                                ? ""
+                                                : sucursalMap.get(String(u.sucursalId)) ?? "-"}
+                                        </td>
+                                    )}
                                     <td>{formatRegistrationDate(u.fechaRegistro)}</td>
                                     <td>
-                                        {u.activo && (
-                                            <div className="users-actions">
+                                        <div className="users-actions">
+                                            {u.activo ? (
+                                                <>
+                                                    <button
+                                                        onClick={() => handleEditUser(u.id)}
+                                                        className="action-button edit"
+                                                    >
+                                                        Editar
+                                                    </button>
+                                                    <button
+                                                        onClick={() => handleDeleteUser(u.id)}
+                                                        className="action-button delete"
+                                                    >
+                                                        Eliminar
+                                                    </button>
+                                                </>
+                                            ) : (
                                                 <button
-                                                    onClick={() => handleEditUser(u.id)}
+                                                    onClick={() => reactivateUser(u.id)}
                                                     className="action-button edit"
                                                 >
-                                                    Editar
+                                                    Reactivar
                                                 </button>
-                                                <button
-                                                    onClick={() => handleDeleteUser(u.id)}
-                                                    className="action-button delete"
-                                                >
-                                                    Eliminar
-                                                </button>
-                                            </div>
-                                        )}
+                                            )}
+                                        </div>
                                     </td>
                                 </tr>
                             ))
                         ) : (
                             <tr>
-                                <td colSpan={6} className="users-empty">
+                                <td colSpan={activeTab === "empleados" ? 7 : 6} className="users-empty">
                                     No hay {activeTab === "empleados" ? "empleados" : "clientes"}{" "}
                                     registrados
                                 </td>

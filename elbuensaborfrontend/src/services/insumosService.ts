@@ -40,10 +40,22 @@ export const deleteInsumo = async (id: number) => {
             headers: buildAuthHeaders(),
             withCredentials: true,
         });
-        console.log(res.data);
         return res.data;
     } catch (error) {
         console.error("Error al eliminar insumo", error);
+        throw error;
+    }
+}
+
+export const reactivateInsumo = async (id: number) => {
+    try {
+        const res = await axios.put(`${API_URL}/insumos/${id}/reactivar`, null, {
+            headers: buildAuthHeaders(),
+            withCredentials: true,
+        });
+        return res.data;
+    } catch (error) {
+        console.error("Error al reactivar insumo", error);
         throw error;
     }
 }

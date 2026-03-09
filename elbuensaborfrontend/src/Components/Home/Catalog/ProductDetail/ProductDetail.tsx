@@ -39,7 +39,7 @@ const ProductDetail = () => {
         return (
             <div className="product-detail">
                 <p>Producto no encontrado.</p>
-                <Link to="/">Volver al catálogo</Link>
+                <Link to="/catalog">Volver al catálogo</Link>
             </div>
         );
     }
@@ -48,13 +48,13 @@ const ProductDetail = () => {
 
     return (
         <div className="product-detail">
-            <Link to="/" className="product-detail__back">
+            <Link to="/catalog" className="product-detail__back">
                 ← Volver al catálogo
             </Link>
             <div className="product-detail__content">
                 <div className="product-detail__image">
-                    {product.imagenes?.[0] ? (
-                        <img src={getImageUrl(product.imagenes[0])} alt={product.denominacion}/>
+                    {product.imagen ? (
+                        <img src={getImageUrl(product.imagen)} alt={product.denominacion}/>
                     ) : (
                         <div className="product-detail__placeholder">Sin imagen</div>
                     )}
@@ -88,7 +88,7 @@ const ProductDetail = () => {
                                     denominacion: product.denominacion,
                                     precio: product.precioVenta,
                                     cantidad: 1,
-                                    imagen: product.imagenes?.[0],
+                                    imagen: product.imagen,
                                 })
                             }
                         >
@@ -97,8 +97,7 @@ const ProductDetail = () => {
                     </div>
                     <div className="product-detail__extra">
                         <p>
-                            Tiempo estimado: {product.tiempoEstimado} min · Precio costo: {" "}
-                            {formatCurrency(product.precioCosto)}
+                            Tiempo estimado: {product.tiempoEstimado} min
                         </p>
                     </div>
                 </div>

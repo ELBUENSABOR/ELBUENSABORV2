@@ -18,7 +18,7 @@ const formatDate = (value: string) => {
 };
 
 const OrdersHistory = () => {
-    const { user } = useUser();
+    const {user} = useUser();
     const navigate = useNavigate();
     const [orders, setOrders] = useState<PedidoResponse[]>([]);
     const [selectedPedido, setSelectedPedido] = useState<PedidoResponse | null>(null);
@@ -28,7 +28,7 @@ const OrdersHistory = () => {
     useEffect(() => {
         if (!user) {
             navigate("/login", {
-                state: { redirectTo: "/pedidos" },
+                state: {redirectTo: "/pedidos"},
                 replace: true,
             });
         }

@@ -5,6 +5,7 @@ import com.utn.elbuensabor.entities.ArticuloInsumo;
 import com.utn.elbuensabor.entities.ImagenInsumo;
 import com.utn.elbuensabor.repositories.ArticuloInsumoRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
@@ -12,6 +13,8 @@ import org.springframework.web.multipart.MultipartFile;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.nio.file.StandardCopyOption;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
@@ -21,7 +24,11 @@ import java.util.UUID;
 @RequiredArgsConstructor
 public class ImagenInsumoController {
     private final ArticuloInsumoRepository insumoRepository;
-    private final UploadStoragePaths uploadStoragePaths;
+
+    @Value("${app.upload-dir:uploads}")
+    private String uploadRootDir;
+
+    private static final String UPLOAD_SUBDIR = "insumos";
 
     @PostMapping("/{id}/imagenes")
     public ResponseEntity<List<String>> uploadImagenes(
@@ -35,17 +42,17 @@ public class ImagenInsumoController {
         List<String> urls = new ArrayList<>();
         Path uploadPath = uploadStoragePaths.subPath("insumos");
 
-        Files.createDirectories(uploadPath);
+        Path uploadDir = Paths.get(uploadRootDir, UPLOAD_SUBDIR);
+        Files.createDirectories(uploadDir);
 
         for (MultipartFile file : files) {
-            String originalName = file.getOriginalFilename() == null ? "imagen" : file.getOriginalFilename();
-            String filename = UUID.randomUUID() + "_" + originalName;
-            Path path = uploadPath.resolve(filename);
+            String filename = UUID.randomUUID() + "_" + file.getOriginalFilename();
+            Path path = uploadDir.resolve(filename);
 
-            Files.write(path, file.getBytes());
+            Files.copy(file.getInputStream(), path, StandardCopyOption.REPLACE_EXISTING);
 
             ImagenInsumo imagen = new ImagenInsumo();
-            imagen.setDenominacion("/uploads/insumos/" + filename);
+            imagen.setDenominacion("/uploads/" + UPLOAD_SUBDIR + "/" + filename);
             imagen.setArticuloInsumo(insumo);
 
             insumo.getImagenes().add(imagen);

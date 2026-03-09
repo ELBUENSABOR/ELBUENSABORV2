@@ -1,30 +1,30 @@
 package com.utn.elbuensabor.config;
 
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
-import java.nio.file.Path;
+import java.nio.file.Paths;
 
 @Configuration
 public class StaticResourceConfig implements WebMvcConfigurer {
-
-    private final UploadStoragePaths uploadStoragePaths;
-
-    public StaticResourceConfig(UploadStoragePaths uploadStoragePaths) {
-        this.uploadStoragePaths = uploadStoragePaths;
-    }
+    @Value("${app.upload-dir:uploads}")
+    private String uploadDir;
 
     @Override
     public void addResourceHandlers(ResourceHandlerRegistry registry) {
-        String configuredUploads = uploadStoragePaths.rootPath().toUri().toString();
-        String backendUploads = Path.of("uploads").toAbsolutePath().normalize().toUri().toString();
-        String repoUploads = Path.of("..", "uploads").toAbsolutePath().normalize().toUri().toString();
+        String uploadLocation = Paths.get(uploadDir)
+                .toAbsolutePath()
+                .normalize()
+                .toUri()
+                .toString();
 
-        registry.addResourceHandler("/uploads/**")
-                .addResourceLocations(configuredUploads, backendUploads, repoUploads);
+        if (!uploadLocation.endsWith("/")) {
+            uploadLocation = uploadLocation + "/";
+        }
 
-        registry.addResourceHandler("/api/uploads/**")
-                .addResourceLocations(configuredUploads, backendUploads, repoUploads);
+        registry.addResourceHandler("/uploads/**", "/api/uploads/**")
+                .addResourceLocations(uploadLocation);
     }
 }

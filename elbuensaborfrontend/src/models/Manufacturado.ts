@@ -17,6 +17,6 @@ export interface Manufacturado {
         precioCompra: number;
         sucursalId?: number;
     }[];
-    imagenes: string[];
+    imagen: string;
     disponible?: boolean;
 }

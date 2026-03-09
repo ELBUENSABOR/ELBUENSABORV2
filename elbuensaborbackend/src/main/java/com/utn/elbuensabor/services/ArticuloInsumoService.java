@@ -19,6 +19,8 @@ public interface ArticuloInsumoService {
 
     void delete(Long id);
 
+    void reactivate(Long id);
+
     void fillFromRequest(ArticuloInsumo insumo, ArticuloInsumoRequest request);
 
     ArticuloInsumoResponse toResponse(ArticuloInsumo insumo);

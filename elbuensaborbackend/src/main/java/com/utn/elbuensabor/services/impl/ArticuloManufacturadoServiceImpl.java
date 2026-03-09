@@ -17,6 +17,8 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class ArticuloManufacturadoServiceImpl implements ArticuloManufacturadoService {
 
+    private static final String MANUFACTURADO_UPLOADS_PREFIX = "/uploads/manufacturados/";
+
     private final ArticuloManufacturadoRepository manufacturadoRepo;
     private final CategoriaArticuloManufacturadoRepository categoriaRepo;
     private final ArticuloInsumoRepository insumoRepo;
@@ -58,6 +60,13 @@ public class ArticuloManufacturadoServiceImpl implements ArticuloManufacturadoSe
         manufacturadoRepo.save(manufacturado);
     }
 
+    public void reactivate(Long id) {
+        ArticuloManufacturado manufacturado = manufacturadoRepo.findById(id)
+                .orElseThrow(() -> new RuntimeException("Producto no encontrado"));
+        manufacturado.setActivo(true);
+        manufacturadoRepo.save(manufacturado);
+    }
+
     public void fillFromRequest(ArticuloManufacturado manufacturado, ArticuloManufacturadoRequest request) {
 
         CategoriaArticuloManufacturado categoria = categoriaRepo.findById(request.categoriaId())
@@ -71,11 +80,6 @@ public class ArticuloManufacturadoServiceImpl implements ArticuloManufacturadoSe
         manufacturado.setTiempoEstimado(request.tiempoEstimado());
         manufacturado.setCategoria(categoria);
         manufacturado.setActivo(request.activo() != null ? request.activo() : true);
-
-    /* ===============================
-       RECETA (INGREDIENTES)
-       =============================== */
-
         manufacturado.getArticuloManufacturadoDetalles().clear();
 
         for (RecetaItemRequest item : request.ingredientes()) {
@@ -84,19 +88,13 @@ public class ArticuloManufacturadoServiceImpl implements ArticuloManufacturadoSe
             manufacturado.getArticuloManufacturadoDetalles().add(detalle);
         }
 
-    /* ===============================
-       IMÁGENES
-       =============================== */
-
         manufacturado.getImagenes().clear();
 
-        if (request.imagenes() != null) {
-            for (String url : request.imagenes()) {
-                ImagenArticuloManufacturado imagen = new ImagenArticuloManufacturado();
-                imagen.setDenominacion(url);
-                imagen.setArticuloManufacturado(manufacturado);
-                manufacturado.getImagenes().add(imagen);
-            }
+        if (request.imagen() != null && !request.imagen().isBlank()) {
+            ImagenArticuloManufacturado imagen = new ImagenArticuloManufacturado();
+            imagen.setDenominacion(normalizeManufacturadoImagePath(request.imagen()));
+            imagen.setArticuloManufacturado(manufacturado);
+            manufacturado.getImagenes().add(imagen);
         }
 
     }
@@ -135,8 +133,10 @@ public class ArticuloManufacturadoServiceImpl implements ArticuloManufacturadoSe
                         .toList(),
                 manufacturado.getImagenes().stream()
                         .map(ImagenArticuloManufacturado::getDenominacion)
-                        .toList(),
-                true // disponibilidad no se evalúa acá
+                        .findFirst()
+                        .map(this::normalizeManufacturadoImagePath)
+                        .orElse(null),
+                true
         );
     }
 
@@ -170,8 +170,10 @@ public class ArticuloManufacturadoServiceImpl implements ArticuloManufacturadoSe
                 })
                 .toList();
 
-        // ✅ DISPONIBILIDAD (CLARA Y SEGURA)
-        boolean disponible = ingredientes.stream()
+        boolean disponible = manufacturado.getActivo()
+                && manufacturado.getArticuloManufacturadoDetalles().stream()
+                .allMatch(det -> Boolean.TRUE.equals(det.getArticuloInsumo().getActivo()))
+                && ingredientes.stream()
                 .allMatch(i -> i.stockActual() >= i.cantidad());
 
         return new ArticuloManufacturadoResponse(
@@ -188,8 +190,24 @@ public class ArticuloManufacturadoServiceImpl implements ArticuloManufacturadoSe
                 ingredientes,
                 manufacturado.getImagenes().stream()
                         .map(ImagenArticuloManufacturado::getDenominacion)
-                        .toList(),
+                        .findFirst()
+                        .map(this::normalizeManufacturadoImagePath)
+                        .orElse(null),
                 disponible
         );
+    }
+
+    private String normalizeManufacturadoImagePath(String rawPath) {
+        if (rawPath == null) {
+            return null;
+        }
+        String path = rawPath.trim();
+        if (path.isBlank()) {
+            return null;
+        }
+        if (path.startsWith("data:image/") || path.startsWith("http://") || path.startsWith("https://") || path.startsWith("/")) {
+            return path;
+        }
+        return MANUFACTURADO_UPLOADS_PREFIX + path;
     }
 }

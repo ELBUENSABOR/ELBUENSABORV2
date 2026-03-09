@@ -3,6 +3,7 @@ import "./rubros.css";
 import {useNavigate} from "react-router-dom";
 import ModalConfirmAction from "../../Common/ModalConfirmAction/ModalConfirmAction";
 import Alert from "../../Alert/Alert";
+import LoadingState from "../../Common/LoadingState";
 import type {Rubro} from "../../../models/Rubro";
 import {getRubrosInsumos, deleteRubroInsumoService} from "../../../services/rubrosService";
 
@@ -18,6 +19,7 @@ const RubrosInsumos = () => {
     const [currentId, setCurrentId] = useState(0);
     const [showModal, setShowModal] = useState(false);
     const [refresh, setRefresh] = useState(false);
+    const [isLoading, setIsLoading] = useState(true);
 
     const [showAlert, setShowAlert] = useState(false);
     const [alertMessage, setAlertMessage] = useState("");
@@ -49,6 +51,7 @@ const RubrosInsumos = () => {
 
     useEffect(() => {
         const getData = async () => {
+            setIsLoading(true);
             try {
                 const res = await getRubrosInsumos();
                 setOriginalRubros(res);
@@ -58,6 +61,8 @@ const RubrosInsumos = () => {
                 console.log("tree", tree);
             } catch (error) {
                 console.error("Error al obtener rubros", error);
+            } finally {
+                setIsLoading(false);
             }
         };
 
@@ -166,7 +171,7 @@ const RubrosInsumos = () => {
             const res = await deleteRubroInsumoService(id);
             if (res) {
                 setRefresh(!refresh);
-                setAlertMessage("Rubro eliminado con éxito!");
+                setAlertMessage("Rubro inactivado con éxito. Los insumos de este rubro también fueron inactivados.");
                 setAlertStatus("success");
                 setShowAlert(true);
             }
@@ -212,6 +217,7 @@ const RubrosInsumos = () => {
 
             <div className="dashboard-table-card">
                 <div className="dashboard-table-header">Lista de Rubros</div>
+                {isLoading && <LoadingState />}
                 <div className="table-responsive">
                     <table className="table table-hover dashboard-table">
                         <thead>
@@ -234,8 +240,8 @@ const RubrosInsumos = () => {
                 <ModalConfirmAction
                     show={showModal}
                     setShowModal={setShowModal}
-                    headerText="¿Deseas eliminar este rubro?"
-                    bodyText="Esta acción no se puede deshacer"
+                    headerText="¿Confirmas inactivar este rubro de insumos?"
+                    bodyText="Se inactivará el rubro y también los insumos asociados a esta categoría."
                     onClick={() => deleteRubro(currentId)}
                 />
             )}

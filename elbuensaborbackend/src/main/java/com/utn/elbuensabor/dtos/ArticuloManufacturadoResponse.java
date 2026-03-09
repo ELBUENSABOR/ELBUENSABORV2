@@ -13,7 +13,7 @@ public record ArticuloManufacturadoResponse(Long id,
                                             String categoria,
                                             Boolean activo,
                                             List<RecetaItemResponse> ingredientes,
-                                            List<String> imagenes,
+                                            String imagen,
                                             Boolean disponible
 ) {
 

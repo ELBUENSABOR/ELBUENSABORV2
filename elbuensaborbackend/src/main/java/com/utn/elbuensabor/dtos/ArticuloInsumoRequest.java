@@ -14,5 +14,5 @@ public record ArticuloInsumoRequest(
                 Boolean esParaElaborar,
                 Long unidadMedidaId,
                 List<SucursalInsumoRequest> stockSucursal,
-                List<String> imagenes) {
+                String imagen) {
 }

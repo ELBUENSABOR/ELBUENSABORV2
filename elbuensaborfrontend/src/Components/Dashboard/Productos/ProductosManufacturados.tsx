@@ -1,16 +1,19 @@
-import { useEffect, useState, type ChangeEvent } from "react";
-import { useSucursal } from "../../../contexts/SucursalContext";
-import { useUser } from "../../../contexts/UsuarioContext";
-import { getAll, deleteManufacturado } from "../../../services/manufacturadosService";
-import type { Manufacturado } from "../../../models/Manufacturado";
-import { useNavigate } from "react-router-dom";
-import { getRubrosManufacturados } from "../../../services/rubrosService";
-import type { Rubro } from "../../../models/Rubro";
+import {useEffect, useState, type ChangeEvent} from "react";
+import {useSucursal} from "../../../contexts/SucursalContext";
+import {useUser} from "../../../contexts/UsuarioContext";
+import {getAll, deleteManufacturado, reactivateManufacturado} from "../../../services/manufacturadosService";
+import type {Manufacturado} from "../../../models/Manufacturado";
+import {useNavigate} from "react-router-dom";
+import {getRubrosManufacturados} from "../../../services/rubrosService";
+import type {Rubro} from "../../../models/Rubro";
 import ModalConfirmAction from "../../Common/ModalConfirmAction/ModalConfirmAction";
+import {getImageUrl} from '../../../utils/image';
+import Alert from "../../Alert/Alert";
+import LoadingState from "../../Common/LoadingState";
 
 const ProductosManufacturados = () => {
-    const { sucursales, sucursalId, setSucursalId, loading } = useSucursal();
-    const { user } = useUser();
+    const {sucursales, sucursalId, setSucursalId, loading} = useSucursal();
+    const {user} = useUser();
     const [rubros, setRubros] = useState<Rubro[]>();
     const [manufacturados, setManufacturados] = useState<Manufacturado[]>();
     const [originalManufacturados, setOriginalManufacturados] =
@@ -26,6 +29,11 @@ const ProductosManufacturados = () => {
 
     const [currentId, setCurrentId] = useState(0);
 
+    const [showAlert, setShowAlert] = useState(false);
+    const [alertMessage, setAlertMessage] = useState("");
+    const [alertStatus, setAlertStatus] = useState<"success" | "error">("success");
+    const [isLoading, setIsLoading] = useState(true);
+    const canManageProducts = user?.role === "ADMIN" || user?.subRole === "COCINERO";
 
     const handleSucursalChange = (event: ChangeEvent<HTMLSelectElement>) => {
         const value = event.target.value;
@@ -34,6 +42,7 @@ const ProductosManufacturados = () => {
 
     useEffect(() => {
         const getData = async () => {
+            setIsLoading(true);
             try {
                 const response = await getAll(sucursalId ?? 0);
                 const rubros = await getRubrosManufacturados();
@@ -45,6 +54,8 @@ const ProductosManufacturados = () => {
                 }
             } catch (error) {
                 console.error("Error al obtener manufacturados: ", error);
+            } finally {
+                setIsLoading(false);
             }
         };
 
@@ -96,14 +107,50 @@ const ProductosManufacturados = () => {
     };
 
     const deleteManufacturadoConfirm = async () => {
-        await deleteManufacturado(currentId);
-        setManufacturados((prev) =>
-            prev?.map((m) => (m.id === currentId ? { ...m, activo: false } : m))
-        );
-        setOriginalManufacturados((prev) =>
-            prev?.map((m) => (m.id === currentId ? { ...m, activo: false } : m))
-        );
-        setShowModal(false);
+        try {
+            await deleteManufacturado(currentId);
+            setManufacturados((prev) =>
+                prev?.map((m) => (m.id === currentId ? {...m, activo: false} : m))
+            );
+            setOriginalManufacturados((prev) =>
+                prev?.map((m) => (m.id === currentId ? {...m, activo: false} : m))
+            );
+            setShowModal(false);
+            setAlertMessage("Manufacturado eliminado con éxito!");
+            setAlertStatus("success");
+            setShowAlert(true);
+        } catch (error) {
+            console.error("Error al eliminar manufacturado", error);
+            setShowModal(false);
+            setAlertMessage("Error al eliminar el manufacturado");
+            setAlertStatus("error");
+            setShowAlert(true);
+        }
+    };
+
+    const reactivateManufacturadoConfirm = async (id: number) => {
+        try {
+            await reactivateManufacturado(id);
+            setManufacturados((prev) =>
+                prev?.map((m) => (m.id === id ? {...m, activo: true} : m))
+            );
+            setOriginalManufacturados((prev) =>
+                prev?.map((m) => (m.id === id ? {...m, activo: true} : m))
+            );
+            setAlertMessage("Manufacturado reactivado con éxito!");
+            setAlertStatus("success");
+            setShowAlert(true);
+        } catch (error) {
+            console.error("Error al reactivar manufacturado", error);
+            setAlertMessage("Error al reactivar el manufacturado");
+            setAlertStatus("error");
+            setShowAlert(true);
+        }
+    };
+
+    const getManufacturadoImageUrl = (imagen: Manufacturado["imagen"]) => {
+        if (!imagen) return "";
+        return getImageUrl(imagen);
     };
 
     return (
@@ -184,6 +231,7 @@ const ProductosManufacturados = () => {
                 <table className="table table-hover">
                     <thead>
                     <th>#</th>
+                    <th>Imagen</th>
                     <th>Denominación</th>
                     <th>Precio de costo</th>
                     <th>Precio de venta</th>
@@ -196,6 +244,22 @@ const ProductosManufacturados = () => {
                     {manufacturados?.map((m, index) => (
                         <tr key={index} className={m.activo ? "" : "deleted-row"}>
                             <td>{m.id}</td>
+                            <td>
+                                {getManufacturadoImageUrl(m.imagen) ? (
+                                    <img
+                                        src={getManufacturadoImageUrl(m.imagen)}
+                                        alt={m.denominacion}
+                                        style={{
+                                            width: "36px",
+                                            height: "36px",
+                                            objectFit: "cover",
+                                            borderRadius: "6px",
+                                        }}
+                                    />
+                                ) : (
+                                    <span className="text-muted small">Sin imagen</span>
+                                )}
+                            </td>
                             <td>{m.denominacion}</td>
                             <td>${m.precioCosto}</td>
                             <td>${m.precioVenta}</td>
@@ -207,19 +271,27 @@ const ProductosManufacturados = () => {
                                 </span>
                             </td>
                             <td>
-                                {
-                                    m.activo && (
+                                {canManageProducts && (
+                                    m.activo ? (
                                         <>
-                                            <button className="btn btn-primary" onClick={() => navigate(`/dashboard/manufacturados/edit/${m.id}`)}>Editar</button>
-                                            <button className="btn btn-danger" onClick={() => handleDeleteManufacturado(m.id)}>Eliminar</button>
+                                            <button className="btn btn-primary"
+                                                    onClick={() => navigate(`/dashboard/manufacturados/edit/${m.id}`)}>Editar
+                                            </button>
+                                            <button className="btn btn-danger"
+                                                    onClick={() => handleDeleteManufacturado(m.id)}>Eliminar
+                                            </button>
                                         </>
+                                    ) : (
+                                        <button className="btn btn-success"
+                                                onClick={() => reactivateManufacturadoConfirm(m.id)}>Reactivar</button>
                                     )
-                                }
+                                )}
                             </td>
                         </tr>
                     ))}
                     </tbody>
                 </table>
+                {isLoading && <LoadingState />}
             </div>
             {showModal && (
                 <ModalConfirmAction
@@ -228,6 +300,13 @@ const ProductosManufacturados = () => {
                     headerText="¿Deseas eliminar el manufacturado?"
                     bodyText="Se dara de baja el manufacturado y sus datos"
                     onClick={() => deleteManufacturadoConfirm()}
+                />
+            )}
+            {showAlert && (
+                <Alert
+                    message={alertMessage}
+                    status={alertStatus}
+                    onClose={() => setShowAlert(false)}
                 />
             )}
         </div>

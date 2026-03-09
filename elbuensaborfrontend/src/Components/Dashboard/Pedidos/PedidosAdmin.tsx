@@ -1,17 +1,26 @@
 import {useEffect, useState} from "react";
 import type {PedidoResponse} from "../../../services/pedidoService";
-import {cambiarEstadoPedido, emitirNotaCredito, getPedidoById, getPedidosAll, marcarPedidoPagado} from "../../../services/pedidoService";
+import {
+    cambiarEstadoPedido,
+    emitirNotaCredito,
+    getPedidoById,
+    getPedidosAll,
+    marcarPedidoPagado
+} from "../../../services/pedidoService";
 import OrderDetailModal from "../../Common/OrderDetailModal/OrderDetailModal.tsx";
 import ModalConfirmAction from "../../Common/ModalConfirmAction/ModalConfirmAction";
-import { useSucursal } from "../../../contexts/SucursalContext";
-import { useUser } from "../../../contexts/UsuarioContext";
+import {useSucursal} from "../../../contexts/SucursalContext";
+import {useUser} from "../../../contexts/UsuarioContext";
+import "./pedidosAdmin.css";
 
 const ESTADOS = [
-    { label: "A confirmar", value: "A_CONFIRMAR" },
-    { label: "En cocina", value: "A_COCINA" },
-    { label: "Listo", value: "LISTO" },
-    { label: "En delivery", value: "EN_DELIVERY" },
-    { label: "Entregado", value: "ENTREGADO" },
+    {label: "A confirmar", value: "A_CONFIRMAR"},
+    {label: "En cocina", value: "A_COCINA"},
+    {label: "Listo", value: "LISTO"},
+    {label: "En delivery", value: "EN_DELIVERY"},
+    {label: "Entregado", value: "ENTREGADO"},
+    { label: "Facturado", value: "FACTURADO" },
+    { label: "Cancelado", value: "CANCELADO" },
 ];
 
 const formatDate = (value: string) => {
@@ -27,8 +36,8 @@ const formatDate = (value: string) => {
 };
 
 const PedidosAdmin = () => {
-    const { sucursales, sucursalId, setSucursalId } = useSucursal();
-    const { user } = useUser();
+    const {sucursales, sucursalId, setSucursalId} = useSucursal();
+    const {user} = useUser();
     const [pedidos, setPedidos] = useState<PedidoResponse[]>([]);
     const [estado, setEstado] = useState("");
     const [busquedaId, setBusquedaId] = useState("");
@@ -38,6 +47,7 @@ const PedidosAdmin = () => {
     const [error, setError] = useState("");
     const [showConfirmNotaCredito, setShowConfirmNotaCredito] = useState(false);
     const [pedidoAAnular, setPedidoAAnular] = useState<PedidoResponse | null>(null);
+    const [actionLoadingId, setActionLoadingId] = useState<number | null>(null);
 
     const cargarPedidos = async (estadoFiltro?: string) => {
         setLoading(true);
@@ -129,15 +139,16 @@ const PedidosAdmin = () => {
         pedido.estado === "LISTO";
 
     const marcarPagado = async (pedido: PedidoResponse) => {
-        setLoading(true);
+        setActionLoadingId(pedido.id);
         setError("");
         try {
-            await marcarPedidoPagado(pedido.id);
-            await cargarPedidos(estado);
+            const actualizado = await marcarPedidoPagado(pedido.id);
+            setPedidos((prev) => prev.map((item) => (item.id === actualizado.id ? actualizado : item)));
+            setSelectedPedido((prev) => (prev?.id === actualizado.id ? actualizado : prev));
         } catch (err) {
             setError("No se pudo marcar el pedido como pagado.");
         } finally {
-            setLoading(false);
+            setActionLoadingId(null);
         }
     };
 
@@ -147,35 +158,37 @@ const PedidosAdmin = () => {
         pedido.estado !== "CANCELADO";
 
     const anularFactura = async (pedido: PedidoResponse) => {
-        setLoading(true);
+        setActionLoadingId(pedido.id);
         setError("");
         try {
-            await emitirNotaCredito(pedido.id);
-            await cargarPedidos(estado);
+            const actualizado = await emitirNotaCredito(pedido.id);
+            setPedidos((prev) => prev.map((item) => (item.id === actualizado.id ? actualizado : item)));
+            setSelectedPedido((prev) => (prev?.id === actualizado.id ? actualizado : prev));
         } catch (err) {
             setError("No se pudo emitir la nota de crédito.");
         } finally {
-            setLoading(false);
+            setActionLoadingId(null);
         }
     };
 
     const actualizarEstado = async (pedido: PedidoResponse) => {
         const nuevoEstado = estadoSeleccionado[pedido.id];
         if (!nuevoEstado) return;
-        setLoading(true);
+        setActionLoadingId(pedido.id);
         setError("");
         try {
-            await cambiarEstadoPedido(pedido.id, nuevoEstado);
+            const actualizado = await cambiarEstadoPedido(pedido.id, nuevoEstado);
+            setPedidos((prev) => prev.map((item) => (item.id === actualizado.id ? actualizado : item)));
+            setSelectedPedido((prev) => (prev?.id === actualizado.id ? actualizado : prev));
             setEstadoSeleccionado((prev) => {
-                const next = { ...prev };
+                const next = {...prev};
                 delete next[pedido.id];
                 return next;
             });
-            await cargarPedidos(estado);
         } catch (err) {
             setError("No se pudo actualizar el estado del pedido.");
         } finally {
-            setLoading(false);
+            setActionLoadingId(null);
         }
     };
 
@@ -245,7 +258,7 @@ const PedidosAdmin = () => {
                             <th>Pago</th>
                             <th>Total</th>
                             <th>Estado</th>
-                            <th className="text-end">Acción</th>
+                            <th className="text-center">Acción</th>
                         </tr>
                         </thead>
                         <tbody>
@@ -269,58 +282,89 @@ const PedidosAdmin = () => {
                                     <td>${pedido.total}</td>
                                     <td>{pedido.estado}</td>
                                     <td className="text-end">
-                                        <div className="d-flex justify-content-end gap-2 flex-wrap">
-                                            <button
-                                                className="btn btn-sm btn-outline-secondary"
-                                                onClick={() => setSelectedPedido(pedido)}
-                                            >
-                                                Ver detalle
-                                            </button>
-                                            <select
-                                                className="form-select form-select-sm"
-                                                style={{ width: "180px" }}
-                                                value={estadoSeleccionado[pedido.id] || ""}
-                                                onChange={(event) =>
-                                                    setEstadoSeleccionado((prev) => ({
-                                                        ...prev,
-                                                        [pedido.id]: event.target.value,
-                                                    }))
-                                                }
-                                            >
-                                                <option value="">Seleccionar</option>
-                                                {obtenerOpciones(pedido).map((opcion) => {
-                                                    const disabled =
-                                                        opcion === "ENTREGADO" && !puedeEntregar(pedido);
-                                                    return (
-                                                        <option key={opcion} value={opcion} disabled={disabled}>
-                                                            {opcion.replace(/_/g, " ")}
-                                                        </option>
-                                                    );
-                                                })}
-                                            </select>
-                                            <button
-                                                className="btn btn-sm btn-outline-primary"
-                                                disabled={!estadoSeleccionado[pedido.id]}
-                                                onClick={() => actualizarEstado(pedido)}
-                                            >
-                                                Actualizar
-                                            </button>
-                                            {puedeMarcarPagado(pedido) && (
+                                        <div className="pedidos-admin-actions">
+                                            <div className="pedidos-admin-action-slot">
                                                 <button
-                                                    className="btn btn-sm btn-outline-success"
-                                                    onClick={() => marcarPagado(pedido)}
+                                                    className="btn btn-sm btn-outline-secondary w-100"
+                                                    onClick={() => setSelectedPedido(pedido)}
                                                 >
-                                                    Marcar pagado
+                                                    Ver detalle
                                                 </button>
-                                            )}
-                                            {puedeEmitirNotaCredito(pedido) && (
-                                                <button
-                                                    className="btn btn-sm btn-outline-danger"
-                                                    onClick={() => { setPedidoAAnular(pedido); setShowConfirmNotaCredito(true); }}
-                                                >
-                                                    Emitir nota de crédito
-                                                </button>
-                                            )}
+                                            </div>
+
+                                            <div className="pedidos-admin-action-slot pedidos-admin-select-slot">
+                                                {pedido.estado !== "CANCELADO" ? (
+                                                    <select
+                                                        className="form-select form-select-sm"
+                                                        disabled={actionLoadingId === pedido.id}
+                                                        value={estadoSeleccionado[pedido.id] || ""}
+                                                        onChange={(event) =>
+                                                            setEstadoSeleccionado((prev) => ({
+                                                                ...prev,
+                                                                [pedido.id]: event.target.value,
+                                                            }))
+                                                        }
+                                                    >
+                                                        <option value="">Seleccionar</option>
+                                                        {obtenerOpciones(pedido).map((opcion) => {
+                                                            const disabled =
+                                                                opcion === "ENTREGADO" && !puedeEntregar(pedido);
+                                                            return (
+                                                                <option key={opcion} value={opcion} disabled={disabled}>
+                                                                    {opcion.replace(/_/g, " ")}
+                                                                </option>
+                                                            );
+                                                        })}
+                                                    </select>
+                                                ) : (
+                                                    <span className="pedidos-admin-action-placeholder" aria-hidden="true" />
+                                                )}
+                                            </div>
+
+                                            <div className="pedidos-admin-action-slot">
+                                                {pedido.estado !== "CANCELADO" ? (
+                                                    <button
+                                                        className="btn btn-sm btn-outline-primary w-100"
+                                                        disabled={!estadoSeleccionado[pedido.id] || actionLoadingId === pedido.id}
+                                                        onClick={() => actualizarEstado(pedido)}
+                                                    >
+                                                        Actualizar
+                                                    </button>
+                                                ) : (
+                                                    <span className="pedidos-admin-action-placeholder" aria-hidden="true" />
+                                                )}
+                                            </div>
+
+                                            <div className="pedidos-admin-action-slot">
+                                                {puedeMarcarPagado(pedido) ? (
+                                                    <button
+                                                        className="btn btn-sm btn-outline-success w-100"
+                                                        disabled={actionLoadingId === pedido.id}
+                                                        onClick={() => marcarPagado(pedido)}
+                                                    >
+                                                        Marcar pagado
+                                                    </button>
+                                                ) : (
+                                                    <span className="pedidos-admin-action-placeholder" aria-hidden="true" />
+                                                )}
+                                            </div>
+
+                                            <div className="pedidos-admin-action-slot">
+                                                {puedeEmitirNotaCredito(pedido) ? (
+                                                    <button
+                                                        className="btn btn-sm btn-outline-danger w-100"
+                                                        disabled={actionLoadingId === pedido.id}
+                                                        onClick={() => {
+                                                            setPedidoAAnular(pedido);
+                                                            setShowConfirmNotaCredito(true);
+                                                        }}
+                                                    >
+                                                        Emitir nota de crédito
+                                                    </button>
+                                                ) : (
+                                                    <span className="pedidos-admin-action-placeholder" aria-hidden="true" />
+                                                )}
+                                            </div>
                                         </div>
                                     </td>
                                 </tr>
