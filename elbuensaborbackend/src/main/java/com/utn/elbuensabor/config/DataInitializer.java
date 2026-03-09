@@ -2,6 +2,8 @@ package com.utn.elbuensabor.config;
 
 import com.utn.elbuensabor.entities.*;
 import com.utn.elbuensabor.repositories.*;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -9,6 +11,8 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 
 @Configuration
 public class DataInitializer {
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(DataInitializer.class);
 
     @Bean
     @SuppressWarnings("unused")
@@ -22,6 +26,7 @@ public class DataInitializer {
             PasswordEncoder encoder
     ) {
         return args -> {
+            try {
 
             // ==============================
             // 1️⃣ Crear País Argentina
@@ -105,7 +110,10 @@ public class DataInitializer {
                 usuarioRepo.save(admin);
                 clienteRepo.save(cliente);
 
-                System.out.println("Usuario ADMIN creado: admin / admin123");
+                LOGGER.info("Usuario ADMIN creado: admin / admin123");
+            }
+            } catch (Exception ex) {
+                LOGGER.error("Error inicializando datos base (se continúa sin abortar la app)", ex);
             }
         };
     }

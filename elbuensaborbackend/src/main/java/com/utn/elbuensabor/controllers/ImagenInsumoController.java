@@ -1,5 +1,6 @@
 package com.utn.elbuensabor.controllers;
 
+import com.utn.elbuensabor.config.UploadStoragePaths;
 import com.utn.elbuensabor.entities.ArticuloInsumo;
 import com.utn.elbuensabor.entities.ImagenInsumo;
 import com.utn.elbuensabor.repositories.ArticuloInsumoRepository;
@@ -39,6 +40,7 @@ public class ImagenInsumoController {
                 .orElseThrow(() -> new RuntimeException("Insumo no encontrado"));
 
         List<String> urls = new ArrayList<>();
+        Path uploadPath = uploadStoragePaths.subPath("insumos");
 
         Path uploadDir = Paths.get(uploadRootDir, UPLOAD_SUBDIR);
         Files.createDirectories(uploadDir);

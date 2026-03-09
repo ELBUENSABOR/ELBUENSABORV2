@@ -90,7 +90,9 @@ public class SecurityConfig {
 
         http.authorizeHttpRequests(auth -> auth
                 .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll() // preflight
-                .requestMatchers("/api/auth/register").permitAll()
+                .requestMatchers("/", "/health", "/actuator/health").permitAll()
+                .requestMatchers("/", "/health").permitAll()
+                .requestMatchers(EndpointRequest.toAnyEndpoint()).permitAll()
                 .requestMatchers("/api/auth/login").permitAll()
                 .requestMatchers("/api/auth/google").permitAll()
                 .requestMatchers("/api/localidad/**").permitAll()

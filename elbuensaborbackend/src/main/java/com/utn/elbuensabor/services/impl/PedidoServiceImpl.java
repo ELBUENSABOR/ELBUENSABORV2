@@ -474,7 +474,7 @@ public class PedidoServiceImpl implements PedidoService {
                 throw new IllegalArgumentException("El pedido no tiene factura para anular");
             }
         }
-
+        
         if (notaCreditoVentaRepository.findByPedidoId(id).isPresent()) {
             throw new IllegalArgumentException("El pedido ya tiene una nota de crédito emitida");
         }

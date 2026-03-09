@@ -39,6 +39,10 @@ export const getImageUrl = (path?: string) => {
         return path;
     }
 
+    if (/^data:/i.test(path)) {
+        return path;
+    }
+
     const normalizedPath = path.startsWith("/") ? path : `/${path}`;
     return `${backendBase}${normalizedPath}`;
 };

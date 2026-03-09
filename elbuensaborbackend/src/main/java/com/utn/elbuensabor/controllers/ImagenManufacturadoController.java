@@ -1,6 +1,7 @@
 package com.utn.elbuensabor.controllers;
 
 
+import com.utn.elbuensabor.config.UploadStoragePaths;
 import com.utn.elbuensabor.entities.ArticuloManufacturado;
 import com.utn.elbuensabor.entities.ImagenArticuloManufacturado;
 import com.utn.elbuensabor.repositories.ArticuloManufacturadoRepository;
@@ -40,6 +41,7 @@ public class ImagenManufacturadoController {
                 .orElseThrow(() -> new RuntimeException("Producto no encontrado"));
 
         List<String> urls = new ArrayList<>();
+        Path uploadPath = uploadStoragePaths.subPath("manufacturados");
 
         Path uploadDir = Paths.get(uploadRootDir, UPLOAD_SUBDIR);
         Files.createDirectories(uploadDir);
